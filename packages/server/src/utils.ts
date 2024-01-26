@@ -1,46 +1,46 @@
+import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { v4 } from 'uuid';
-import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
 
 /**
- * 
- * 
- * Logger 
- */ 
+ *
+ *
+ * Logger
+ */
 export class Logger {
-  private static instance: Logger;
+    private static instance: Logger;
 
-  private constructor() {}
+    private constructor() {}
 
-  public static getInstance(): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger();
+    public static getInstance(): Logger {
+        if (!Logger.instance) {
+            Logger.instance = new Logger();
+        }
+        return Logger.instance;
     }
-    return Logger.instance;
-  }
 
-  private logWithColor(message: string, color: string): void {
-    console.log(`${color}%s\x1b[0m`, message);
-  }
+    private logWithColor(message: string, color: string): void {
+        console.log(`${color}%s\x1b[0m`, message);
+    }
 
-  public logWarning(message: string): void {
-    this.logWithColor(`Warning: ${message}`, "\x1b[33m"); // Yellow
-  }
+    public logWarning(message: string): void {
+        this.logWithColor(`Warning: ${message}`, '\x1b[33m'); // Yellow
+    }
 
-  public logError(message: string): void {
-    this.logWithColor(`Error: ${message}`, "\x1b[31m"); // Red
-  }
+    public logError(message: string): void {
+        this.logWithColor(`Error: ${message}`, '\x1b[31m'); // Red
+    }
 
-  public logSuccess(message: string): void {
-    this.logWithColor(`Success: ${message}`, "\x1b[32m"); // Green
-  }
+    public logSuccess(message: string): void {
+        this.logWithColor(`Success: ${message}`, '\x1b[32m'); // Green
+    }
 }
-/**   
- * 
- * 
- * 
- * 
+/**
+ *
+ *
+ *
+ *
  * Authenticate user
  */
 export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
@@ -75,15 +75,15 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
     }
 };
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  * Hash password
  */
 export const hashPassword = (password: string): string => {
-  const hash = crypto.createHash("sha256");
-  hash.update(password);
-  return hash.digest("hex");
+    const hash = crypto.createHash('sha256');
+    hash.update(password);
+    return hash.digest('hex');
 };
 /**
  *
@@ -96,7 +96,9 @@ export async function signUpAdmin() {
     const password = process.env.ADMIN_PASSWORD;
 
     if (!(email && password)) {
-        Logger.getInstance().logError('Admin email and password are required. please set ADMIN_EMAIL and ADMIN_PASSWORD in the environment variables');
+        Logger.getInstance().logError(
+            'Admin email and password are required. please set ADMIN_EMAIL and ADMIN_PASSWORD in the environment variables'
+        );
         throw new Error('Admin email and password are required. please set ADMIN_EMAIL and ADMIN_PASSWORD');
     }
 
@@ -126,8 +128,8 @@ export async function signUpAdmin() {
     return token;
 }
 /**
- * 
- * 
+ *
+ *
  * Do admin user exit
  */
 export async function doAdminUserExit(email: string) {
@@ -135,43 +137,85 @@ export async function doAdminUserExit(email: string) {
 
     const user = await prisma.admin.findUnique({
         where: {
-            email: email
-        }
+            email: email,
+        },
     });
 
     return user;
 }
 /**
- * 
- * 
- * 
+ *
+ *
+ *
  * Create JWT
  */
 export async function createJwt(userId: string, email: string, isAdmin: boolean = false): Promise<string> {
-  const jwt = require("jsonwebtoken");
-  const JWT_SECRET = process.env.JWT_SECRET;
-  const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
+    const jwt = require('jsonwebtoken');
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
-  if (!JWT_SECRET) {
-    Logger.getInstance().logError("JWT_SECRET not set in the environment variables");
-    throw new Error("JWT_SECRET not set");
-  }
+    if (!JWT_SECRET) {
+        Logger.getInstance().logError('JWT_SECRET not set in the environment variables');
+        throw new Error('JWT_SECRET not set');
+    }
 
-  return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 /**
- * 
- * 
+ *
+ *
  * Prisma client
  */
 export class PrismaClientSingleton {
-  static #instance: PrismaClient;
+    static #instance: PrismaClient;
 
-  static get prisma() {
-    if (!PrismaClientSingleton.#instance) {
-      PrismaClientSingleton.#instance = new PrismaClient();
+    static get prisma() {
+        if (!PrismaClientSingleton.#instance) {
+            PrismaClientSingleton.#instance = new PrismaClient();
+        }
+
+        return PrismaClientSingleton.#instance;
+    }
+}
+/**
+ *
+ * Email validator
+ */
+export function isValidEmail(email: string): boolean {
+    // Regular expression for basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+/**
+ *
+ * Password validator
+ */
+export function isValidPassword(password: string): { valid: boolean; message?: string } {
+    // Password must be at least 8 characters long
+    if (password.length < 8) {
+        return { valid: false, message: 'Password must be at least 8 characters long.' };
     }
 
-    return PrismaClientSingleton.#instance;
-  }
+    // Password must contain at least one uppercase letter
+    if (!/[A-Z]/.test(password)) {
+        return { valid: false, message: 'Password must contain at least one uppercase letter.' };
+    }
+
+    // Password must contain at least one lowercase letter
+    if (!/[a-z]/.test(password)) {
+        return { valid: false, message: 'Password must contain at least one lowercase letter.' };
+    }
+
+    // Password must contain at least one digit
+    if (!/\d/.test(password)) {
+        return { valid: false, message: 'Password must contain at least one digit.' };
+    }
+
+    // Password must contain at least one special character (e.g., !@#$%^&*)
+    if (!/[!@#$%^&*]/.test(password)) {
+        return { valid: false, message: 'Password must contain at least one special character (!@#$%^&*).' };
+    }
+
+    // If all checks pass, the password is considered valid
+    return { valid: true };
 }
