@@ -15,5 +15,13 @@ router.post('/signup', (req, res) => new SignupController(req, res).signup());
  * Route: /login with email and password
  */
 router.post('/login', (req, res) => new SignupController(req, res).login());
+/**
+ *
+ * Route: /forgot-password
+ */
+router.post('/forgot-password', (req, res) => new SignupController(req, res).forgotPassword());
+/**
+ *
+ */
 
 export default router;

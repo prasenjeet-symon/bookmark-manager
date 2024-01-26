@@ -149,10 +149,15 @@ export async function doAdminUserExit(email: string) {
  *
  * Create JWT
  */
-export async function createJwt(userId: string, email: string, isAdmin: boolean = false): Promise<string> {
+export async function createJwt(
+    userId: string,
+    email: string,
+    isAdmin: boolean = false,
+    expiresIn: string | null = null
+): Promise<string> {
     const jwt = require('jsonwebtoken');
     const JWT_SECRET = process.env.JWT_SECRET;
-    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+    const JWT_EXPIRES_IN = expiresIn || process.env.JWT_EXPIRES_IN || '1d';
 
     if (!JWT_SECRET) {
         Logger.getInstance().logError('JWT_SECRET not set in the environment variables');

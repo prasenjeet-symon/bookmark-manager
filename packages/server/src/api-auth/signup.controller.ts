@@ -125,6 +125,45 @@ export class SignupController {
 
         return;
     }
+    /**
+     *
+     * Forgot password
+     */
+    async forgotPassword() {
+        // We just need to check if the user with given email exit or not
+        // If it exit then send the email with forgot password link
+        // That link contains token and user id that can we use to reset password
+        if (!this.validReqBodyForgotPassword()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { email } = this.req.body;
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+        });
+
+        if (!user) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        const token = await createJwt(user.userId, user.email, false, '10m');
+
+        this.res.status(200).json({
+            userId: user.userId,
+            email: user.email,
+        });
+
+        // SEND EMAIL HERE WITH FORGOT PASSWORD LINK THAT CONTAINS TOKEN AND USER ID
+        return;
+    }
 
     /**
      *  Validates request body
@@ -149,6 +188,27 @@ export class SignupController {
         if (!passwordValidation.valid) {
             this.res.status(400).json({ error: passwordValidation.message });
             Logger.getInstance().logError(passwordValidation.message || 'Invalid password');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Valid req body for forgot password
+     */
+    validReqBodyForgotPassword(): boolean {
+        const { email } = this.req.body;
+
+        if (!email) {
+            this.res.status(400).json({ error: 'Email is required' });
+            Logger.getInstance().logError('Email is required');
+            return false;
+        }
+
+        if (!isValidEmail(email)) {
+            this.res.status(400).json({ error: 'Invalid email' });
+            Logger.getInstance().logError('Invalid email');
             return false;
         }
 
