@@ -11,5 +11,10 @@ router.get('/', (_req, res) => {
  * Get user settings
  */
 router.get('/user-setting', (req, res) => new UserSetting(req, res).getUserSetting());
+/**
+ *
+ * Update user settings
+ */
+router.put('/user-setting', (req, res) => new UserSetting(req, res).updateUserSetting());
 
 export default router;
