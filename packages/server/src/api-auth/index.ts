@@ -45,6 +45,11 @@ router.post('/google-signin', (req, res) => new Google(req, res).googleSignin())
 router.post('/google-signup', (req, res) => new Google(req, res).googleSignup());
 /**
  *
+ * Is token valid
+ */
+router.post('/is-token-valid', (req, res) => new SignupController(req, res).isTokenValid());
+/**
+ *
  *
  */
 export default router;

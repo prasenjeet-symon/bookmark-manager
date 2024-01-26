@@ -231,6 +231,31 @@ export class SignupController {
         Logger.getInstance().logSuccess('Password reset');
         return;
     }
+    /**
+     *
+     *
+     * Is token valid
+     */
+    async isTokenValid() {
+        if (!this.validReqBodyIsTokenValid()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { token } = this.req.body;
+
+        const isExpired = isTokenExpired(token);
+
+        if (isExpired) {
+            this.res.status(400).json({ error: 'Token expired' });
+            Logger.getInstance().logError('Token expired');
+            return;
+        }
+
+        this.res.status(200).json({ valid: true });
+        Logger.getInstance().logSuccess('Token valid');
+        return;
+    }
 
     /**
      *  Validates request body
@@ -299,6 +324,22 @@ export class SignupController {
         if (!passwordValidation.valid) {
             this.res.status(400).json({ error: passwordValidation.message });
             Logger.getInstance().logError(passwordValidation.message || 'Invalid password');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * Valid req body for is token valid
+     */
+    validReqBodyIsTokenValid(): boolean {
+        const { token } = this.req.body;
+
+        if (!token) {
+            this.res.status(400).json({ error: 'token is required' });
+            Logger.getInstance().logError('token is required');
             return false;
         }
 
