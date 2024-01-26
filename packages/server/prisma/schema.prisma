@@ -16,19 +16,43 @@ model Admin {
     password       String
     userId         String
     createdAt      DateTime @default(now())
-    updatedAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 }
 
 model User {
-    id             Int      @id @default(autoincrement())
-    email          String   @unique
+    id             Int          @id @default(autoincrement())
+    email          String       @unique
+    mobile         String?
     fullName       String
     profilePicture String?
-    mobile         String?
     password       String
     userId         String
-    timeZone       String @default("IST")
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @default(now())
-    isDeleted      Boolean @default(false)
+    dateOfBirth    DateTime?
+    timeZone       String       @default("IST")
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    isDeleted      Boolean      @default(false)
+    userSetting    UserSetting?
 }
+
+enum ColumnNumber {
+    THREE
+    FOUR
+    FIVE
+}
+
+model UserSetting {
+    id                             Int          @id @default(autoincrement())
+    userId                         Int          @unique
+    user                           User         @relation(fields: [userId], references: [id])
+    isDarkMode                     Boolean      @default(true)
+    numberOfColumns                ColumnNumber
+    showNumberOfBookmarkInTab      Boolean      @default(false)
+    showNumberOfBookmarkInCategory Boolean      @default(false)
+    showTagsInTooltip              Boolean      @default(false)
+    showNoteInTooltip              Boolean      @default(false)
+    allowDragDropToMoveLink        Boolean      @default(true)
+    createdAt                      DateTime     @default(now())
+    updatedAt                      DateTime     @updatedAt
+}
+
