@@ -31,9 +31,9 @@ model User {
     timeZone       String       @default("IST")
     createdAt      DateTime     @default(now())
     updatedAt      DateTime     @updatedAt
-    isDeleted      Boolean      @default(false)
     userSetting    UserSetting?
     userTabs       UserTab[]
+    isDeleted      Boolean      @default(false)
 }
 
 enum ColumnNumber {
@@ -79,5 +79,20 @@ model Category {
     tab       UserTab  @relation(fields: [tabId], references: [id], onUpdate: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    links     Link[]
     isDeleted Boolean  @default(false)
+}
+
+model Link {
+    id         Int      @id @default(autoincrement())
+    title      String
+    url        String
+    order      Int
+    icon       String?
+    notes      String?
+    category   Category? @relation(fields: [categoryId], references: [id])
+    categoryId Int?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    isDeleted  Boolean  @default(false)
 }
