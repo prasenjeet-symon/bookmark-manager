@@ -1,6 +1,14 @@
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
-import { Logger, PrismaClientSingleton, createJwt, hashPassword, isValidEmail, isValidPassword } from '../utils';
+import {
+    Logger,
+    PrismaClientSingleton,
+    createJwt,
+    hashPassword,
+    isTokenExpired,
+    isValidEmail,
+    isValidPassword,
+} from '../utils';
 
 export class SignupController {
     private req: Request;
@@ -164,6 +172,65 @@ export class SignupController {
         // SEND EMAIL HERE WITH FORGOT PASSWORD LINK THAT CONTAINS TOKEN AND USER ID
         return;
     }
+    /**
+     *
+     * Reset password
+     */
+    async resetPassword() {
+        if (!this.validReqBodyResetPassword()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { userId, password, token } = this.req.body;
+
+        // Do user exit with the given user id
+        const prisma = PrismaClientSingleton.prisma;
+
+        const user = await prisma.user.findFirst({
+            where: {
+                userId: userId,
+            },
+        });
+
+        if (!user) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        const isTokenActive = isTokenExpired(token);
+
+        if (!isTokenActive) {
+            this.res.status(400).json({ error: 'Token expired' });
+            Logger.getInstance().logError('Token expired');
+            return;
+        }
+
+        const hashedPassword = hashPassword(password);
+
+        await prisma.user.update({
+            where: {
+                email: user.email,
+            },
+            data: {
+                password: hashedPassword,
+            },
+        });
+
+        const jwtToken = await createJwt(user.userId, user.email);
+
+        this.res.status(200).json({
+            token: jwtToken,
+            userId: user.userId,
+            email: user.email,
+            fullName: user.fullName,
+            timeZone: user.timeZone,
+        });
+
+        Logger.getInstance().logSuccess('Password reset');
+        return;
+    }
 
     /**
      *  Validates request body
@@ -209,6 +276,29 @@ export class SignupController {
         if (!isValidEmail(email)) {
             this.res.status(400).json({ error: 'Invalid email' });
             Logger.getInstance().logError('Invalid email');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Valid req body for reset password
+     */
+    validReqBodyResetPassword(): boolean {
+        const { userId, token, password } = this.req.body;
+
+        if (!userId || !token || !password) {
+            this.res.status(400).json({ error: 'userId, token and password are required' });
+            Logger.getInstance().logError('userId, token and password are required');
+            return false;
+        }
+
+        const passwordValidation = isValidPassword(password);
+
+        if (!passwordValidation.valid) {
+            this.res.status(400).json({ error: passwordValidation.message });
+            Logger.getInstance().logError(passwordValidation.message || 'Invalid password');
             return false;
         }
 

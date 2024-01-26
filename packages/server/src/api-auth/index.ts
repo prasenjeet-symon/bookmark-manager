@@ -22,6 +22,10 @@ router.post('/login', (req, res) => new SignupController(req, res).login());
 router.post('/forgot-password', (req, res) => new SignupController(req, res).forgotPassword());
 /**
  *
+ * Route: /reset-password
  */
-
+router.post('/reset-password', (req, res) => new SignupController(req, res).resetPassword());
+/**
+ * 
+ */
 export default router;
