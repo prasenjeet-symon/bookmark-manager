@@ -70,6 +70,61 @@ export class SignupController {
         Logger.getInstance().logSuccess('User created');
         return;
     }
+    /**
+     *
+     * Login
+     */
+    async login() {
+        if (!this.validReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { email, password } = this.req.body;
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            select: {
+                userId: true,
+                email: true,
+                password: true,
+                fullName: true,
+                timeZone: true,
+            },
+        });
+
+        if (!user) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        const validPassword = hashPassword(password) === user.password;
+
+        if (!validPassword) {
+            this.res.status(400).json({ error: 'Invalid password' });
+            Logger.getInstance().logError('Invalid password');
+            return;
+        }
+
+        const token = await createJwt(user.userId, user.email);
+
+        this.res.status(200).json({
+            token: token,
+            userId: user.userId,
+            email: user.email,
+            fullName: user.fullName,
+            timeZone: user.timeZone,
+        });
+
+        Logger.getInstance().logSuccess('User logged in');
+
+        return;
+    }
 
     /**
      *  Validates request body
