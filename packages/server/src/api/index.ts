@@ -25,6 +25,8 @@ router.put('/user-setting', (req, res) => new UserSetting(req, res).updateUserSe
 router.get('/tabs', (req, res) => new TabController(req, res).getTabs());
 /**
  *
- *
+ * Add new tab
  */
+router.post('/tabs', (req, res) => new TabController(req, res).addTab());
+
 export default router;
