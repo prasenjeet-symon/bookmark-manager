@@ -58,11 +58,26 @@ model UserSetting {
 }
 
 model UserTab {
+    id         Int        @id @default(autoincrement())
+    userId     Int
+    user       User       @relation(fields: [userId], references: [id])
+    name       String
+    order      Int
+    categories Category[]
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+    isDeleted  Boolean    @default(false)
+}
+
+model Category {
     id        Int      @id @default(autoincrement())
-    userId    Int
-    user      User     @relation(fields: [userId], references: [id])
     name      String
     order     Int
+    color     String
+    icon      String?
+    tabId     Int
+    tab       UserTab  @relation(fields: [tabId], references: [id], onUpdate: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    isDeleted Boolean  @default(false)
 }
