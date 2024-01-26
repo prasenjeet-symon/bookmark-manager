@@ -33,6 +33,7 @@ model User {
     updatedAt      DateTime     @updatedAt
     isDeleted      Boolean      @default(false)
     userSetting    UserSetting?
+    userTabs       UserTab[]
 }
 
 enum ColumnNumber {
@@ -56,3 +57,12 @@ model UserSetting {
     updatedAt                      DateTime     @updatedAt
 }
 
+model UserTab {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    name      String
+    order     Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
