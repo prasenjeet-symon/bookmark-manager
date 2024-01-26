@@ -40,6 +40,11 @@ router.post('/reset-password', (req, res) => new SignupController(req, res).rese
 router.post('/google-signin', (req, res) => new Google(req, res).googleSignin());
 /**
  *
+ * Google signup
+ */
+router.post('/google-signup', (req, res) => new Google(req, res).googleSignup());
+/**
+ *
  *
  */
 export default router;

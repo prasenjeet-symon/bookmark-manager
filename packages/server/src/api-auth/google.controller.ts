@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
+import { v4 } from 'uuid';
 import { IGoogleAuthTokenResponse } from '../schema';
 import { Logger, PrismaClientSingleton, createJwt } from '../utils';
 
@@ -60,6 +61,72 @@ export class Google {
         });
 
         Logger.getInstance().logSuccess('User signed in successfully');
+        return;
+    }
+    /**
+     *
+     * Google signup
+     */
+    async googleSignup() {
+        if (!this.validReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const token = this.req.body.token;
+
+        const googleAuthTokenResponse = await this.verifyGoogleAuthToken(token);
+        if (!googleAuthTokenResponse) {
+            this.res.status(400).json({ error: 'Invalid token' });
+            Logger.getInstance().logError('Invalid token');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        const user = await prisma.user.findFirst({
+            where: {
+                email: googleAuthTokenResponse.email,
+                userId: googleAuthTokenResponse.userId,
+            },
+        });
+
+        if (user) {
+            this.res.status(400).json({ error: 'User already exist' });
+            Logger.getInstance().logError('User already exist');
+            return;
+        }
+
+        const timeZone = this.req.body.timeZone;
+
+        const newUser = await prisma.user.create({
+            data: {
+                email: googleAuthTokenResponse.email,
+                userId: googleAuthTokenResponse.userId,
+                fullName: googleAuthTokenResponse.name,
+                timeZone: timeZone || null,
+                password: v4(),
+            },
+            select: {
+                userId: true,
+                email: true,
+                fullName: true,
+                timeZone: true,
+            },
+        });
+
+        const tokenJwt = await createJwt(newUser.userId, newUser.email);
+
+        this.res.status(200).json({
+            token: tokenJwt,
+            userId: newUser.userId,
+            email: newUser.email,
+            fullName: newUser.fullName,
+            timeZone: newUser.timeZone,
+        });
+
+        Logger.getInstance().logSuccess('User created');
+
         return;
     }
     /**
