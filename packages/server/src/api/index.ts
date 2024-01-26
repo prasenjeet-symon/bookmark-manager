@@ -28,5 +28,10 @@ router.get('/tabs', (req, res) => new TabController(req, res).getTabs());
  * Add new tab
  */
 router.post('/tabs', (req, res) => new TabController(req, res).addTab());
+/**
+ * 
+ * Update tab
+ */
+router.put('/tabs', (req, res) => new TabController(req, res).updateTab());
 
 export default router;

@@ -20,20 +20,20 @@ model Admin {
 }
 
 model User {
-    id                 Int          @id @default(autoincrement())
-    email              String       @unique
-    mobile             String?
-    fullName           String
-    profilePicture     String?
-    password           String
-    userId             String
-    dateOfBirth        DateTime?
-    timeZone           String       @default("IST")
-    createdAt          DateTime     @default(now())
-    updatedAt          DateTime     @updatedAt
-    userSetting        UserSetting?
-    userTabs           UserTab[]
-    isDeleted          Boolean      @default(false)
+    id             Int          @id @default(autoincrement())
+    email          String       @unique
+    mobile         String?
+    fullName       String
+    profilePicture String?
+    password       String
+    userId         String
+    dateOfBirth    DateTime?
+    timeZone       String       @default("IST")
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    userSetting    UserSetting?
+    userTabs       UserTab[]
+    isDeleted      Boolean      @default(false)
 }
 
 enum ColumnNumber {
@@ -59,6 +59,7 @@ model UserSetting {
 
 model UserTab {
     id         Int        @id @default(autoincrement())
+    identifier String     @unique
     userId     Int
     user       User       @relation(fields: [userId], references: [id])
     name       String
@@ -70,21 +71,23 @@ model UserTab {
 }
 
 model Category {
-    id        Int      @id @default(autoincrement())
-    name      String
-    order     Int
-    color     String
-    icon      String?
-    tabId     Int
-    tab       UserTab  @relation(fields: [tabId], references: [id], onUpdate: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    links     Link[]
-    isDeleted Boolean  @default(false)
+    id         Int      @id @default(autoincrement())
+    identifier String   @unique
+    name       String
+    order      Int
+    color      String
+    icon       String?
+    tabId      Int
+    tab        UserTab  @relation(fields: [tabId], references: [id], onUpdate: Cascade)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    links      Link[]
+    isDeleted  Boolean  @default(false)
 }
 
 model Link {
     id         Int         @id @default(autoincrement())
+    identifier String      @unique
     title      String
     url        String
     order      Int
@@ -100,15 +103,17 @@ model Link {
 }
 
 model Tag {
-    id    Int    @id @default(autoincrement())
-    name  String
-    order Int // for priority 
-    links Link[]
+    id         Int    @id @default(autoincrement())
+    identifier String @unique
+    name       String
+    order      Int // for priority 
+    links      Link[]
 }
 
 model HiddenTag {
-    id    Int    @id @default(autoincrement())
-    name  String
-    order Int
-    links Link[]
+    id         Int    @id @default(autoincrement())
+    identifier String @unique
+    name       String
+    order      Int
+    links      Link[]
 }

@@ -47,7 +47,7 @@ export class TabController {
     async addTab() {
         const email = this.res.locals.email; // Target user
 
-        if (!this.validateAddTabReqBody()) {
+        if (!this.validateAddUpdateTabReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
@@ -63,6 +63,7 @@ export class TabController {
                     create: {
                         name: this.req.body.name,
                         order: +this.req.body.order,
+                        identifier: this.req.body.identifier,
                     },
                 },
             },
@@ -71,18 +72,55 @@ export class TabController {
         this.res.status(200).json({ message: 'Tab added' });
         return;
     }
+    /**
+     *
+     * Update tab
+     */
+    async updateTab() {
+        const email = this.res.locals.email; // Target user
+
+        if (!this.validateAddUpdateTabReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        await prisma.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                userTabs: {
+                    update: {
+                        where: {
+                            identifier: this.req.body.identifier,
+                        },
+                        data: {
+                            name: this.req.body.name,
+                            order: +this.req.body.order,
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Tab updated' });
+
+        return;
+    }
 
     /**
      *
      * Validate request body of add tab
      *
      */
-    validateAddTabReqBody(): boolean {
-        const { name, order } = this.req.body;
+    validateAddUpdateTabReqBody(): boolean {
+        const { name, order, identifier } = this.req.body;
 
-        if (name === undefined || order === undefined) {
-            this.res.status(400).json({ error: 'name and order are required' });
-            Logger.getInstance().logError('name and order are required');
+        if (name === undefined || order === undefined || identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
             return false;
         }
 
