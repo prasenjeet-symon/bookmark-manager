@@ -29,9 +29,14 @@ router.get('/tabs', (req, res) => new TabController(req, res).getTabs());
  */
 router.post('/tabs', (req, res) => new TabController(req, res).addTab());
 /**
- * 
+ *
  * Update tab
  */
 router.put('/tabs', (req, res) => new TabController(req, res).updateTab());
+/**
+ *
+ * Delete tab
+ */
+router.delete('/tabs', (req, res) => new TabController(req, res).deleteTab());
 
 export default router;

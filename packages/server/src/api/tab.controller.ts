@@ -109,7 +109,40 @@ export class TabController {
 
         return;
     }
+    /**
+     *
+     * Delete tab
+     */
+    async deleteTab() {
+        const email = this.res.locals.email; // Target user
 
+        if (!this.validateDeleteTabReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        await prisma.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                userTabs: {
+                    update: {
+                        where: { identifier: this.req.body.identifier },
+                        data: {
+                            isDeleted: true,
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Tab deleted' });
+
+        return;
+    }
     /**
      *
      * Validate request body of add tab
@@ -128,6 +161,22 @@ export class TabController {
         if (typeof order !== 'number') {
             this.res.status(400).json({ error: 'order must be a number' });
             Logger.getInstance().logError('order must be a number');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * Validation of request body of delete tab
+     */
+    validateDeleteTabReqBody(): boolean {
+        const { identifier } = this.req.body;
+
+        if (identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing identifier' });
+            Logger.getInstance().logError('Missing identifier');
             return false;
         }
 
