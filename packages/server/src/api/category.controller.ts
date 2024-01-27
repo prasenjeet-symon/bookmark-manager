@@ -99,7 +99,51 @@ export class CategoryController {
         this.res.status(200).json({ message: 'Category added' });
         return;
     }
+    /**
+     *
+     * Update category
+     */
+    async updateCategory() {
+        if (!this.validateAddUpdateCategoryReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
 
+        const prisma = PrismaClientSingleton.prisma;
+
+        await prisma.user.update({
+            where: {
+                email: this.res.locals.email,
+            },
+            data: {
+                userTabs: {
+                    update: {
+                        where: {
+                            identifier: this.req.body.tabIdentifier,
+                        },
+                        data: {
+                            categories: {
+                                update: {
+                                    where: {
+                                        identifier: this.req.body.identifier,
+                                    },
+                                    data: {
+                                        color: this.req.body.color,
+                                        name: this.req.body.name,
+                                        order: +this.req.body.order,
+                                        icon: this.req.body.icon || null,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Category updated' });
+        return;
+    }
     /**
      * Validate request body of get all categories of given tab
      */

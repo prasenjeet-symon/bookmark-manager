@@ -54,6 +54,11 @@ router.get('/categories', (req, res) => new CategoryController(req, res).getAllC
  * Add new category in given tab
  */
 router.post('/categories', (req, res) => new CategoryController(req, res).addCategory());
+/**
+ *
+ * Update category
+ */
+router.put('/categories', (req, res) => new CategoryController(req, res).updateCategory());
 
 /**
  *
