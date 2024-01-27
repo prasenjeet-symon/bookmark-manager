@@ -26,7 +26,7 @@ model User {
     fullName       String
     profilePicture String?
     password       String
-    userId         String
+    userId         String       @unique
     dateOfBirth    DateTime?
     timeZone       String       @default("IST")
     createdAt      DateTime     @default(now())
@@ -44,8 +44,8 @@ enum ColumnNumber {
 
 model UserSetting {
     id                             Int          @id @default(autoincrement())
-    userId                         Int          @unique
-    user                           User         @relation(fields: [userId], references: [id])
+    userIdentifier                 String       @unique
+    user                           User         @relation(fields: [userIdentifier], references: [userId])
     isDarkMode                     Boolean      @default(true)
     numberOfColumns                ColumnNumber
     showNumberOfBookmarkInTab      Boolean      @default(false)
@@ -71,49 +71,71 @@ model UserTab {
 }
 
 model Category {
-    id         Int      @id @default(autoincrement())
-    identifier String   @unique
-    name       String
-    order      Int
-    color      String
-    icon       String?
-    tabId      Int
-    tab        UserTab  @relation(fields: [tabId], references: [id], onUpdate: Cascade)
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    links      Link[]
-    isDeleted  Boolean  @default(false)
+    id            Int      @id @default(autoincrement())
+    identifier    String   @unique
+    name          String
+    order         Int
+    color         String
+    icon          String?
+    tabIdentifier String
+    tab           UserTab  @relation(fields: [tabIdentifier], references: [identifier])
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    links         Link[]
+    isDeleted     Boolean  @default(false)
 }
 
 model Link {
-    id         Int         @id @default(autoincrement())
-    identifier String      @unique
-    title      String
-    url        String
-    order      Int
-    icon       String?
-    notes      String?
-    tags       Tag[]
-    hiddenTags HiddenTag[]
-    category   Category?   @relation(fields: [categoryId], references: [id])
-    categoryId Int?
-    createdAt  DateTime    @default(now())
-    updatedAt  DateTime    @updatedAt
-    isDeleted  Boolean     @default(false)
+    id                 Int             @id @default(autoincrement())
+    identifier         String          @unique
+    title              String
+    url                String
+    order              Int
+    icon               String?
+    notes              String?
+    linkTags           LinkTag[]
+    linkHiddenTags     LinkHiddenTag[]
+    category           Category?       @relation(fields: [categoryIdentifier], references: [identifier])
+    categoryIdentifier String?
+    createdAt          DateTime        @default(now())
+    updatedAt          DateTime        @updatedAt
+    isDeleted          Boolean         @default(false)
 }
 
 model Tag {
-    id         Int    @id @default(autoincrement())
-    identifier String @unique
+    id         Int       @id @default(autoincrement())
+    identifier String    @unique
     name       String
-    order      Int // for priority 
-    links      Link[]
+    order      Int // for priority
+    linkTags   LinkTag[]
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    isDeleted  Boolean   @default(false)
 }
 
 model HiddenTag {
-    id         Int    @id @default(autoincrement())
-    identifier String @unique
-    name       String
-    order      Int
-    links      Link[]
+    id             Int             @id @default(autoincrement())
+    identifier     String          @unique
+    name           String
+    order          Int
+    linkHiddenTags LinkHiddenTag[]
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    isDeleted      Boolean         @default(false)
+}
+
+model LinkTag {
+    id             Int    @id @default(autoincrement())
+    linkIdentifier String
+    tagIdentifier  String
+    link           Link   @relation(fields: [linkIdentifier], references: [identifier])
+    tag            Tag    @relation(fields: [tagIdentifier], references: [identifier])
+}
+
+model LinkHiddenTag {
+    id                  Int       @id @default(autoincrement())
+    linkIdentifier      String
+    hiddenTagIdentifier String
+    link                Link      @relation(fields: [linkIdentifier], references: [identifier])
+    hiddenTag           HiddenTag @relation(fields: [hiddenTagIdentifier], references: [identifier])
 }

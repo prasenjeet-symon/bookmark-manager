@@ -1,4 +1,5 @@
 import express from 'express';
+import { CategoryController } from './category.controller';
 import { TabController } from './tab.controller';
 import { UserSetting } from './user-setting.controller';
 
@@ -39,9 +40,13 @@ router.put('/tabs', (req, res) => new TabController(req, res).updateTab());
  */
 router.delete('/tabs', (req, res) => new TabController(req, res).deleteTab());
 /**
- * 
+ *
  * Get tabs incrementally
  */
 router.get('/tabs-incrementally', (req, res) => new TabController(req, res).getTabsIncrementally());
-
+/**
+ *
+ * Get all categories of given tab
+ */
+router.get('/categories', (req, res) => new CategoryController(req, res).getAllCategoriesOfTab());
 export default router;
