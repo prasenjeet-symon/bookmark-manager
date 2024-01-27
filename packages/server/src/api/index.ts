@@ -51,15 +51,19 @@ router.get('/tabs-incrementally', (req, res) => new TabController(req, res).getT
 router.get('/categories', (req, res) => new CategoryController(req, res).getAllCategoriesOfTab());
 /**
  *
- * Add new category in given tab
+ * Add category in given tab
  */
 router.post('/categories', (req, res) => new CategoryController(req, res).addCategory());
 /**
  *
- * Update category
+ * Update category in given tab
  */
 router.put('/categories', (req, res) => new CategoryController(req, res).updateCategory());
-
+/**
+ *
+ * Delete category from given tab
+ */
+router.delete('/categories', (req, res) => new CategoryController(req, res).deleteCategory());
 /**
  *
  *

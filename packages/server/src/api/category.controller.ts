@@ -145,6 +145,49 @@ export class CategoryController {
         return;
     }
     /**
+     *
+     * Delete category from given tab
+     */
+    async deleteCategory() {
+        if (!this.validateDeleteCategoryReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+
+        await prisma.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                userTabs: {
+                    update: {
+                        where: {
+                            identifier: this.req.body.tabIdentifier,
+                        },
+                        data: {
+                            categories: {
+                                update: {
+                                    where: {
+                                        identifier: this.req.body.identifier,
+                                    },
+                                    data: {
+                                        isDeleted: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Category deleted' });
+        return;
+    }
+    /**
      * Validate request body of get all categories of given tab
      */
     validateGetAllCategoriesOfTabReqBody(): boolean {
@@ -182,6 +225,21 @@ export class CategoryController {
         if (!isInteger(order)) {
             this.res.status(400).json({ error: 'order must be a number' });
             Logger.getInstance().logError('order must be a number');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate request body of delete category
+     */
+    validateDeleteCategoryReqBody(): boolean {
+        const { identifier, tabIdentifier } = this.req.body;
+
+        if (identifier === undefined || tabIdentifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
             return false;
         }
 
