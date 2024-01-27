@@ -49,4 +49,15 @@ router.get('/tabs-incrementally', (req, res) => new TabController(req, res).getT
  * Get all categories of given tab
  */
 router.get('/categories', (req, res) => new CategoryController(req, res).getAllCategoriesOfTab());
+/**
+ *
+ * Add new category in given tab
+ */
+router.post('/categories', (req, res) => new CategoryController(req, res).addCategory());
+
+/**
+ *
+ *
+ *
+ */
 export default router;
