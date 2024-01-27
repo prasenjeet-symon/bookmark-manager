@@ -38,5 +38,10 @@ router.put('/tabs', (req, res) => new TabController(req, res).updateTab());
  * Delete tab
  */
 router.delete('/tabs', (req, res) => new TabController(req, res).deleteTab());
+/**
+ * 
+ * Get tabs incrementally
+ */
+router.get('/tabs-incrementally', (req, res) => new TabController(req, res).getTabsIncrementally());
 
 export default router;

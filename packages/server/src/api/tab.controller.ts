@@ -9,7 +9,60 @@ export class TabController {
         this.req = req;
         this.res = res;
     }
+    /**
+     * Get tabs of user incrementally
+     */
+    async getTabsIncrementally() {
+        const { lastUpdatedTime } = this.req.body;
 
+        if (lastUpdatedTime === undefined) {
+            // Return all tabs
+            return this.getTabs();
+        } else {
+            // Return tabs that is greater than lastUpdatedTime
+            return this.getUpdatedTabs();
+        }
+    }
+
+    /**
+     *
+     * Get all updated tabs that is greater than the last updated time
+     */
+    async getUpdatedTabs() {
+        const email = this.res.locals.email; // Target user
+
+        if (!this.validateGetUpdatedTabsReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+
+        const tabs = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            include: {
+                userTabs: {
+                    where: {
+                        updatedAt: {
+                            gte: this.req.body.lastUpdatedTime,
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!tabs) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        this.res.status(200).json(tabs.userTabs);
+
+        return;
+    }
     /**
      *
      * Get tabs of user
@@ -177,6 +230,21 @@ export class TabController {
         if (identifier === undefined) {
             this.res.status(400).json({ error: 'Missing identifier' });
             Logger.getInstance().logError('Missing identifier');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate request body of get updated tabs
+     */
+    validateGetUpdatedTabsReqBody(): boolean {
+        const { lastUpdatedTime } = this.req.body;
+
+        if (lastUpdatedTime === undefined) {
+            this.res.status(400).json({ error: 'Missing lastUpdatedTime' });
+            Logger.getInstance().logError('Missing lastUpdatedTime');
             return false;
         }
 
