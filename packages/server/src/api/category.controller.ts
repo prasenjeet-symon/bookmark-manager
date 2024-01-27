@@ -9,6 +9,79 @@ export class CategoryController {
         this.req = req;
         this.res = res;
     }
+    /**
+     *
+     * Get categories incrementally
+     */
+    async getAllCategoriesIncrementally() {
+        if (!this.validateGetAllCategoriesIncrementallyReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { lastUpdatedTime } = this.req.body;
+
+        if (lastUpdatedTime === undefined) {
+            // Return all categories
+            return this.getAllCategoriesOfTab();
+        } else {
+            // Return categories updated after lastUpdatedTime
+            return this.getAllCategoriesUpdated();
+        }
+    }
+    /**
+     *
+     * Get all categories updated after lastUpdatedTime
+     */
+    async getAllCategoriesUpdated() {
+        if (!this.validateGetAllCategoriesUpdatedReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { tabIdentifier, lastUpdatedTime } = this.req.body;
+        const email = this.res.locals.email;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const userWithTabWithCategoriesUpdated = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            include: {
+                userTabs: {
+                    where: {
+                        identifier: tabIdentifier,
+                    },
+                    include: {
+                        categories: {
+                            where: {
+                                updatedAt: {
+                                    gte: lastUpdatedTime,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!userWithTabWithCategoriesUpdated) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (userWithTabWithCategoriesUpdated.userTabs.length === 0) {
+            this.res.status(400).json({ error: 'Tab not found' });
+            Logger.getInstance().logError('Tab not found');
+            return;
+        }
+
+        const categories = userWithTabWithCategoriesUpdated.userTabs[0].categories;
+
+        this.res.status(200).json(categories);
+        return;
+    }
 
     /**
      *
@@ -30,7 +103,7 @@ export class CategoryController {
             include: {
                 userTabs: {
                     where: {
-                        identifier: this.req.body.identifier,
+                        identifier: this.req.body.tabIdentifier,
                     },
                     include: {
                         categories: true,
@@ -53,8 +126,7 @@ export class CategoryController {
 
         const categories = userWithTabWithCategories.userTabs[0].categories;
 
-        this.res.status(200).json({ categories });
-
+        this.res.status(200).json(categories);
         return;
     }
     /**
@@ -191,9 +263,9 @@ export class CategoryController {
      * Validate request body of get all categories of given tab
      */
     validateGetAllCategoriesOfTabReqBody(): boolean {
-        const { identifier } = this.req.body;
+        const { tabIdentifier } = this.req.body;
 
-        if (identifier === undefined) {
+        if (tabIdentifier === undefined) {
             this.res.status(400).json({ error: 'Missing identifier' });
             Logger.getInstance().logError('Missing identifier');
             return false;
@@ -238,6 +310,36 @@ export class CategoryController {
         const { identifier, tabIdentifier } = this.req.body;
 
         if (identifier === undefined || tabIdentifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate request body of get all categories incrementally
+     */
+    validateGetAllCategoriesIncrementallyReqBody(): boolean {
+        const { tabIdentifier } = this.req.body;
+
+        if (tabIdentifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate request body of get all categories updated
+     */
+    validateGetAllCategoriesUpdatedReqBody(): boolean {
+        const { lastUpdatedTime, tabIdentifier } = this.req.body;
+
+        if (lastUpdatedTime === undefined || tabIdentifier === undefined) {
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;

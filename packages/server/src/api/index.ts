@@ -65,6 +65,11 @@ router.put('/categories', (req, res) => new CategoryController(req, res).updateC
  */
 router.delete('/categories', (req, res) => new CategoryController(req, res).deleteCategory());
 /**
+ * 
+ * Get categories incrementally
+ */
+router.get('/categories-incrementally', (req, res) => new CategoryController(req, res).getAllCategoriesIncrementally());
+/**
  *
  *
  *
