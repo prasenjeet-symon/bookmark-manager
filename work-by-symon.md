@@ -19,3 +19,50 @@ Furthermore, this commit introduces utility functions that contribute to the ove
 These implementations collectively lay the groundwork for a secure, modular, and extensible application. The commit not only enhances security but also fosters a maintainable and organized codebase, setting the stage for future development and feature additions.
 
 ---
+
+# Work Completed: Application Feature Implementations and Enhancements
+
+## 26 Jan 2023
+
+## UserSetting Prisma Model
+- Implemented the `UserSetting` Prisma model, capturing user-specific settings such as dark mode, number of columns, and more.
+- Designed the model with structured fields, contributing to a personalized user experience.
+
+## UserTab Prisma Model
+- Introduced the `UserTab` Prisma model, allowing users to create and customize individual tabs within the application.
+- Established a relation to associate each tab with a specific user, enhancing content organization.
+
+## Category Prisma Model
+- Implemented the `Category` Prisma model, representing categories within the application for organizing content.
+- Established relationships with the `UserTab` model to maintain data consistency and flexibility.
+
+## Link Prisma Model
+- Introduced the `Link` Prisma model, facilitating the organization and management of individual links within the application.
+- Established relationships with the `Category` model for structured content representation.
+
+## Tag and HiddenTag Prisma Models
+- Implemented the `Tag` and `HiddenTag` Prisma models, providing a robust mechanism for categorizing and managing links with user-defined tags and hidden tags.
+- Established many-to-many relationships with the `Link` model for effective content organization.
+
+## User Authentication Functionality
+- Implemented user signup, login, forgot password, and password reset functionalities.
+- Enhanced security through password hashing, JWT generation, and email validation.
+- Enabled users to securely create accounts, log in, and recover passwords.
+
+## Google Sign-In and Sign-Up
+- Implemented Google Sign-In and Sign-Up functionalities for enhanced user authentication.
+- Validated Google authentication tokens and created JWTs for secure user sessions.
+
+## Token Validity Check
+- Implemented a route to check the validity of provided tokens.
+- Enhanced security by allowing clients to verify token validity before sensitive operations.
+
+## User Settings Management
+- Implemented routes for retrieving and updating user settings.
+- Enhanced the user experience by providing personalized configurations.
+
+## User Tabs Management
+- Implemented routes for retrieving, adding, and updating user tabs.
+- Improved content organization and customization for users.
+
+These features collectively lay the groundwork for a secure, modular, and user-friendly application. The commit not only focuses on enhancing security but also contributes to a more organized and personalized user experience. The implemented functionalities provide a strong foundation for future development and user-centric feature additions.
