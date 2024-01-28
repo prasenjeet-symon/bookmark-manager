@@ -15,9 +15,7 @@ export class UserSetting {
      * Get user setting
      */
     async getUserSetting() {
-        const email = this.res.locals.email; // Target user
-
-        // Check if the setting exit or not
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
         const userWithSetting = await prisma.user.findUnique({
@@ -35,10 +33,13 @@ export class UserSetting {
             return;
         }
 
-        this.res.status(200).json({
-            userSetting: userWithSetting.userSetting,
-        });
+        if (!userWithSetting.userSetting) {
+            this.res.status(400).json({ error: 'User setting not found' });
+            Logger.getInstance().logError('User setting not found');
+            return;
+        }
 
+        this.res.status(200).json(userWithSetting.userSetting);
         return;
     }
 
@@ -47,14 +48,12 @@ export class UserSetting {
      * Update user setting
      */
     async updateUserSetting() {
-        const email = this.res.locals.email; // Target user
-
-        // Validate body for the required data
         if (!this.validReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
 
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
         await prisma.user.update({

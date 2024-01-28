@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Logger, PrismaClientSingleton } from '../utils';
+import { Logger, PrismaClientSingleton, isInteger } from '../utils';
 
 export class TabController {
     private req: Request;
@@ -29,16 +29,15 @@ export class TabController {
      * Get all updated tabs that is greater than the last updated time
      */
     async getUpdatedTabs() {
-        const email = this.res.locals.email; // Target user
-
         if (!this.validateGetUpdatedTabsReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
 
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
-        const tabs = await prisma.user.findUnique({
+        const userWithTabs = await prisma.user.findUnique({
             where: {
                 email: email,
             },
@@ -53,14 +52,13 @@ export class TabController {
             },
         });
 
-        if (!tabs) {
+        if (!userWithTabs) {
             this.res.status(400).json({ error: 'User not found' });
             Logger.getInstance().logError('User not found');
             return;
         }
 
-        this.res.status(200).json(tabs.userTabs);
-
+        this.res.status(200).json(userWithTabs.userTabs);
         return;
     }
     /**
@@ -69,11 +67,10 @@ export class TabController {
      *
      */
     async getTabs() {
-        const email = this.res.locals.email; // Target user
-
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
-        const tabs = await prisma.user.findUnique({
+        const userWithTabs = await prisma.user.findUnique({
             where: {
                 email: email,
             },
@@ -82,14 +79,13 @@ export class TabController {
             },
         });
 
-        if (!tabs) {
+        if (!userWithTabs) {
             this.res.status(400).json({ error: 'User not found' });
             Logger.getInstance().logError('User not found');
             return;
         }
 
-        this.res.status(200).json(tabs.userTabs);
-
+        this.res.status(200).json(userWithTabs.userTabs);
         return;
     }
     /**
@@ -98,13 +94,12 @@ export class TabController {
      *
      */
     async addTab() {
-        const email = this.res.locals.email; // Target user
-
         if (!this.validateAddUpdateTabReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
 
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
         await prisma.user.update({
@@ -113,16 +108,24 @@ export class TabController {
             },
             data: {
                 userTabs: {
-                    create: {
-                        name: this.req.body.name,
-                        order: +this.req.body.order,
-                        identifier: this.req.body.identifier,
+                    upsert: {
+                        where: { identifier: this.req.body.identifier },
+                        create: {
+                            name: this.req.body.name,
+                            order: +this.req.body.order,
+                            identifier: this.req.body.identifier,
+                        },
+                        update: {
+                            name: this.req.body.name,
+                            order: +this.req.body.order,
+                            identifier: this.req.body.identifier,
+                        },
                     },
                 },
             },
         });
 
-        this.res.status(200).json({ message: 'Tab added' });
+        this.res.status(200).json({ message: 'Tab added successfully' });
         return;
     }
     /**
@@ -130,13 +133,12 @@ export class TabController {
      * Update tab
      */
     async updateTab() {
-        const email = this.res.locals.email; // Target user
-
         if (!this.validateAddUpdateTabReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
 
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
         await prisma.user.update({
@@ -158,8 +160,7 @@ export class TabController {
             },
         });
 
-        this.res.status(200).json({ message: 'Tab updated' });
-
+        this.res.status(200).json({ message: 'Tab updated successfully' });
         return;
     }
     /**
@@ -167,13 +168,12 @@ export class TabController {
      * Delete tab
      */
     async deleteTab() {
-        const email = this.res.locals.email; // Target user
-
         if (!this.validateDeleteTabReqBody()) {
             Logger.getInstance().logError('Invalid request body');
             return;
         }
 
+        const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
 
         await prisma.user.update({
@@ -192,8 +192,7 @@ export class TabController {
             },
         });
 
-        this.res.status(200).json({ message: 'Tab deleted' });
-
+        this.res.status(200).json({ message: 'Tab deleted successfully' });
         return;
     }
     /**
@@ -211,8 +210,8 @@ export class TabController {
         }
 
         // order is number
-        if (typeof order !== 'number') {
-            this.res.status(400).json({ error: 'order must be a number' });
+        if (!isInteger(order)) {
+            this.res.status(400).json({ error: 'order must be a integer number' });
             Logger.getInstance().logError('order must be a number');
             return false;
         }

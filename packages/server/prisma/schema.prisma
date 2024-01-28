@@ -32,8 +32,9 @@ model User {
     createdAt      DateTime     @default(now())
     updatedAt      DateTime     @updatedAt
     userSetting    UserSetting?
-    userTabs       UserTab[]
     isDeleted      Boolean      @default(false)
+    links          Link[]
+    userTabs       UserTab[]
 }
 
 enum ColumnNumber {
@@ -58,16 +59,16 @@ model UserSetting {
 }
 
 model UserTab {
-    id         Int        @id @default(autoincrement())
-    identifier String     @unique
-    userId     Int
-    user       User       @relation(fields: [userId], references: [id])
-    name       String
-    order      Int
-    categories Category[]
-    createdAt  DateTime   @default(now())
-    updatedAt  DateTime   @updatedAt
-    isDeleted  Boolean    @default(false)
+    id             Int        @id @default(autoincrement())
+    identifier     String     @unique
+    userIdentifier String
+    user           User       @relation(fields: [userIdentifier], references: [userId])
+    name           String
+    order          Int
+    categories     Category[]
+    createdAt      DateTime   @default(now())
+    updatedAt      DateTime   @updatedAt
+    isDeleted      Boolean    @default(false)
 }
 
 model Category {
@@ -86,56 +87,40 @@ model Category {
 }
 
 model Link {
-    id                 Int             @id @default(autoincrement())
-    identifier         String          @unique
+    id                 Int       @id @default(autoincrement())
+    identifier         String    @unique
     title              String
     url                String
     order              Int
     icon               String?
     notes              String?
     linkTags           LinkTag[]
-    linkHiddenTags     LinkHiddenTag[]
-    category           Category?       @relation(fields: [categoryIdentifier], references: [identifier])
-    categoryIdentifier String?
-    createdAt          DateTime        @default(now())
-    updatedAt          DateTime        @updatedAt
-    isDeleted          Boolean         @default(false)
+    categoryIdentifier String
+    category           Category  @relation(fields: [categoryIdentifier], references: [identifier])
+    userIdentifier     String
+    user               User      @relation(fields: [userIdentifier], references: [userId])
+    createdAt          DateTime  @default(now())
+    updatedAt          DateTime  @updatedAt
+    isDeleted          Boolean   @default(false)
 }
 
 model Tag {
     id         Int       @id @default(autoincrement())
     identifier String    @unique
-    name       String
-    order      Int // for priority
+    name       String    @unique
+    order      Int
     linkTags   LinkTag[]
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
     isDeleted  Boolean   @default(false)
 }
 
-model HiddenTag {
-    id             Int             @id @default(autoincrement())
-    identifier     String          @unique
-    name           String
-    order          Int
-    linkHiddenTags LinkHiddenTag[]
-    createdAt      DateTime        @default(now())
-    updatedAt      DateTime        @updatedAt
-    isDeleted      Boolean         @default(false)
-}
-
 model LinkTag {
-    id             Int    @id @default(autoincrement())
+    id             Int      @id @default(autoincrement())
     linkIdentifier String
+    link           Link     @relation(fields: [linkIdentifier], references: [identifier])
     tagIdentifier  String
-    link           Link   @relation(fields: [linkIdentifier], references: [identifier])
-    tag            Tag    @relation(fields: [tagIdentifier], references: [identifier])
-}
-
-model LinkHiddenTag {
-    id                  Int       @id @default(autoincrement())
-    linkIdentifier      String
-    hiddenTagIdentifier String
-    link                Link      @relation(fields: [linkIdentifier], references: [identifier])
-    hiddenTag           HiddenTag @relation(fields: [hiddenTagIdentifier], references: [identifier])
+    tag            Tag      @relation(fields: [tagIdentifier], references: [identifier])
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 }

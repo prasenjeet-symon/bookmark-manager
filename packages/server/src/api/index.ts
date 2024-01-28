@@ -1,5 +1,6 @@
 import express from 'express';
 import { CategoryController } from './category.controller';
+import { LinkController } from './link.controller';
 import { TabController } from './tab.controller';
 import { UserSetting } from './user-setting.controller';
 
@@ -65,10 +66,15 @@ router.put('/categories', (req, res) => new CategoryController(req, res).updateC
  */
 router.delete('/categories', (req, res) => new CategoryController(req, res).deleteCategory());
 /**
- * 
+ *
  * Get categories incrementally
  */
 router.get('/categories-incrementally', (req, res) => new CategoryController(req, res).getAllCategoriesIncrementally());
+/**
+ *
+ * Add new link
+ */
+router.post('/links', (req, res) => new LinkController(req, res).addLink());
 /**
  *
  *

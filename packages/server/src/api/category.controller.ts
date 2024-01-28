@@ -78,7 +78,6 @@ export class CategoryController {
         }
 
         const categories = userWithTabWithCategoriesUpdated.userTabs[0].categories;
-
         this.res.status(200).json(categories);
         return;
     }
@@ -125,7 +124,6 @@ export class CategoryController {
         }
 
         const categories = userWithTabWithCategories.userTabs[0].categories;
-
         this.res.status(200).json(categories);
         return;
     }
@@ -154,12 +152,21 @@ export class CategoryController {
                         },
                         data: {
                             categories: {
-                                create: {
-                                    color: this.req.body.color,
-                                    identifier: this.req.body.identifier,
-                                    name: this.req.body.name,
-                                    order: +this.req.body.order,
-                                    icon: this.req.body.icon || null,
+                                upsert: {
+                                    where: { identifier: this.req.body.identifier },
+                                    create: {
+                                        color: this.req.body.color,
+                                        identifier: this.req.body.identifier,
+                                        name: this.req.body.name,
+                                        order: +this.req.body.order,
+                                        icon: this.req.body.icon || null,
+                                    },
+                                    update: {
+                                        color: this.req.body.color,
+                                        name: this.req.body.name,
+                                        order: +this.req.body.order,
+                                        icon: this.req.body.icon || null,
+                                    },
                                 },
                             },
                         },
@@ -168,7 +175,7 @@ export class CategoryController {
             },
         });
 
-        this.res.status(200).json({ message: 'Category added' });
+        this.res.status(200).json({ message: 'Category added successfully' });
         return;
     }
     /**
@@ -213,7 +220,7 @@ export class CategoryController {
             },
         });
 
-        this.res.status(200).json({ message: 'Category updated' });
+        this.res.status(200).json({ message: 'Category updated successfully' });
         return;
     }
     /**
@@ -256,7 +263,7 @@ export class CategoryController {
             },
         });
 
-        this.res.status(200).json({ message: 'Category deleted' });
+        this.res.status(200).json({ message: 'Category deleted successfully' });
         return;
     }
     /**
@@ -293,7 +300,6 @@ export class CategoryController {
             return false;
         }
 
-        // order is number
         if (!isInteger(order)) {
             this.res.status(400).json({ error: 'order must be a number' });
             Logger.getInstance().logError('order must be a number');
