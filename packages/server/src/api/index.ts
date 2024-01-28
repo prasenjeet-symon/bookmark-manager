@@ -76,6 +76,10 @@ router.get('/categories-incrementally', (req, res) => new CategoryController(req
  */
 router.post('/links', (req, res) => new LinkController(req, res).addLink());
 /**
+ * Update link
+ */
+router.put('/links', (req, res) => new LinkController(req, res).updateLink());
+/**
  *
  *
  *

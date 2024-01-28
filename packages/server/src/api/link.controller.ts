@@ -90,6 +90,103 @@ export class LinkController {
     }
     /**
      *
+     * Update a link
+     */
+    async updateLink() {
+        if (!this.validateAddLinkReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const email = this.res.locals.email;
+        const { tabIdentifier, categoryIdentifier, identifier, tags } = this.req.body;
+        const prisma = PrismaClientSingleton.prisma;
+
+        // We have to delete all the tags before updating
+        await prisma.user.update({
+            where: { email: email },
+            data: {
+                userTabs: {
+                    update: {
+                        where: { identifier: tabIdentifier },
+                        data: {
+                            categories: {
+                                update: {
+                                    where: { identifier: categoryIdentifier },
+                                    data: {
+                                        links: {
+                                            update: {
+                                                where: { identifier: identifier },
+                                                data: {
+                                                    linkTags: {
+                                                        deleteMany: {},
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        // Update the link and create new tags
+        await prisma.user.update({
+            where: { email: email },
+            data: {
+                userTabs: {
+                    update: {
+                        where: { identifier: tabIdentifier },
+                        data: {
+                            categories: {
+                                update: {
+                                    where: { identifier: categoryIdentifier },
+                                    data: {
+                                        links: {
+                                            update: {
+                                                where: { identifier: identifier },
+                                                data: {
+                                                    order: +this.req.body.order,
+                                                    title: this.req.body.title,
+                                                    url: this.req.body.url,
+                                                    icon: this.req.body.icon || null,
+                                                    notes: this.req.body.notes || null,
+                                                    linkTags: {
+                                                        create: [
+                                                            ...(tags as string[]).map((tag) => ({
+                                                                tag: {
+                                                                    connectOrCreate: {
+                                                                        where: { identifier: tag.trim().toLowerCase() },
+                                                                        create: {
+                                                                            identifier: tag.trim().toLowerCase(),
+                                                                            name: tag.trim().toLowerCase(),
+                                                                            order: 1,
+                                                                        },
+                                                                    },
+                                                                },
+                                                            })),
+                                                        ],
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link updated successfully' });
+        return;
+    }
+    /**
+     *
      * Validate request body of add link
      *
      */
