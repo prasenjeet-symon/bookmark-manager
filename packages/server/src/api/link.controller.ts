@@ -232,6 +232,88 @@ export class LinkController {
     }
     /**
      *
+     * Move a link from one category to another
+     */
+    async moveLink() {
+        if (!this.validateMoveLinkReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+        const { tabIdentifier, categoryIdentifier, finalCategoryIdentifier, identifier } = this.req.body;
+
+        const userWithTabWithCategoryWithLink = await prisma.user.findUnique({
+            where: { email: email },
+            include: {
+                userTabs: {
+                    where: { identifier: tabIdentifier },
+                    include: {
+                        categories: {
+                            where: { identifier: categoryIdentifier },
+                            include: {
+                                links: {
+                                    where: { identifier: identifier },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (
+            userWithTabWithCategoryWithLink === null ||
+            userWithTabWithCategoryWithLink.userTabs.length === 0 ||
+            userWithTabWithCategoryWithLink.userTabs[0].categories.length === 0 ||
+            userWithTabWithCategoryWithLink.userTabs[0].categories[0].links.length === 0
+        ) {
+            this.res.status(404).json({ error: 'Link not found' });
+            Logger.getInstance().logError('Link not found');
+            return;
+        }
+
+        // Move link to new category
+        await prisma.link.update({
+            where: {
+                identifier: identifier,
+            },
+            data: {
+                category: {
+                    connect: {
+                        identifier: finalCategoryIdentifier,
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link moved successfully' });
+        return;
+    }
+    /**
+     *
+     * Validate request body of move link
+     */
+    validateMoveLinkReqBody(): boolean {
+        // We need tabIdentifier, categoryIdentifier, identifier
+        const { tabIdentifier, categoryIdentifier, finalCategoryIdentifier, identifier } = this.req.body;
+
+        if (
+            tabIdentifier === undefined ||
+            categoryIdentifier === undefined ||
+            finalCategoryIdentifier === undefined ||
+            identifier === undefined
+        ) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
      * Validate request body of delete link
      */
     validateDeleteLinkReqBody(): boolean {
