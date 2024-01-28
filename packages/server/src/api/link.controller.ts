@@ -9,7 +9,59 @@ export class LinkController {
         this.req = req;
         this.res = res;
     }
+    /**
+     * Get all links
+     */
+    async getAllLinks() {
+        if (!this.validateGetAllLinksReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
 
+        const email = this.res.locals.email;
+        const { tabIdentifier, categoryIdentifier } = this.req.body;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const userWithTabWithCategoryWithLinks = await prisma.user.findUnique({
+            where: { email: email },
+            include: {
+                userTabs: {
+                    where: { identifier: tabIdentifier },
+                    include: {
+                        categories: {
+                            where: { identifier: categoryIdentifier },
+                            include: {
+                                links: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!userWithTabWithCategoryWithLinks) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (userWithTabWithCategoryWithLinks.userTabs.length === 0) {
+            this.res.status(400).json({ error: 'Tab not found' });
+            Logger.getInstance().logError('Tab not found');
+            return;
+        }
+
+        if (userWithTabWithCategoryWithLinks.userTabs[0].categories.length === 0) {
+            this.res.status(400).json({ error: 'Category not found' });
+            Logger.getInstance().logError('Category not found');
+            return;
+        }
+
+        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links;
+
+        this.res.status(200).json(links);
+        return;
+    }
     /**
      *
      * Add new link to the given category ( where category may be optional )
@@ -367,6 +419,22 @@ export class LinkController {
         if (!isAllTagsValid) {
             this.res.status(400).json({ error: 'Tags must be an array of strings' });
             Logger.getInstance().logError('Tags must be an array of strings');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate req body of get all links
+     *
+     */
+    validateGetAllLinksReqBody(): boolean {
+        const { tabIdentifier, categoryIdentifier } = this.req.body;
+
+        if (tabIdentifier === undefined || categoryIdentifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
             return false;
         }
 

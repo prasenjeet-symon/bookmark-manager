@@ -89,6 +89,10 @@ router.delete('/links', (req, res) => new LinkController(req, res).deleteLink())
  */
 router.put('/links/move', (req, res) => new LinkController(req, res).moveLink());
 /**
+ * Get all links
+ */
+router.get('/links', (req, res) => new LinkController(req, res).getAllLinks());
+/**
  *
  *
  *
