@@ -2,6 +2,7 @@ import express from 'express';
 import { CategoryController } from './category.controller';
 import { LinkController } from './link.controller';
 import { TabController } from './tab.controller';
+import { TagController } from './tag.cotroller';
 import { UserSetting } from './user-setting.controller';
 
 const router = express.Router();
@@ -108,6 +109,11 @@ router.post('/catalog', (req, res) => new LinkController(req, res).addLinkToCata
  *
  */
 router.put('/catalog/move', (req, res) => new LinkController(req, res).moveCatalogLink());
+/**
+ *
+ * Get all tags of application
+ */
+router.get('/tags', (req, res) => new TagController(req, res).getAllTags());
 /**
  *
  *
