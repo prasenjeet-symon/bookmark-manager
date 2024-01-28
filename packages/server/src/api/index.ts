@@ -93,10 +93,21 @@ router.put('/links/move', (req, res) => new LinkController(req, res).moveLink())
  */
 router.get('/links', (req, res) => new LinkController(req, res).getAllLinks());
 /**
- * 
+ *
  * Get links incrementally
  */
 router.get('/links-incrementally', (req, res) => new LinkController(req, res).getLinksIncrementally());
+/**
+ *
+ * Add link to catalog
+ */
+router.post('/catalog', (req, res) => new LinkController(req, res).addLinkToCatalog());
+/**
+ *
+ * Move link from catalog to given tab and category
+ *
+ */
+router.put('/catalog/move', (req, res) => new LinkController(req, res).moveCatalogLink());
 /**
  *
  *

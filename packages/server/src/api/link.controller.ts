@@ -11,6 +11,60 @@ export class LinkController {
     }
     /**
      *
+     * Add link to catalog
+     */
+    async addLinkToCatalog() {
+        if (!this.validateAddLinkToCatalogReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const email = this.res.locals.email;
+        const prisma = PrismaClientSingleton.prisma;
+
+        await prisma.user.update({
+            where: { email: email },
+            data: {
+                links: {
+                    connectOrCreate: {
+                        where: { identifier: this.req.body.identifier },
+                        create: {
+                            identifier: this.req.body.identifier,
+                            order: +this.req.body.order,
+                            title: this.req.body.title,
+                            url: this.req.body.url,
+                            icon: this.req.body.icon,
+                            notes: this.req.body.notes,
+                            category: {
+                                connect: { identifier: undefined },
+                            },
+                            linkTags: {
+                                create: [
+                                    ...(this.req.body.tags as string[]).map((tag) => ({
+                                        tag: {
+                                            connectOrCreate: {
+                                                where: { identifier: tag.trim().toLowerCase() },
+                                                create: {
+                                                    identifier: tag.trim().toLowerCase(),
+                                                    name: tag.trim().toLowerCase(),
+                                                    order: 1,
+                                                },
+                                            },
+                                        },
+                                    })),
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link added successfully' });
+        return;
+    }
+    /**
+     *
      * Get links incrementally
      */
     async getLinksIncrementally() {
@@ -417,6 +471,56 @@ export class LinkController {
     }
     /**
      *
+     * Move catalog link to the category
+     */
+    async moveCatalogLink() {
+        if (!this.validateMoveCatalogLinkReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+        const { finalCategoryIdentifier, identifier } = this.req.body;
+
+        const userWithLink = await prisma.user.findUnique({
+            where: { email: email },
+            include: {
+                links: {
+                    where: { identifier: identifier },
+                },
+            },
+        });
+
+        if (!userWithLink) {
+            this.res.status(404).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (userWithLink.links.length === 0) {
+            this.res.status(404).json({ error: 'Link not found' });
+            Logger.getInstance().logError('Link not found');
+            return;
+        }
+
+        // Move link to new category
+        await prisma.link.update({
+            where: {
+                identifier: identifier,
+            },
+            data: {
+                category: {
+                    connect: { identifier: finalCategoryIdentifier },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link moved successfully' });
+        return;
+    }
+    /**
+     *
      * Validate request body of move link
      */
     validateMoveLinkReqBody(): boolean {
@@ -522,6 +626,66 @@ export class LinkController {
         const { tabIdentifier, categoryIdentifier, lastUpdatedTime } = this.req.body;
 
         if (tabIdentifier === undefined || categoryIdentifier === undefined || lastUpdatedTime === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate req body of add link to catalog
+     */
+    validateAddLinkToCatalogReqBody(): boolean {
+        const { identifier } = this.req.body;
+
+        if (identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        const { order, title, url, icon, notes, tags } = this.req.body;
+
+        if (order === undefined || title === undefined || url === undefined || tags === undefined) {
+            this.res.status(400).json({ error: 'Invalid parameters' });
+            Logger.getInstance().logError('Invalid parameters');
+            return false;
+        }
+
+        if (!isInteger(order)) {
+            this.res.status(400).json({ error: 'Order must be an integer' });
+            Logger.getInstance().logError('Order must be an integer');
+            return false;
+        }
+
+        // tags should be an array of strings
+        if (!Array.isArray(tags)) {
+            this.res.status(400).json({ error: 'Tags must be an array of strings' });
+            Logger.getInstance().logError('Tags must be an array of strings');
+            return false;
+        }
+
+        const isAllTagsValid = tags.every((tag) => typeof tag === 'string');
+
+        if (!isAllTagsValid) {
+            this.res.status(400).json({ error: 'Tags must be an array of strings' });
+            Logger.getInstance().logError('Tags must be an array of strings');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * Validate req body of move catalog link
+     */
+    validateMoveCatalogLinkReqBody(): boolean {
+        const { finalCategoryIdentifier, identifier } = this.req.body;
+
+        if (finalCategoryIdentifier === undefined || identifier === undefined) {
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;
