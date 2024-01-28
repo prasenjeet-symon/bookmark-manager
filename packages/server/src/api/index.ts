@@ -93,6 +93,11 @@ router.put('/links/move', (req, res) => new LinkController(req, res).moveLink())
  */
 router.get('/links', (req, res) => new LinkController(req, res).getAllLinks());
 /**
+ * 
+ * Get links incrementally
+ */
+router.get('/links-incrementally', (req, res) => new LinkController(req, res).getLinksIncrementally());
+/**
  *
  *
  *

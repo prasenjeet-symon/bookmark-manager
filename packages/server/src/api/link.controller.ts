@@ -10,6 +10,78 @@ export class LinkController {
         this.res = res;
     }
     /**
+     *
+     * Get links incrementally
+     */
+    async getLinksIncrementally() {
+        const { lastUpdatedTime } = this.req.body;
+
+        if (lastUpdatedTime === undefined) {
+            // Return all links
+            return this.getAllLinks();
+        } else {
+            // Return links updated after lastUpdatedTime
+            return this.getLinksUpdated();
+        }
+    }
+    /**
+     *
+     * Get all links updated after lastUpdatedTime
+     */
+    async getLinksUpdated() {
+        if (!this.validateGetLinksUpdatedReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { tabIdentifier, categoryIdentifier, lastUpdatedTime } = this.req.body;
+        const email = this.res.locals.email;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const userWithTabWithCategoryWithLinks = await prisma.user.findUnique({
+            where: { email: email },
+            include: {
+                userTabs: {
+                    where: { identifier: tabIdentifier },
+                    include: {
+                        categories: {
+                            where: { identifier: categoryIdentifier },
+                            include: {
+                                links: {
+                                    where: { updatedAt: { gte: lastUpdatedTime } },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!userWithTabWithCategoryWithLinks) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (userWithTabWithCategoryWithLinks.userTabs.length === 0) {
+            this.res.status(400).json({ error: 'Tab not found' });
+            Logger.getInstance().logError('Tab not found');
+            return;
+        }
+
+        if (userWithTabWithCategoryWithLinks.userTabs[0].categories.length === 0) {
+            this.res.status(400).json({ error: 'Category not found' });
+            Logger.getInstance().logError('Category not found');
+            return;
+        }
+
+        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links;
+
+        this.res.status(200).json(links);
+        return;
+    }
+
+    /**
      * Get all links
      */
     async getAllLinks() {
@@ -433,6 +505,23 @@ export class LinkController {
         const { tabIdentifier, categoryIdentifier } = this.req.body;
 
         if (tabIdentifier === undefined || categoryIdentifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * Validate req body of get links updated
+     *
+     */
+    validateGetLinksUpdatedReqBody(): boolean {
+        const { tabIdentifier, categoryIdentifier, lastUpdatedTime } = this.req.body;
+
+        if (tabIdentifier === undefined || categoryIdentifier === undefined || lastUpdatedTime === undefined) {
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;
