@@ -187,6 +187,67 @@ export class LinkController {
     }
     /**
      *
+     * Delete link
+     */
+    async deleteLink() {
+        if (!this.validateDeleteLinkReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+        const { tabIdentifier, categoryIdentifier, identifier } = this.req.body;
+
+        await prisma.user.update({
+            where: { email: email },
+            data: {
+                userTabs: {
+                    update: {
+                        where: { identifier: tabIdentifier },
+                        data: {
+                            categories: {
+                                update: {
+                                    where: { identifier: categoryIdentifier },
+                                    data: {
+                                        links: {
+                                            update: {
+                                                where: { identifier: identifier },
+                                                data: {
+                                                    isDeleted: true,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link deleted successfully' });
+        return;
+    }
+    /**
+     *
+     * Validate request body of delete link
+     */
+    validateDeleteLinkReqBody(): boolean {
+        // We need tabIdentifier, categoryIdentifier, identifier
+        const { tabIdentifier, categoryIdentifier, identifier } = this.req.body;
+
+        if (tabIdentifier === undefined || categoryIdentifier === undefined || identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
      * Validate request body of add link
      *
      */

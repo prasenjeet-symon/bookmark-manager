@@ -80,6 +80,11 @@ router.post('/links', (req, res) => new LinkController(req, res).addLink());
  */
 router.put('/links', (req, res) => new LinkController(req, res).updateLink());
 /**
+ * Delete link
+ * 
+ */
+router.delete('/links', (req, res) => new LinkController(req, res).deleteLink());
+/**
  *
  *
  *
