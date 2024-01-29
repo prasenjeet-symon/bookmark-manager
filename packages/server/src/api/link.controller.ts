@@ -21,7 +21,7 @@ export class LinkController {
 
         const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
-        const hiddenTags = ["uncategorized", "catalog", "other"];
+        const hiddenTags = ['uncategorized', 'catalog', 'other'];
 
         await prisma.user.update({
             where: { email: email },
@@ -70,7 +70,7 @@ export class LinkController {
                                         },
                                     })),
                                 ],
-                            }
+                            },
                         },
                     },
                 },
@@ -219,6 +219,7 @@ export class LinkController {
         const email = this.res.locals.email;
         const { tabIdentifier, categoryIdentifier, identifier, tags } = this.req.body;
         const prisma = PrismaClientSingleton.prisma;
+        const hiddenTags = [tabIdentifier, categoryIdentifier];
 
         await prisma.user.update({
             where: { email: email },
@@ -244,6 +245,22 @@ export class LinkController {
                                                     linkTags: {
                                                         create: [
                                                             ...(tags as string[]).map((tag) => ({
+                                                                tag: {
+                                                                    connectOrCreate: {
+                                                                        where: { identifier: tag.trim().toLowerCase() },
+                                                                        create: {
+                                                                            identifier: tag.trim().toLowerCase(),
+                                                                            name: tag.trim().toLowerCase(),
+                                                                            order: 1,
+                                                                        },
+                                                                    },
+                                                                },
+                                                            })),
+                                                        ],
+                                                    },
+                                                    linkHiddenTags: {
+                                                        create: [
+                                                            ...hiddenTags.map((tag) => ({
                                                                 tag: {
                                                                     connectOrCreate: {
                                                                         where: { identifier: tag.trim().toLowerCase() },
