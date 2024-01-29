@@ -174,7 +174,15 @@ export class LinkController {
                         categories: {
                             where: { identifier: categoryIdentifier },
                             include: {
-                                links: true,
+                                links: {
+                                    include: {
+                                        linkTags: {
+                                            include: {
+                                                tag: true,
+                                            },
+                                        },
+                                    },
+                                },
                             },
                         },
                     },
