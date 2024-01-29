@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
 import { IGoogleAuthTokenResponse } from '../schema';
-import { Logger, PrismaClientSingleton, createJwt } from '../utils';
+import { Logger, PrismaClientSingleton, createJwt, getJwtExpirationDate } from '../utils';
 
 export class Google {
     private req: Request;
@@ -51,6 +51,24 @@ export class Google {
 
         // User do exit , create jwt token
         const tokenJwt = await createJwt(user.userId, user.email);
+
+        // Add session
+        await prisma.user.update({
+            where: {
+                userId: user.userId,
+            },
+            data: {
+                sessions: {
+                    create: {
+                        sessionToken: tokenJwt,
+                        expires: getJwtExpirationDate(tokenJwt),
+                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
+                        userAgent: this.req.headers['user-agent']?.toString() || '',
+                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                    },
+                },
+            },
+        });
 
         this.res.status(200).json({
             token: tokenJwt,
@@ -116,6 +134,24 @@ export class Google {
         });
 
         const tokenJwt = await createJwt(newUser.userId, newUser.email);
+
+        // Add session
+        await prisma.user.update({
+            where: {
+                userId: newUser.userId,
+            },
+            data: {
+                sessions: {
+                    create: {
+                        sessionToken: tokenJwt,
+                        expires: getJwtExpirationDate(tokenJwt),
+                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
+                        userAgent: this.req.headers['user-agent']?.toString() || '',
+                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                    },
+                },
+            },
+        });
 
         this.res.status(200).json({
             token: tokenJwt,

@@ -168,6 +168,19 @@ export async function createJwt(
 }
 /**
  *
+ * Find JWT expiration date in UTC
+ *
+ */
+export function getJwtExpirationDate(token: String) {
+    const jwt = require('jsonwebtoken');
+    const tokenExpiration = process.env.JWT_EXPIRES_IN || '1d';
+    const expirationSeconds = jwt.decode(tokenExpiration).exp;
+    const tokenExpirationDateUTC = new Date(Date.now() + expirationSeconds * 1000);
+
+    return tokenExpirationDateUTC;
+}
+/**
+ *
  *
  * Prisma client
  */

@@ -4,6 +4,7 @@ import {
     Logger,
     PrismaClientSingleton,
     createJwt,
+    getJwtExpirationDate,
     hashPassword,
     isTokenExpired,
     isValidEmail,
@@ -67,6 +68,24 @@ export class SignupController {
 
         const token = await createJwt(newUser.userId, newUser.email);
 
+        // Add session
+        await prisma.user.update({
+            where: {
+                userId: newUser.userId,
+            },
+            data: {
+                sessions: {
+                    create: {
+                        sessionToken: token,
+                        expires: getJwtExpirationDate(token),
+                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
+                        userAgent: this.req.headers['user-agent']?.toString() || '',
+                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                    },
+                },
+            },
+        });
+
         this.res.status(200).json({
             token: token,
             userId: newUser.userId,
@@ -121,6 +140,25 @@ export class SignupController {
 
         const token = await createJwt(user.userId, user.email);
 
+        // Add session
+
+        await prisma.user.update({
+            where: {
+                userId: user.userId,
+            },
+            data: {
+                sessions: {
+                    create: {
+                        sessionToken: token,
+                        expires: getJwtExpirationDate(token),
+                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
+                        userAgent: this.req.headers['user-agent']?.toString() || '',
+                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                    },
+                },
+            },
+        });
+
         this.res.status(200).json({
             token: token,
             userId: user.userId,
@@ -131,6 +169,61 @@ export class SignupController {
 
         Logger.getInstance().logSuccess('User logged in');
 
+        return;
+    }
+    /**
+     *
+     * Logout user
+     */
+    async logout() {
+        // We have to remove the session
+        // Should have token
+        if (!this.validLogoutReqBody()) {
+            Logger.getInstance().logError('Invalid request body');
+            return;
+        }
+
+        const { token } = this.req.body;
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+
+        const userWithSession = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            include: {
+                sessions: {
+                    where: { sessionToken: token },
+                },
+            },
+        });
+
+        if (!userWithSession) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (userWithSession.sessions.length === 0) {
+            this.res.status(400).json({ error: 'Session not found' });
+            Logger.getInstance().logError('Session not found');
+            return;
+        }
+
+        await prisma.user.update({
+            where: {
+                userId: userWithSession.userId,
+            },
+            data: {
+                sessions: {
+                    deleteMany: {
+                        sessionToken: token,
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ success: 'User logged out' });
         return;
     }
     /**
@@ -336,6 +429,27 @@ export class SignupController {
      */
     validReqBodyIsTokenValid(): boolean {
         const { token } = this.req.body;
+
+        if (!token) {
+            this.res.status(400).json({ error: 'token is required' });
+            Logger.getInstance().logError('token is required');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate logout request body
+     */
+    validLogoutReqBody(): boolean {
+        const { token } = this.req.body;
+
+        if (token === undefined) {
+            this.res.status(400).json({ error: 'token is required' });
+            Logger.getInstance().logError('token is required');
+            return false;
+        }
 
         if (!token) {
             this.res.status(400).json({ error: 'token is required' });

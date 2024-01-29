@@ -8,13 +8,18 @@ export interface ApiEventData {
 
 // Hold all the action names
 class ApiEventNames {
-    public static readonly USER_CREATED = 'user_created';
-    public static readonly SEND_FORGOT_PASSWORD_LINK = 'send_forgot_password_link';
+    public static readonly SEND_PASSWORD_RESET_LINK_EMAIL = 'send_forgot_password_link';
     public static readonly SEND_RESET_PASSWORD_SUCCESS_EMAIL = 'send_reset_password_success_email';
+    public static readonly SEND_GREETING_EMAIL = 'send_greeting_email';
     public static readonly TAB_DELETED = 'tab_deleted';
+    public static readonly TAB_CREATED = 'tab_created';
     public static readonly CATEGORY_DELETED = 'category_deleted';
+    public static readonly CATEGORY_CREATED = 'category_created';
     public static readonly LINK_DELETED = 'link_deleted';
+    public static readonly LINK_CREATED = 'link_created';
     public static readonly USER_DELETED = 'user_deleted';
+    public static readonly USER_CREATED = 'user_created';
+    public static readonly USER_LOGIN = 'user_login';
 }
 
 export class ApiEvent {

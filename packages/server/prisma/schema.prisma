@@ -35,6 +35,21 @@ model User {
     isDeleted      Boolean      @default(false)
     links          Link[]
     userTabs       UserTab[]
+    sessions       Session[]
+    maxSession     Int          @default(5)
+}
+
+model Session {
+    id             Int      @id @default(autoincrement())
+    sessionToken   String   @unique
+    userIdentifier String
+    user           User     @relation(fields: [userIdentifier], references: [userId])
+    expires        DateTime
+    ipAddress      String
+    userAgent      String
+    ipLocation     String?
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 }
 
 enum ColumnNumber {
