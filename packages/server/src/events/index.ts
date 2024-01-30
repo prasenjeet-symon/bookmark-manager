@@ -42,6 +42,10 @@ export class ApiEvent {
                 case ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL:
                     new AuthenticationEvent(data).sendPasswordResetLinkEmail();
                     break;
+
+                case ApiEventNames.SEND_RESET_PASSWORD_SUCCESS_EMAIL:
+                    new AuthenticationEvent(data).sendResetPasswordSuccessEmail();
+                    break;
             }
         });
     }
