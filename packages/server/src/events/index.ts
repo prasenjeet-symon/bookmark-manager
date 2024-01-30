@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { UserEvent } from './user.event';
 
 export interface ApiEventData {
     name: string;
@@ -32,7 +33,11 @@ export class ApiEvent {
 
     private constructor() {
         this.source.subscribe((data) => {
-            console.log(data);
+            switch (data.name) {
+                case ApiEventNames.SEND_GREETING_EMAIL:
+                    new UserEvent(data).sendGreetingEmail();
+                    break;
+            }
         });
     }
 

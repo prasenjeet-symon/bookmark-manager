@@ -5,3 +5,10 @@ export interface IGoogleAuthTokenResponse {
     profile: string;
     success: boolean;
 }
+
+export interface EmailOptions {
+    to: string;
+    subject: string;
+    text?: string;
+    html?: string;
+}

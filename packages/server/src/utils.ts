@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
+import { Resend } from 'resend';
 import { v4 } from 'uuid';
+import { EmailOptions } from './schema';
 
 /**
  *
@@ -272,4 +274,28 @@ export function isTokenExpired(token: string): boolean {
  */
 export function isInteger(value: any): boolean {
     return Number.isInteger(value);
+}
+/**
+ *
+ * Send email with resend
+ */
+export async function sendEmail(data: EmailOptions): Promise<string | undefined> {
+    const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+    const API_KEY = process.env.RESEND_API_KEY || '';
+    const resend = new Resend(API_KEY);
+
+    try {
+        const sendResult = await resend.emails.send({
+            from: from,
+            to: data.to,
+            subject: data.subject,
+            html: data.html || '',
+        });
+
+        if (sendResult.error) throw sendResult.error;
+        return sendResult.data?.id;
+    } catch (error: any) {
+        Logger.getInstance().logError('Error sending email : ' + error);
+        return undefined;
+    }
 }

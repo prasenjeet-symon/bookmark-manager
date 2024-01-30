@@ -120,6 +120,13 @@ export class LinkController {
                             include: {
                                 links: {
                                     where: { updatedAt: { gte: lastUpdatedTime } },
+                                    include: {
+                                        linkTags: {
+                                            include: {
+                                                tag: true,
+                                            },
+                                        }
+                                    }
                                 },
                             },
                         },
