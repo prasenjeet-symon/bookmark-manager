@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import axios from 'axios';
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { Resend } from 'resend';
 import { v4 } from 'uuid';
-import { EmailOptions } from './schema';
+import { EmailOptions, LocationInfo } from './schema';
 
 /**
  *
@@ -155,7 +156,8 @@ export async function createJwt(
     userId: string,
     email: string,
     isAdmin: boolean = false,
-    expiresIn: string | null = null
+    expiresIn: string | null = null,
+    timeZone: string | null = null
 ): Promise<string> {
     const jwt = require('jsonwebtoken');
     const JWT_SECRET = process.env.JWT_SECRET;
@@ -166,7 +168,7 @@ export async function createJwt(
         throw new Error('JWT_SECRET not set');
     }
 
-    return jwt.sign({ userId, email, isAdmin: isAdmin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    return jwt.sign({ userId, email, isAdmin: isAdmin, timeZone }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 /**
  *
@@ -311,4 +313,48 @@ export function getCurrentTimestampInSecondsUTC(): number {
     const timestampInSeconds = Math.floor(timestampInMilliseconds / 1000);
 
     return timestampInSeconds;
+}
+/**
+ *
+ * Get client ip address
+ */
+export function getClientIP(req: Request): string {
+    // Check if the request is coming through a proxy
+    const forwardedFor = req.headers['x-forwarded-for'];
+    if (forwardedFor && typeof forwardedFor === 'string') {
+        // Extract the client IP from the X-Forwarded-For header
+        const ips = forwardedFor.split(',');
+        return ips[0].trim();
+    }
+
+    // If not behind a proxy, simply use the remote address from the request
+    return req.ip || '';
+}
+
+/**
+ *
+ * Get user agent
+ */
+export function getUserAgent(req: Request): string {
+    return req.headers['user-agent'] || '';
+}
+/**
+ * Get client location
+ */
+export async function getClientLocation(req: Request): Promise<LocationInfo | undefined> {
+    const { IPINFO_TOKEN } = process.env;
+    if (IPINFO_TOKEN === undefined) {
+        Logger.getInstance().logError('IPINFO_TOKEN is not defined. Please set it in .env file');
+        return;
+    }
+
+    const clientIP = getClientIP(req);
+    try {
+        // Make a request to the ipinfo.io API to get location information
+        const response = await axios.get<LocationInfo>(`https://ipinfo.io/${clientIP}?token=${IPINFO_TOKEN}`);
+        return response.data;
+    } catch (error) {
+        Logger.getInstance().logError('Error getting client location : ' + error);
+        return;
+    }
 }

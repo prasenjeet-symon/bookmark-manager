@@ -4,7 +4,10 @@ import {
     Logger,
     PrismaClientSingleton,
     createJwt,
+    getClientIP,
+    getClientLocation,
     getJwtExpirationDate,
+    getUserAgent,
     hashPassword,
     isTokenExpired,
     isValidEmail,
@@ -48,7 +51,8 @@ export class SignupController {
 
         // We can create new user with this email
         const hashedPassword = hashPassword(password);
-        const { fullName, timeZone } = this.req.body;
+        const { fullName } = this.req.body;
+        const ipLocation = await getClientLocation(this.req);
 
         const newUser = await prisma.user.create({
             data: {
@@ -56,7 +60,7 @@ export class SignupController {
                 password: hashedPassword,
                 fullName: fullName || '',
                 userId: v4(),
-                timeZone: timeZone || null,
+                timeZone: ipLocation?.timezone || '',
             },
             select: {
                 userId: true,
@@ -66,7 +70,7 @@ export class SignupController {
             },
         });
 
-        const token = await createJwt(newUser.userId, newUser.email);
+        const token = await createJwt(newUser.userId, newUser.email, false, null, ipLocation?.timezone || null);
 
         // Add session
         await prisma.user.update({
@@ -78,9 +82,15 @@ export class SignupController {
                     create: {
                         sessionToken: token,
                         expires: getJwtExpirationDate(token),
-                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
-                        userAgent: this.req.headers['user-agent']?.toString() || '',
-                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                        ipAddress: getClientIP(this.req),
+                        userAgent: getUserAgent(this.req),
+                        city: ipLocation?.city || '',
+                        country: ipLocation?.country || '',
+                        loc: ipLocation?.loc || '',
+                        org: ipLocation?.org || '',
+                        postal: ipLocation?.postal || '',
+                        region: ipLocation?.region || '',
+                        timezone: ipLocation?.timezone || '',
                     },
                 },
             },
@@ -91,7 +101,7 @@ export class SignupController {
             userId: newUser.userId,
             email: newUser.email,
             fullName: newUser.fullName,
-            timeZone: newUser.timeZone,
+            timeZone: ipLocation?.timezone || null,
         });
 
         Logger.getInstance().logSuccess('User created');
@@ -138,7 +148,8 @@ export class SignupController {
             return;
         }
 
-        const token = await createJwt(user.userId, user.email);
+        const ipLocation = await getClientLocation(this.req);
+        const token = await createJwt(user.userId, user.email, false, null, ipLocation?.timezone || null);
 
         // Add session
 
@@ -151,9 +162,15 @@ export class SignupController {
                     create: {
                         sessionToken: token,
                         expires: getJwtExpirationDate(token),
-                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
-                        userAgent: this.req.headers['user-agent']?.toString() || '',
-                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                        ipAddress: getClientIP(this.req),
+                        userAgent: getUserAgent(this.req),
+                        city: ipLocation?.city || '',
+                        country: ipLocation?.country || '',
+                        loc: ipLocation?.loc || '',
+                        org: ipLocation?.org || '',
+                        postal: ipLocation?.postal || '',
+                        region: ipLocation?.region || '',
+                        timezone: ipLocation?.timezone || '',
                     },
                 },
             },
@@ -164,7 +181,7 @@ export class SignupController {
             userId: user.userId,
             email: user.email,
             fullName: user.fullName,
-            timeZone: user.timeZone,
+            timeZone: ipLocation?.timezone || null,
         });
 
         Logger.getInstance().logSuccess('User logged in');
@@ -216,8 +233,11 @@ export class SignupController {
             },
             data: {
                 sessions: {
-                    deleteMany: {
-                        sessionToken: token,
+                    update: {
+                        where: { sessionToken: token },
+                        data: {
+                            isDeleted: true,
+                        },
                     },
                 },
             },

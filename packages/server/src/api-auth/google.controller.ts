@@ -2,7 +2,15 @@ import axios from 'axios';
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
 import { IGoogleAuthTokenResponse } from '../schema';
-import { Logger, PrismaClientSingleton, createJwt, getJwtExpirationDate } from '../utils';
+import {
+    Logger,
+    PrismaClientSingleton,
+    createJwt,
+    getClientIP,
+    getClientLocation,
+    getJwtExpirationDate,
+    getUserAgent,
+} from '../utils';
 
 export class Google {
     private req: Request;
@@ -50,7 +58,8 @@ export class Google {
         }
 
         // User do exit , create jwt token
-        const tokenJwt = await createJwt(user.userId, user.email);
+        const ipLocation = await getClientLocation(this.req);
+        const tokenJwt = await createJwt(user.userId, user.email, false, null, ipLocation?.timezone || null);
 
         // Add session
         await prisma.user.update({
@@ -62,9 +71,15 @@ export class Google {
                     create: {
                         sessionToken: tokenJwt,
                         expires: getJwtExpirationDate(tokenJwt),
-                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
-                        userAgent: this.req.headers['user-agent']?.toString() || '',
-                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                        ipAddress: getClientIP(this.req),
+                        userAgent: getUserAgent(this.req),
+                        city: ipLocation?.city || '',
+                        country: ipLocation?.country || '',
+                        loc: ipLocation?.loc || '',
+                        org: ipLocation?.org || '',
+                        postal: ipLocation?.postal || '',
+                        region: ipLocation?.region || '',
+                        timezone: ipLocation?.timezone || '',
                     },
                 },
             },
@@ -115,14 +130,14 @@ export class Google {
             return;
         }
 
-        const timeZone = this.req.body.timeZone;
+        const ipLocation = await getClientLocation(this.req);
 
         const newUser = await prisma.user.create({
             data: {
                 email: googleAuthTokenResponse.email,
                 userId: googleAuthTokenResponse.userId,
                 fullName: googleAuthTokenResponse.name,
-                timeZone: timeZone || null,
+                timeZone: ipLocation?.timezone || '',
                 password: v4(),
             },
             select: {
@@ -133,7 +148,7 @@ export class Google {
             },
         });
 
-        const tokenJwt = await createJwt(newUser.userId, newUser.email);
+        const tokenJwt = await createJwt(newUser.userId, newUser.email, false, null, ipLocation?.timezone || null);
 
         // Add session
         await prisma.user.update({
@@ -145,9 +160,15 @@ export class Google {
                     create: {
                         sessionToken: tokenJwt,
                         expires: getJwtExpirationDate(tokenJwt),
-                        ipAddress: this.req.headers['x-forwarded-for']?.toString() || '',
-                        userAgent: this.req.headers['user-agent']?.toString() || '',
-                        ipLocation: this.req.headers['cf-ipcountry']?.toString() || '',
+                        ipAddress: getClientIP(this.req),
+                        userAgent: getUserAgent(this.req),
+                        city: ipLocation?.city || '',
+                        country: ipLocation?.country || '',
+                        loc: ipLocation?.loc || '',
+                        org: ipLocation?.org || '',
+                        postal: ipLocation?.postal || '',
+                        region: ipLocation?.region || '',
+                        timezone: ipLocation?.timezone || '',
                     },
                 },
             },
@@ -158,11 +179,10 @@ export class Google {
             userId: newUser.userId,
             email: newUser.email,
             fullName: newUser.fullName,
-            timeZone: newUser.timeZone,
+            timeZone: ipLocation?.timezone || '',
         });
 
         Logger.getInstance().logSuccess('User created');
-
         return;
     }
     /**
