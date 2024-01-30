@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationEvent } from './authentication.event';
+import { CategoryEvent } from './category.event';
 import { TabEvent } from './tab.event';
 import { UserEvent } from './user.event';
 
@@ -59,6 +60,10 @@ export class ApiEvent {
 
                 case ApiEventNames.TAB_DELETED:
                     new TabEvent(data).deletedTab();
+                    break;
+
+                case ApiEventNames.CATEGORY_DELETED:
+                    new CategoryEvent(data).deletedCategory();
                     break;
             }
         });
