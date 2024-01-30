@@ -234,6 +234,8 @@ export class UserEvent {
             Logger.getInstance().logError('Invalid event body. userId and email are required');
             return false;
         }
+
+        return true;
     }
     /**
      *

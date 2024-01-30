@@ -161,7 +161,7 @@ export async function createJwt(
 ): Promise<string> {
     const jwt = require('jsonwebtoken');
     const JWT_SECRET = process.env.JWT_SECRET;
-    const JWT_EXPIRES_IN = expiresIn || process.env.JWT_EXPIRES_IN || '1d';
+    const JWT_EXPIRES_IN = (expiresIn || process.env.JWT_EXPIRES_IN) || '1d';
 
     if (!JWT_SECRET) {
         Logger.getInstance().logError('JWT_SECRET not set in the environment variables');
@@ -177,8 +177,8 @@ export async function createJwt(
  */
 export function getJwtExpirationDate(token: String) {
     const jwt = require('jsonwebtoken');
-    const tokenExpiration = process.env.JWT_EXPIRES_IN || '1d';
-    const expirationSeconds = jwt.decode(tokenExpiration).exp;
+    const expirationSeconds = jwt.decode(token).exp;
+    Logger.getInstance().logWarning(expirationSeconds);
     const tokenExpirationDateUTC = new Date(Date.now() + expirationSeconds * 1000);
 
     return tokenExpirationDateUTC;
@@ -282,6 +282,7 @@ export function isInteger(value: any): boolean {
  * Send email with resend
  */
 export async function sendEmail(data: EmailOptions): Promise<string | undefined> {
+    
     const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
     const API_KEY = process.env.RESEND_API_KEY || '';
     const resend = new Resend(API_KEY);
@@ -349,6 +350,8 @@ export async function getClientLocation(req: Request): Promise<LocationInfo | un
     }
 
     const clientIP = getClientIP(req);
+    console.log('Client IP: ' + clientIP);
+    
     try {
         // Make a request to the ipinfo.io API to get location information
         const response = await axios.get<LocationInfo>(`https://ipinfo.io/${clientIP}?token=${IPINFO_TOKEN}`);

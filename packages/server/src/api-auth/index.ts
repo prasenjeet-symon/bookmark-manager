@@ -1,6 +1,7 @@
 import express from 'express';
 import { Google } from './google.controller';
 import { SignupController } from './signup.controller';
+import { authenticateUser } from '../utils';
 
 const router = express.Router();
 
@@ -52,7 +53,7 @@ router.post('/is-token-valid', (req, res) => new SignupController(req, res).isTo
  * 
  * Logout
  */
-router.post('/logout', (req, res) => new SignupController(req, res).logout());
+router.post('/logout', authenticateUser, (req, res) => new SignupController(req, res).logout());
 /**
  *
  *

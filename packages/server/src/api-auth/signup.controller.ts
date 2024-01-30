@@ -62,6 +62,11 @@ export class SignupController {
                 fullName: fullName || '',
                 userId: v4(),
                 timeZone: ipLocation?.timezone || '',
+                userSetting: {
+                    create: {
+                        numberOfColumns: 'THREE',
+                    }
+                }
             },
             select: {
                 userId: true,
@@ -80,18 +85,33 @@ export class SignupController {
             },
             data: {
                 sessions: {
-                    create: {
-                        sessionToken: token,
-                        expires: getJwtExpirationDate(token),
-                        ipAddress: getClientIP(this.req),
-                        userAgent: getUserAgent(this.req),
-                        city: ipLocation?.city || '',
-                        country: ipLocation?.country || '',
-                        loc: ipLocation?.loc || '',
-                        org: ipLocation?.org || '',
-                        postal: ipLocation?.postal || '',
-                        region: ipLocation?.region || '',
-                        timezone: ipLocation?.timezone || '',
+                    upsert: {
+                        where: { sessionToken: token },
+                        create: {
+                            sessionToken: token,
+                            expires: getJwtExpirationDate(token),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                        update: {
+                            expires: getJwtExpirationDate(token),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
                     },
                 },
             },
@@ -106,6 +126,8 @@ export class SignupController {
         });
 
         Logger.getInstance().logSuccess('User created');
+        console.log(`User created: ${newUser.userId}`);
+
         ApiEvent.getInstance().dispatch(ApiEventNames.USER_CREATED, {
             userId: newUser.userId,
             email: newUser.email,
@@ -158,25 +180,39 @@ export class SignupController {
         const token = await createJwt(user.userId, user.email, false, null, ipLocation?.timezone || null);
 
         // Add session
-
         await prisma.user.update({
             where: {
                 userId: user.userId,
             },
             data: {
                 sessions: {
-                    create: {
-                        sessionToken: token,
-                        expires: getJwtExpirationDate(token),
-                        ipAddress: getClientIP(this.req),
-                        userAgent: getUserAgent(this.req),
-                        city: ipLocation?.city || '',
-                        country: ipLocation?.country || '',
-                        loc: ipLocation?.loc || '',
-                        org: ipLocation?.org || '',
-                        postal: ipLocation?.postal || '',
-                        region: ipLocation?.region || '',
-                        timezone: ipLocation?.timezone || '',
+                    upsert: {
+                        where: { sessionToken: token },
+                        create: {
+                            sessionToken: token,
+                            expires: getJwtExpirationDate(token),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                        update: {
+                            expires: getJwtExpirationDate(token),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
                     },
                 },
             },
@@ -280,8 +316,8 @@ export class SignupController {
             Logger.getInstance().logError('User not found');
             return;
         }
-
-        const token = await createJwt(user.userId, user.email, false, '10m');
+         
+        const token = await createJwt(user.userId, user.email, false, '10m', null);
 
         this.res.status(200).json({
             message: 'Forgot password link sent to your email',
@@ -350,19 +386,34 @@ export class SignupController {
             },
             data: {
                 sessions: {
-                    create: {
-                        sessionToken: jwtToken,
-                        expires: getJwtExpirationDate(jwtToken),
-                        ipAddress: getClientIP(this.req),
-                        userAgent: getUserAgent(this.req),
-                        city: ipLocation?.city || '',
-                        country: ipLocation?.country || '',
-                        loc: ipLocation?.loc || '',
-                        org: ipLocation?.org || '',
-                        postal: ipLocation?.postal || '',
-                        region: ipLocation?.region || '',
-                        timezone: ipLocation?.timezone || '',
-                    },
+                    upsert: {
+                        where: { sessionToken: jwtToken },
+                        create:  {
+                            sessionToken: jwtToken,
+                            expires: getJwtExpirationDate(jwtToken),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                        update:  {
+                            expires: getJwtExpirationDate(jwtToken),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                    }
                 },
             },
         });
@@ -382,6 +433,8 @@ export class SignupController {
             email: user.email,
         });
 
+
+        // TODO We need to logout from all devices after password reset
         return;
     }
     /**

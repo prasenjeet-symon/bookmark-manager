@@ -45,17 +45,17 @@ router.delete('/tabs', (req, res) => new TabController(req, res).deleteTab());
  *
  * Get tabs incrementally
  */
-router.get('/tabs-incrementally', (req, res) => new TabController(req, res).getTabsIncrementally());
+router.post('/tabs-incrementally', (req, res) => new TabController(req, res).getTabsIncrementally());
 /**
  *
  * Get all categories of given tab
  */
-router.get('/categories', (req, res) => new CategoryController(req, res).getAllCategoriesOfTab());
+router.post('/categories', (req, res) => new CategoryController(req, res).getAllCategoriesOfTab());
 /**
  *
  * Add category in given tab
  */
-router.post('/categories', (req, res) => new CategoryController(req, res).addCategory());
+router.post('/categories/new', (req, res) => new CategoryController(req, res).addCategory());
 /**
  *
  * Update category in given tab
@@ -70,12 +70,12 @@ router.delete('/categories', (req, res) => new CategoryController(req, res).dele
  *
  * Get categories incrementally
  */
-router.get('/categories-incrementally', (req, res) => new CategoryController(req, res).getAllCategoriesIncrementally());
+router.post('/categories-incrementally', (req, res) => new CategoryController(req, res).getAllCategoriesIncrementally());
 /**
  *
  * Add new link
  */
-router.post('/links', (req, res) => new LinkController(req, res).addLink());
+router.post('/links/new', (req, res) => new LinkController(req, res).addLink());
 /**
  * Update link
  */
@@ -92,12 +92,12 @@ router.put('/links/move', (req, res) => new LinkController(req, res).moveLink())
 /**
  * Get all links
  */
-router.get('/links', (req, res) => new LinkController(req, res).getAllLinks());
+router.post('/links', (req, res) => new LinkController(req, res).getAllLinks());
 /**
  *
  * Get links incrementally
  */
-router.get('/links-incrementally', (req, res) => new LinkController(req, res).getLinksIncrementally());
+router.post('/links-incrementally', (req, res) => new LinkController(req, res).getLinksIncrementally());
 /**
  *
  * Add link to catalog
@@ -109,6 +109,10 @@ router.post('/catalog', (req, res) => new LinkController(req, res).addLinkToCata
  *
  */
 router.put('/catalog/move', (req, res) => new LinkController(req, res).moveCatalogLink());
+/**
+ * Get all catalog link
+ */
+router.get('/catalog', (req, res) => new LinkController(req, res).getAllCatalogLinks());
 /**
  *
  * Get all tags of application

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { v4 } from 'uuid';
 import { Logger, PrismaClientSingleton, getCurrentTimestampInSecondsUTC, isInteger } from '../utils';
 
 export class LinkController {
@@ -8,6 +9,41 @@ export class LinkController {
     constructor(req: Request, res: Response) {
         this.req = req;
         this.res = res;
+    }
+    /**
+     * 
+     * Get all catalog links
+     */
+    async getAllCatalogLinks() {
+        const email = this.res.locals.email;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const userWithLinks = await prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+            include: {
+                links: {
+                    where: {
+                        category: {
+                            is: null
+                        }
+                    }
+                },
+            },
+        });
+        
+
+        if (!userWithLinks) {
+            this.res.status(400).json({ error: 'User not found' });
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        const links = userWithLinks.links;
+
+        this.res.status(200).json(links);
+        return;
     }
     /**
      *
@@ -21,24 +57,21 @@ export class LinkController {
 
         const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
-        const hiddenTags = ['uncategorized', 'catalog', 'other', `catalog_${getCurrentTimestampInSecondsUTC()}`];
+        const hiddenTags = ['uncategorized', 'catalog', 'other', `catalog__${getCurrentTimestampInSecondsUTC()}__${v4()}`];
 
         await prisma.user.update({
             where: { email: email },
             data: {
                 links: {
-                    connectOrCreate: {
-                        where: { identifier: this.req.body.identifier },
+                    upsert: {
+                        where: {identifier: this.req.body.identifier},
                         create: {
                             identifier: this.req.body.identifier,
                             order: +this.req.body.order,
                             title: this.req.body.title,
                             url: this.req.body.url,
-                            icon: this.req.body.icon,
-                            notes: this.req.body.notes,
-                            category: {
-                                connect: { identifier: undefined },
-                            },
+                            icon: this.req.body.icon || null,
+                            notes: this.req.body.notes || null,
                             linkTags: {
                                 create: [
                                     ...(this.req.body.tags as string[]).map((tag) => ({
@@ -60,10 +93,10 @@ export class LinkController {
                                     ...(hiddenTags as string[]).map((tag) => ({
                                         tag: {
                                             connectOrCreate: {
-                                                where: { identifier: tag.trim().toLowerCase() },
+                                                where: { identifier: tag.trim() },
                                                 create: {
-                                                    identifier: tag.trim().toLowerCase(),
-                                                    name: tag.trim().toLowerCase(),
+                                                    identifier: tag.trim(),
+                                                    name: tag.trim(),
                                                     order: 1,
                                                 },
                                             },
@@ -72,6 +105,13 @@ export class LinkController {
                                 ],
                             },
                         },
+                        update: {
+                            order: +this.req.body.order,
+                            title: this.req.body.title,
+                            url: this.req.body.url,
+                            icon: this.req.body.icon || null,
+                            notes: this.req.body.notes || null,
+                        }
                     },
                 },
             },
@@ -234,12 +274,9 @@ export class LinkController {
         const email = this.res.locals.email;
         const { tabIdentifier, categoryIdentifier, identifier, tags } = this.req.body;
         const prisma = PrismaClientSingleton.prisma;
-        const hiddenTags = [
-            tabIdentifier,
-            categoryIdentifier,
-            `${tabIdentifier}__${getCurrentTimestampInSecondsUTC()}`,
-            `${categoryIdentifier}__${getCurrentTimestampInSecondsUTC()}`,
-        ];
+        const hiddenTagTabIdentifier = `${tabIdentifier}__${getCurrentTimestampInSecondsUTC()}__${v4()}`;
+        const hiddenTagCategoryIdentifier = `${categoryIdentifier}__${getCurrentTimestampInSecondsUTC()}__${v4()}`;
+        const hiddenTags = [hiddenTagTabIdentifier, hiddenTagCategoryIdentifier];
 
         await prisma.user.update({
             where: { email: email },
@@ -283,10 +320,10 @@ export class LinkController {
                                                             ...hiddenTags.map((tag) => ({
                                                                 tag: {
                                                                     connectOrCreate: {
-                                                                        where: { identifier: tag.trim().toLowerCase() },
+                                                                        where: { identifier: tag.trim() },
                                                                         create: {
-                                                                            identifier: tag.trim().toLowerCase(),
-                                                                            name: tag.trim().toLowerCase(),
+                                                                            identifier: tag.trim(),
+                                                                            name: tag.trim(),
                                                                             order: 1,
                                                                         },
                                                                     },
@@ -430,7 +467,7 @@ export class LinkController {
         const prisma = PrismaClientSingleton.prisma;
         const email = this.res.locals.email;
         const { tabIdentifier, categoryIdentifier, identifier } = this.req.body;
-        const hiddenTags = [`deleted__${getCurrentTimestampInSecondsUTC()}`];
+        const hiddenTags = [`deleted__${getCurrentTimestampInSecondsUTC()}__${v4()}`];
 
         await prisma.user.update({
             where: { email: email },
@@ -453,10 +490,10 @@ export class LinkController {
                                                             ...hiddenTags.map((tag) => ({
                                                                 tag: {
                                                                     connectOrCreate: {
-                                                                        where: { identifier: tag.trim().toLowerCase() },
+                                                                        where: { identifier: tag.trim() },
                                                                         create: {
-                                                                            identifier: tag.trim().toLowerCase(),
-                                                                            name: tag.trim().toLowerCase(),
+                                                                            identifier: tag.trim(),
+                                                                            name: tag.trim(),
                                                                             order: 1,
                                                                         },
                                                                     },
@@ -492,7 +529,7 @@ export class LinkController {
         const prisma = PrismaClientSingleton.prisma;
         const email = this.res.locals.email;
         const { tabIdentifier, categoryIdentifier, finalCategoryIdentifier, identifier } = this.req.body;
-        const hiddenTags = [`${finalCategoryIdentifier}__${getCurrentTimestampInSecondsUTC()}`];
+        const hiddenTags = [`${finalCategoryIdentifier}__${getCurrentTimestampInSecondsUTC()}__${v4()}`];
 
         const userWithTabWithCategoryWithLink = await prisma.user.findUnique({
             where: { email: email },
@@ -557,10 +594,10 @@ export class LinkController {
                         ...hiddenTags.map((tag) => ({
                             tag: {
                                 connectOrCreate: {
-                                    where: { identifier: tag.trim().toLowerCase() },
+                                    where: { identifier: tag.trim() },
                                     create: {
-                                        identifier: tag.trim().toLowerCase(),
-                                        name: tag.trim().toLowerCase(),
+                                        identifier: tag.trim(),
+                                        name: tag.trim(),
                                         order: 1,
                                     },
                                 },
@@ -587,7 +624,7 @@ export class LinkController {
         const prisma = PrismaClientSingleton.prisma;
         const email = this.res.locals.email;
         const { finalCategoryIdentifier, identifier } = this.req.body;
-        const hiddenTags = [`${finalCategoryIdentifier}__${getCurrentTimestampInSecondsUTC()}`];
+        const hiddenTags = [`${finalCategoryIdentifier}__${getCurrentTimestampInSecondsUTC()}__${v4()}`];
 
         const userWithLink = await prisma.user.findUnique({
             where: { email: email },
@@ -624,7 +661,7 @@ export class LinkController {
             return;
         }
 
-        if(categoryWithTab.isDeleted){
+        if (categoryWithTab.isDeleted) {
             this.res.status(404).json({ error: 'Category is deleted' });
             Logger.getInstance().logError('Category is deleted');
             return;
@@ -653,10 +690,10 @@ export class LinkController {
                         ...hiddenTags.map((tag) => ({
                             tag: {
                                 connectOrCreate: {
-                                    where: { identifier: tag.trim().toLowerCase() },
+                                    where: { identifier: tag.trim() },
                                     create: {
-                                        identifier: tag.trim().toLowerCase(),
-                                        name: tag.trim().toLowerCase(),
+                                        identifier: tag.trim(),
+                                        name: tag.trim(),
                                         order: 1,
                                     },
                                 },
@@ -683,7 +720,7 @@ export class LinkController {
             categoryIdentifier === undefined ||
             finalCategoryIdentifier === undefined ||
             identifier === undefined
-        ) {
+        ) { 
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;

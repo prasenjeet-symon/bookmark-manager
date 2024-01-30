@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
+import { ApiEvent, ApiEventNames } from '../events';
 import { IGoogleAuthTokenResponse } from '../schema';
 import {
     Logger,
@@ -11,7 +12,6 @@ import {
     getJwtExpirationDate,
     getUserAgent,
 } from '../utils';
-import { ApiEvent, ApiEventNames } from '../events';
 
 export class Google {
     private req: Request;
@@ -69,18 +69,33 @@ export class Google {
             },
             data: {
                 sessions: {
-                    create: {
-                        sessionToken: tokenJwt,
-                        expires: getJwtExpirationDate(tokenJwt),
-                        ipAddress: getClientIP(this.req),
-                        userAgent: getUserAgent(this.req),
-                        city: ipLocation?.city || '',
-                        country: ipLocation?.country || '',
-                        loc: ipLocation?.loc || '',
-                        org: ipLocation?.org || '',
-                        postal: ipLocation?.postal || '',
-                        region: ipLocation?.region || '',
-                        timezone: ipLocation?.timezone || '',
+                    upsert: {
+                        where: { sessionToken: tokenJwt },
+                        create: {
+                            sessionToken: tokenJwt,
+                            expires: getJwtExpirationDate(tokenJwt),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                        update: {
+                            expires: getJwtExpirationDate(tokenJwt),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
                     },
                 },
             },
@@ -140,6 +155,11 @@ export class Google {
                 fullName: googleAuthTokenResponse.name,
                 timeZone: ipLocation?.timezone || '',
                 password: v4(),
+                userSetting: {
+                    create: {
+                        numberOfColumns: 'THREE',
+                    }
+                }
             },
             select: {
                 userId: true,
@@ -158,18 +178,33 @@ export class Google {
             },
             data: {
                 sessions: {
-                    create: {
-                        sessionToken: tokenJwt,
-                        expires: getJwtExpirationDate(tokenJwt),
-                        ipAddress: getClientIP(this.req),
-                        userAgent: getUserAgent(this.req),
-                        city: ipLocation?.city || '',
-                        country: ipLocation?.country || '',
-                        loc: ipLocation?.loc || '',
-                        org: ipLocation?.org || '',
-                        postal: ipLocation?.postal || '',
-                        region: ipLocation?.region || '',
-                        timezone: ipLocation?.timezone || '',
+                    upsert: {
+                        where: { sessionToken: tokenJwt },
+                        create: {
+                            sessionToken: tokenJwt,
+                            expires: getJwtExpirationDate(tokenJwt),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
+                        update: {
+                            expires: getJwtExpirationDate(tokenJwt),
+                            ipAddress: getClientIP(this.req),
+                            userAgent: getUserAgent(this.req),
+                            city: ipLocation?.city || '',
+                            country: ipLocation?.country || '',
+                            loc: ipLocation?.loc || '',
+                            org: ipLocation?.org || '',
+                            postal: ipLocation?.postal || '',
+                            region: ipLocation?.region || '',
+                            timezone: ipLocation?.timezone || '',
+                        },
                     },
                 },
             },
@@ -188,7 +223,7 @@ export class Google {
             userId: newUser.userId,
             email: newUser.email,
         });
-        
+
         return;
     }
     /**
@@ -198,7 +233,13 @@ export class Google {
      */
     validReqBody(): boolean {
         // We need token only
-        const token = this.req.body.token;
+        const { token } = this.req.body;
+
+        if (token === undefined) {
+            this.res.status(400).json({ error: 'token is required' });
+            Logger.getInstance().logError('token is required');
+            return false;
+        }
 
         if (!token) {
             this.res.status(400).json({ error: 'token is required' });

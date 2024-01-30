@@ -74,6 +74,9 @@ export class UserSetting {
                 },
             },
         });
+
+        this.res.status(200).json({message: 'User setting updated'});
+        return;
     }
     /**
      *

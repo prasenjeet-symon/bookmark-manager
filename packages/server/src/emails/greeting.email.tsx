@@ -9,7 +9,7 @@ export function WelcomeEmail(props: { user: any, platformName: string, platformU
             <Head title={`Welcome to ${platformName}`} />
             <Body>
                 <Heading>Welcome to {platformName}!</Heading>
-                <p>Dear {user.name},</p>
+                <p>Dear {user.fullName},</p>
                 <p>We are thrilled to welcome you to {platformName}! Your presence means a lot to us.</p>
                 <p>{platformName} is a {platformName.toLowerCase()} platform designed to help you {platformName.toLowerCase()} efficiently.</p>
                 <p>Feel free to explore the features and make the most out of your experience. If you have any questions, our support team is here to help.</p>

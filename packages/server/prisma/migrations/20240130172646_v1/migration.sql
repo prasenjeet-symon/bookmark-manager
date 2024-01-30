@@ -5,7 +5,7 @@ CREATE TABLE `Admin` (
     `fullName` VARCHAR(191) NOT NULL,
     `profilePicture` VARCHAR(191) NULL,
     `password` VARCHAR(191) NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(37) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -21,12 +21,13 @@ CREATE TABLE `User` (
     `fullName` VARCHAR(191) NOT NULL,
     `profilePicture` VARCHAR(191) NULL,
     `password` VARCHAR(191) NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(37) NOT NULL,
     `dateOfBirth` DATETIME(3) NULL,
     `timeZone` VARCHAR(191) NOT NULL DEFAULT 'IST',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
+    `maxSession` INTEGER NOT NULL DEFAULT 5,
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_userId_key`(`userId`),
@@ -34,9 +35,32 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Session` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sessionToken` VARCHAR(700) NOT NULL,
+    `userIdentifier` VARCHAR(37) NOT NULL,
+    `expires` DATETIME(3) NOT NULL,
+    `ipAddress` VARCHAR(191) NOT NULL,
+    `userAgent` VARCHAR(191) NOT NULL,
+    `city` VARCHAR(191) NOT NULL,
+    `country` VARCHAR(191) NOT NULL,
+    `region` VARCHAR(191) NOT NULL,
+    `loc` VARCHAR(191) NOT NULL,
+    `org` VARCHAR(191) NOT NULL,
+    `postal` VARCHAR(191) NOT NULL,
+    `timezone` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
+
+    UNIQUE INDEX `Session_sessionToken_key`(`sessionToken`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `UserSetting` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userIdentifier` VARCHAR(191) NOT NULL,
+    `userIdentifier` VARCHAR(37) NOT NULL,
     `isDarkMode` BOOLEAN NOT NULL DEFAULT true,
     `numberOfColumns` ENUM('THREE', 'FOUR', 'FIVE') NOT NULL,
     `showNumberOfBookmarkInTab` BOOLEAN NOT NULL DEFAULT false,
@@ -54,8 +78,8 @@ CREATE TABLE `UserSetting` (
 -- CreateTable
 CREATE TABLE `UserTab` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `identifier` VARCHAR(191) NOT NULL,
-    `userIdentifier` VARCHAR(191) NOT NULL,
+    `identifier` VARCHAR(37) NOT NULL,
+    `userIdentifier` VARCHAR(37) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `order` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -69,12 +93,12 @@ CREATE TABLE `UserTab` (
 -- CreateTable
 CREATE TABLE `Category` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `identifier` VARCHAR(191) NOT NULL,
+    `identifier` VARCHAR(37) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `order` INTEGER NOT NULL,
     `color` VARCHAR(191) NOT NULL,
     `icon` VARCHAR(191) NULL,
-    `tabIdentifier` VARCHAR(191) NOT NULL,
+    `tabIdentifier` VARCHAR(37) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
@@ -86,14 +110,14 @@ CREATE TABLE `Category` (
 -- CreateTable
 CREATE TABLE `Link` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `identifier` VARCHAR(191) NOT NULL,
+    `identifier` VARCHAR(37) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `url` VARCHAR(191) NOT NULL,
     `order` INTEGER NOT NULL,
     `icon` VARCHAR(191) NULL,
     `notes` VARCHAR(191) NULL,
-    `categoryIdentifier` VARCHAR(191) NOT NULL,
-    `userIdentifier` VARCHAR(191) NOT NULL,
+    `categoryIdentifier` VARCHAR(37) NOT NULL,
+    `userIdentifier` VARCHAR(37) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
@@ -105,7 +129,7 @@ CREATE TABLE `Link` (
 -- CreateTable
 CREATE TABLE `Tag` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `identifier` VARCHAR(191) NOT NULL,
+    `identifier` VARCHAR(37) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `order` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -120,13 +144,42 @@ CREATE TABLE `Tag` (
 -- CreateTable
 CREATE TABLE `LinkTag` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `linkIdentifier` VARCHAR(191) NOT NULL,
-    `tagIdentifier` VARCHAR(191) NOT NULL,
+    `linkIdentifier` VARCHAR(37) NOT NULL,
+    `tagIdentifier` VARCHAR(37) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `HiddenTag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `identifier` VARCHAR(300) NOT NULL,
+    `name` VARCHAR(300) NOT NULL,
+    `order` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `isDeleted` BOOLEAN NOT NULL DEFAULT false,
+
+    UNIQUE INDEX `HiddenTag_identifier_key`(`identifier`),
+    UNIQUE INDEX `HiddenTag_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `LinkHiddenTag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `linkIdentifier` VARCHAR(37) NOT NULL,
+    `tagIdentifier` VARCHAR(37) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Session` ADD CONSTRAINT `Session_userIdentifier_fkey` FOREIGN KEY (`userIdentifier`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `UserSetting` ADD CONSTRAINT `UserSetting_userIdentifier_fkey` FOREIGN KEY (`userIdentifier`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -148,3 +201,9 @@ ALTER TABLE `LinkTag` ADD CONSTRAINT `LinkTag_linkIdentifier_fkey` FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE `LinkTag` ADD CONSTRAINT `LinkTag_tagIdentifier_fkey` FOREIGN KEY (`tagIdentifier`) REFERENCES `Tag`(`identifier`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `LinkHiddenTag` ADD CONSTRAINT `LinkHiddenTag_linkIdentifier_fkey` FOREIGN KEY (`linkIdentifier`) REFERENCES `Link`(`identifier`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `LinkHiddenTag` ADD CONSTRAINT `LinkHiddenTag_tagIdentifier_fkey` FOREIGN KEY (`tagIdentifier`) REFERENCES `HiddenTag`(`identifier`) ON DELETE RESTRICT ON UPDATE CASCADE;

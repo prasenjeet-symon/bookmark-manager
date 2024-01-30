@@ -14,7 +14,7 @@ model Admin {
     fullName       String
     profilePicture String?
     password       String
-    userId         String
+    userId         String   @db.VarChar(37)
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 }
@@ -26,7 +26,7 @@ model User {
     fullName       String
     profilePicture String?
     password       String
-    userId         String       @unique
+    userId         String       @unique @db.VarChar(37)
     dateOfBirth    DateTime?
     timeZone       String       @default("IST")
     createdAt      DateTime     @default(now())
@@ -41,8 +41,8 @@ model User {
 
 model Session {
     id             Int      @id @default(autoincrement())
-    sessionToken   String   @unique
-    userIdentifier String
+    sessionToken   String   @unique @db.VarChar(700)
+    userIdentifier String   @db.VarChar(37)
     user           User     @relation(fields: [userIdentifier], references: [userId])
     expires        DateTime
     ipAddress      String
@@ -67,7 +67,7 @@ enum ColumnNumber {
 
 model UserSetting {
     id                             Int          @id @default(autoincrement())
-    userIdentifier                 String       @unique
+    userIdentifier                 String       @unique @db.VarChar(37)
     user                           User         @relation(fields: [userIdentifier], references: [userId])
     isDarkMode                     Boolean      @default(true)
     numberOfColumns                ColumnNumber
@@ -82,8 +82,8 @@ model UserSetting {
 
 model UserTab {
     id             Int        @id @default(autoincrement())
-    identifier     String     @unique
-    userIdentifier String
+    identifier     String     @unique @db.VarChar(37)
+    userIdentifier String     @db.VarChar(37)
     user           User       @relation(fields: [userIdentifier], references: [userId])
     name           String
     order          Int
@@ -95,12 +95,12 @@ model UserTab {
 
 model Category {
     id            Int      @id @default(autoincrement())
-    identifier    String   @unique
+    identifier    String   @unique @db.VarChar(37)
     name          String
     order         Int
     color         String
     icon          String?
-    tabIdentifier String
+    tabIdentifier String   @db.VarChar(37)
     tab           UserTab  @relation(fields: [tabIdentifier], references: [identifier])
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
@@ -110,7 +110,7 @@ model Category {
 
 model Link {
     id                 Int             @id @default(autoincrement())
-    identifier         String          @unique
+    identifier         String          @unique @db.VarChar(37)
     title              String
     url                String
     order              Int
@@ -118,9 +118,9 @@ model Link {
     notes              String?
     linkTags           LinkTag[]
     linkHiddenTags     LinkHiddenTag[]
-    categoryIdentifier String
-    category           Category        @relation(fields: [categoryIdentifier], references: [identifier])
-    userIdentifier     String
+    categoryIdentifier String?          @db.VarChar(37)
+    category           Category?        @relation(fields: [categoryIdentifier], references: [identifier])
+    userIdentifier     String          @db.VarChar(37)
     user               User            @relation(fields: [userIdentifier], references: [userId])
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt
@@ -129,7 +129,7 @@ model Link {
 
 model Tag {
     id         Int       @id @default(autoincrement())
-    identifier String    @unique
+    identifier String    @unique @db.VarChar(37)
     name       String    @unique
     order      Int
     linkTags   LinkTag[]
@@ -140,9 +140,9 @@ model Tag {
 
 model LinkTag {
     id             Int      @id @default(autoincrement())
-    linkIdentifier String
+    linkIdentifier String   @db.VarChar(37)
     link           Link     @relation(fields: [linkIdentifier], references: [identifier])
-    tagIdentifier  String
+    tagIdentifier  String   @db.VarChar(37)
     tag            Tag      @relation(fields: [tagIdentifier], references: [identifier])
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
@@ -150,8 +150,8 @@ model LinkTag {
 
 model HiddenTag {
     id             Int             @id @default(autoincrement())
-    identifier     String          @unique
-    name           String          @unique
+    identifier     String          @unique @db.VarChar(300)
+    name           String          @unique @db.VarChar(300)
     order          Int
     linkHiddenTags LinkHiddenTag[]
     createdAt      DateTime        @default(now())
@@ -161,9 +161,9 @@ model HiddenTag {
 
 model LinkHiddenTag {
     id             Int       @id @default(autoincrement())
-    linkIdentifier String
+    linkIdentifier String    @db.VarChar(37)
     link           Link      @relation(fields: [linkIdentifier], references: [identifier])
-    tagIdentifier  String
+    tagIdentifier  String    @db.VarChar(300)
     tag            HiddenTag @relation(fields: [tagIdentifier], references: [identifier])
     createdAt      DateTime  @default(now())
     updatedAt      DateTime  @updatedAt
