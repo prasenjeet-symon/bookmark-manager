@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { AuthenticationEvent } from './authentication.event';
 import { UserEvent } from './user.event';
 
 export interface ApiEventData {
@@ -36,6 +37,10 @@ export class ApiEvent {
             switch (data.name) {
                 case ApiEventNames.SEND_GREETING_EMAIL:
                     new UserEvent(data).sendGreetingEmail();
+                    break;
+
+                case ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL:
+                    new AuthenticationEvent(data).sendPasswordResetLinkEmail();
                     break;
             }
         });
