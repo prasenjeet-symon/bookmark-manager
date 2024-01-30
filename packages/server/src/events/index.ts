@@ -46,6 +46,10 @@ export class ApiEvent {
                 case ApiEventNames.SEND_RESET_PASSWORD_SUCCESS_EMAIL:
                     new AuthenticationEvent(data).sendResetPasswordSuccessEmail();
                     break;
+
+                case ApiEventNames.USER_DELETED:
+                    new UserEvent(data).deleteUser();
+                    break;
             }
         });
     }
