@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationEvent } from './authentication.event';
+import { TabEvent } from './tab.event';
 import { UserEvent } from './user.event';
 
 export interface ApiEventData {
@@ -54,6 +55,10 @@ export class ApiEvent {
 
                 case ApiEventNames.SEND_FAREWELLS_EMAIL:
                     new UserEvent(data).sendFarewellsEmail();
+                    break;
+
+                case ApiEventNames.TAB_DELETED:
+                    new TabEvent(data).deletedTab();
                     break;
             }
         });

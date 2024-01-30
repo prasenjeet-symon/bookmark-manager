@@ -101,6 +101,8 @@ export class UserEvent {
                 },
             }),
         ]);
+
+        return;
     }
 
     // Send greeting email
