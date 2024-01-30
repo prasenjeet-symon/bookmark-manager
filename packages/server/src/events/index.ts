@@ -11,7 +11,7 @@ export interface ApiEventData {
 }
 
 // Hold all the action names
-class ApiEventNames {
+export class ApiEventNames {
     public static readonly SEND_PASSWORD_RESET_LINK_EMAIL = 'send_forgot_password_link';
     public static readonly SEND_RESET_PASSWORD_SUCCESS_EMAIL = 'send_reset_password_success_email';
     public static readonly SEND_GREETING_EMAIL = 'send_greeting_email';
@@ -38,6 +38,10 @@ export class ApiEvent {
     private constructor() {
         this.source.subscribe((data) => {
             switch (data.name) {
+                case ApiEventNames.USER_CREATED:
+                    new UserEvent(data).createdUser();
+                    break;
+
                 case ApiEventNames.SEND_GREETING_EMAIL:
                     new UserEvent(data).sendGreetingEmail();
                     break;

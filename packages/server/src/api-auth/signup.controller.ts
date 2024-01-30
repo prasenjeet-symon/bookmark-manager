@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
+import { ApiEvent, ApiEventNames } from '../events';
 import {
     Logger,
     PrismaClientSingleton,
@@ -105,6 +106,11 @@ export class SignupController {
         });
 
         Logger.getInstance().logSuccess('User created');
+        ApiEvent.getInstance().dispatch(ApiEventNames.USER_CREATED, {
+            userId: newUser.userId,
+            email: newUser.email,
+        });
+
         return;
     }
     /**
@@ -278,11 +284,14 @@ export class SignupController {
         const token = await createJwt(user.userId, user.email, false, '10m');
 
         this.res.status(200).json({
-            userId: user.userId,
-            email: user.email,
+            message: 'Forgot password link sent to your email',
         });
 
-        // SEND EMAIL HERE WITH FORGOT PASSWORD LINK THAT CONTAINS TOKEN AND USER ID
+        ApiEvent.getInstance().dispatch(ApiEventNames.SEND_PASSWORD_RESET_LINK_EMAIL, {
+            email: user.email,
+            token: token,
+        });
+
         return;
     }
     /**
@@ -331,17 +340,48 @@ export class SignupController {
             },
         });
 
-        const jwtToken = await createJwt(user.userId, user.email);
+        const ipLocation = await getClientLocation(this.req);
+        const jwtToken = await createJwt(user.userId, user.email, false, null, ipLocation?.timezone || null);
+
+        // Add session
+        await prisma.user.update({
+            where: {
+                userId: user.userId,
+            },
+            data: {
+                sessions: {
+                    create: {
+                        sessionToken: jwtToken,
+                        expires: getJwtExpirationDate(jwtToken),
+                        ipAddress: getClientIP(this.req),
+                        userAgent: getUserAgent(this.req),
+                        city: ipLocation?.city || '',
+                        country: ipLocation?.country || '',
+                        loc: ipLocation?.loc || '',
+                        org: ipLocation?.org || '',
+                        postal: ipLocation?.postal || '',
+                        region: ipLocation?.region || '',
+                        timezone: ipLocation?.timezone || '',
+                    },
+                },
+            },
+        });
 
         this.res.status(200).json({
             token: jwtToken,
             userId: user.userId,
             email: user.email,
             fullName: user.fullName,
-            timeZone: user.timeZone,
+            timeZone: ipLocation?.timezone || '',
         });
 
         Logger.getInstance().logSuccess('Password reset');
+
+        ApiEvent.getInstance().dispatch(ApiEventNames.SEND_RESET_PASSWORD_SUCCESS_EMAIL, {
+            userId: user.userId,
+            email: user.email,
+        });
+
         return;
     }
     /**

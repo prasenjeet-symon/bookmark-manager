@@ -1,4 +1,4 @@
-import { ApiEventData } from '.';
+import { ApiEvent, ApiEventData, ApiEventNames } from '.';
 import farewellEmailRender from '../emails/farewell.email';
 import greetingEmailRender from '../emails/greeting.email';
 import { EmailOptions } from '../schema';
@@ -9,6 +9,39 @@ export class UserEvent {
 
     constructor(data: ApiEventData) {
         this.data = data;
+    }
+
+    /**
+     * User created
+     */
+    async createdUser() {
+        if (!this.validateUserCreatedEventData()) {
+            Logger.getInstance().logError('Invalid event data');
+            return;
+        }
+
+        const { userId, email } = this.data.data;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const createdUser = await prisma.user.findUnique({
+            where: { email: email },
+        });
+
+        if (!createdUser) {
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        if (createdUser.isDeleted) {
+            Logger.getInstance().logError('User is deleted');
+            return;
+        }
+
+        // Send greeting email
+        ApiEvent.getInstance().dispatch(ApiEventNames.SEND_GREETING_EMAIL, {
+            email: email,
+            userId: userId,
+        });
     }
 
     /**
@@ -239,6 +272,27 @@ export class UserEvent {
             return false;
         }
 
+        const { data } = this.data;
+
+        if (data === undefined) {
+            Logger.getInstance().logError('Invalid event body. data is required');
+            return false;
+        }
+
+        const { userId, email } = data;
+
+        if (userId === undefined || email === undefined) {
+            Logger.getInstance().logError('Invalid event body. userId and email are required');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate data for user created
+     */
+    private validateUserCreatedEventData() {
         const { data } = this.data;
 
         if (data === undefined) {

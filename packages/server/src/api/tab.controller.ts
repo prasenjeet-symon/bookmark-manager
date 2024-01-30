@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ApiEvent, ApiEventNames } from '../events';
 import { Logger, PrismaClientSingleton, isInteger } from '../utils';
 
 export class TabController {
@@ -193,6 +194,10 @@ export class TabController {
         });
 
         this.res.status(200).json({ message: 'Tab deleted successfully' });
+        ApiEvent.getInstance().dispatch(ApiEventNames.TAB_DELETED, {
+            tabIdentifier: this.req.body.identifier,
+        });
+
         return;
     }
     /**

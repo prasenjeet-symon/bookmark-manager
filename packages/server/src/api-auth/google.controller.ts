@@ -11,6 +11,7 @@ import {
     getJwtExpirationDate,
     getUserAgent,
 } from '../utils';
+import { ApiEvent, ApiEventNames } from '../events';
 
 export class Google {
     private req: Request;
@@ -183,6 +184,11 @@ export class Google {
         });
 
         Logger.getInstance().logSuccess('User created');
+        ApiEvent.getInstance().dispatch(ApiEventNames.USER_CREATED, {
+            userId: newUser.userId,
+            email: newUser.email,
+        });
+        
         return;
     }
     /**

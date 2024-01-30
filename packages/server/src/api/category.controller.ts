@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ApiEvent, ApiEventNames } from '../events';
 import { Logger, PrismaClientSingleton, isInteger } from '../utils';
 
 export class CategoryController {
@@ -264,6 +265,10 @@ export class CategoryController {
         });
 
         this.res.status(200).json({ message: 'Category deleted successfully' });
+        ApiEvent.getInstance().dispatch(ApiEventNames.CATEGORY_DELETED, {
+            categoryIdentifier: this.req.body.identifier,
+        });
+
         return;
     }
     /**
