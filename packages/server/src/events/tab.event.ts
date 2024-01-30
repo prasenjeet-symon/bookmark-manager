@@ -90,5 +90,7 @@ export class TabEvent {
             Logger.getInstance().logError('Invalid event body. tabIdentifier is required');
             return false;
         }
+
+        return true;
     }
 }
