@@ -13,6 +13,7 @@ class ApiEventNames {
     public static readonly SEND_PASSWORD_RESET_LINK_EMAIL = 'send_forgot_password_link';
     public static readonly SEND_RESET_PASSWORD_SUCCESS_EMAIL = 'send_reset_password_success_email';
     public static readonly SEND_GREETING_EMAIL = 'send_greeting_email';
+    public static readonly SEND_FAREWELLS_EMAIL = 'send_farewells_email';
     public static readonly TAB_DELETED = 'tab_deleted';
     public static readonly TAB_CREATED = 'tab_created';
     public static readonly CATEGORY_DELETED = 'category_deleted';
@@ -49,6 +50,10 @@ export class ApiEvent {
 
                 case ApiEventNames.USER_DELETED:
                     new UserEvent(data).deleteUser();
+                    break;
+
+                case ApiEventNames.SEND_FAREWELLS_EMAIL:
+                    new UserEvent(data).sendFarewellsEmail();
                     break;
             }
         });

@@ -1,4 +1,5 @@
 import { ApiEventData } from '.';
+import farewellEmailRender from '../emails/farewell.email';
 import greetingEmailRender from '../emails/greeting.email';
 import { EmailOptions } from '../schema';
 import { Logger, PrismaClientSingleton, sendEmail } from '../utils';
@@ -134,6 +135,40 @@ export class UserEvent {
         const sendId = await sendEmail(emailData);
         Logger.getInstance().logSuccess('Email sent successfully with id: ' + sendId);
     }
+    /**
+     * Send farewells email
+     */
+    async sendFarewellsEmail() {
+        if (!this.validateSendFarewellsEmailEventData()) {
+            Logger.getInstance().logError('Invalid event data');
+            return;
+        }
+
+        const { userId, email } = this.data.data;
+        const { COMPANY_NAME, COMPANY_BASE_URL } = process.env;
+        const prisma = PrismaClientSingleton.prisma;
+
+        const user = await prisma.user.findUnique({
+            where: { email: email },
+        });
+
+        if (!user) {
+            Logger.getInstance().logError('User not found');
+            return;
+        }
+
+        const template = farewellEmailRender(user);
+
+        const emailData: EmailOptions = {
+            subject: 'Goodbye from Bookmark Manager',
+            html: template,
+            to: email,
+        };
+
+        const sendId = await sendEmail(emailData);
+        Logger.getInstance().logSuccess('Email sent successfully with id: ' + sendId);
+        return;
+    }
 
     /**
      *
@@ -170,6 +205,38 @@ export class UserEvent {
      * Validate data for deleteUser
      */
     private validateDeleteUserEventData() {
+        const { data } = this.data;
+
+        if (data === undefined) {
+            Logger.getInstance().logError('Invalid event body. data is required');
+            return false;
+        }
+
+        const { userId, email } = data;
+
+        if (userId === undefined || email === undefined) {
+            Logger.getInstance().logError('Invalid event body. userId and email are required');
+            return false;
+        }
+
+        return true;
+    }
+    /**
+     *
+     * Validate data for sendFarewellsEmail
+     */
+    private validateSendFarewellsEmailEventData() {
+        // We need COMPANY_NAME and  COMPANY_BASE_URL from env
+        const { COMPANY_NAME, COMPANY_BASE_URL } = process.env;
+
+        if (COMPANY_NAME === undefined || COMPANY_BASE_URL === undefined) {
+            Logger.getInstance().logError(
+                'Missing environment variables. COMPANY_NAME and COMPANY_BASE_URL are required'
+            );
+
+            return false;
+        }
+
         const { data } = this.data;
 
         if (data === undefined) {
