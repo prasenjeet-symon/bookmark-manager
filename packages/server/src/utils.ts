@@ -299,3 +299,16 @@ export async function sendEmail(data: EmailOptions): Promise<string | undefined>
         return undefined;
     }
 }
+/**
+ *
+ * Get timestamp
+ */
+export function getCurrentTimestampInSecondsUTC(): number {
+    // Get the current timestamp in milliseconds using Date.now()
+    const timestampInMilliseconds = Date.now();
+
+    // Convert the timestamp to seconds
+    const timestampInSeconds = Math.floor(timestampInMilliseconds / 1000);
+
+    return timestampInSeconds;
+}
