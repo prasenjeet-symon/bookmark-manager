@@ -1,6 +1,6 @@
 # feat: Implement Comprehensive Server Setup, Authentication Middleware, and Utility Functions
 
-## 25 Jan 2023
+## 25 Jan 2024
 
 This commit represents a substantial step forward in the development of our application. The introduction of a sophisticated server setup using Express.js brings several key features into play. Notably, the server now incorporates CORS handling, ensuring secure cross-origin resource sharing. Middleware for parsing JSON and URL-encoded data has been integrated, enhancing the server's ability to handle diverse content types seamlessly.
 
@@ -22,7 +22,7 @@ These implementations collectively lay the groundwork for a secure, modular, and
 
 # Work Completed: Application Feature Implementations and Enhancements
 
-## 26 Jan 2023
+## 26 Jan 2024
 
 ## UserSetting Prisma Model
 - Implemented the `UserSetting` Prisma model, capturing user-specific settings such as dark mode, number of columns, and more.
@@ -66,3 +66,52 @@ These implementations collectively lay the groundwork for a secure, modular, and
 - Improved content organization and customization for users.
 
 These features collectively lay the groundwork for a secure, modular, and user-friendly application. The commit not only focuses on enhancing security but also contributes to a more organized and personalized user experience. The implemented functionalities provide a strong foundation for future development and user-centric feature additions.
+
+# Work completed: Application Feature Implementations and Enhancements
+
+## 27 Jan 2024
+
+1. **Implement Google Sign-Up Functionality:**
+   - Introduces a new route ("/google-signup") and a method in the Google class for handling Google Sign-Up requests.
+   - The controller validates the request body, verifies the Google authentication token, and creates a new user if not already existing.
+   - Proper error handling is implemented for invalid tokens or existing users with corresponding credentials.
+
+2. **Implement Google Sign-In Functionality:**
+   - Introduces a new route ("/google-signin") and a method in the Google class for handling Google Sign-In requests.
+   - The controller validates the request body, verifies the Google authentication token, and creates a JWT for existing users.
+   - Proper error handling ensures a robust Google Sign-In process using axios to interact with Google's authentication endpoints.
+
+3. **Implement Password Reset Functionality:**
+   - Introduces a new route ("/reset-password") and a method in the SignupController class for handling password resets.
+   - The controller validates the request body, verifies the token's validity and expiration, and updates the user's password in the database.
+   - Proper error handling for user not found, token expiration, or decoding errors.
+
+4. **Implement Forgot Password Functionality:**
+   - Introduces a new route ("/forgot-password") and a method in the SignupController class for handling forgot password functionality.
+   - Validates the request body, generates a temporary token for password reset, and sends it to the user via email.
+   - Includes proper error handling and validation for a secure and user-friendly forgot password process.
+
+5. **Implement User Login Functionality with Email and Password:**
+   - Introduces a login route ("/login") and a login method in the SignupController class for handling user login requests.
+   - Validates the request body, checks for the existence of a user with the provided email, and verifies the password against the hashed password in the database.
+   - Generates a JWT for authentication with appropriate error handling and success logging.
+
+6. **Implement User Signup Functionality with Email and Password:**
+   - Introduces a signup route ("/signup") and a SignupController class for handling user signup requests.
+   - Validates the request body, checks for existing users with the same email, and creates a new user with hashed passwords.
+   - Generates a JWT for authentication and includes email and password validation functions.
+
+7. **Add Tag and HiddenTag Prisma Models:**
+   - Introduces Tag and HiddenTag Prisma models for organizing links with many-to-many relationships.
+   - Enhances the database structure for categorizing and managing links based on user-defined tags and hidden tags.
+
+8. **Add Link Prisma Model:**
+   - Introduces the Link Prisma model representing individual links with fields such as id, title, url, order, icon, notes, categoryId, createdAt, updatedAt, and isDeleted.
+   - Establishes relationships with the Category model for structured content organization.
+
+9. **Add Category Prisma Model:**
+   - Introduces the Category Prisma model representing categories within the application.
+   - Includes fields for name, order, color, icon, tabId, createdAt, updatedAt, and isDeleted.
+   - Establishes relationships with the UserTab model for organizing content within tabs.
+
+These changes collectively enhance the application's functionality, providing a secure and structured experience for users in managing authentication and content organization.
