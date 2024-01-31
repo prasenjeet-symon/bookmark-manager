@@ -310,3 +310,70 @@ These enhancements collectively improve the management of links, categories, and
 
 ---
 
+# Work completed: Application Feature Implementations and Enhancements
+
+## 31 Jan 2024
+
+## Link Management and Event Handling
+
+### 1. **Implement `getAllCatalogLinks` Endpoint in `LinkController`:**
+   - Introduced the `getAllCatalogLinks` method in the `LinkController` class to handle the retrieval of all catalog links for a user.
+   - The method queries the database for the user's catalog links by excluding those associated with any category.
+   - The resulting links are then returned as a response.
+   - This feature enhances the API by providing an endpoint to fetch all catalog links associated with a user, facilitating the efficient retrieval of uncategorized links.
+
+### 2. **Connected Events and Additional Features:**
+   - Added IP location support and a way to track link lifecycle.
+   - Implemented various event handling methods for improved application functionality and user interaction.
+
+### 3. **Implement `deletedCategory` Method in `CategoryEvent` Class:**
+   - Introduced the `deletedCategory` method in the `CategoryEvent` class to handle the deletion of categories.
+   - Validates the provided event data, fetches the category to be deleted, and ensures that the category is marked as deleted.
+   - Proceeds to update associated links to reflect the deletion.
+   - A new private method, `validateDeletedCategoryEventData`, is added for data validation.
+   - Enhances the application's ability to handle category deletions gracefully.
+
+### 4. **Implement `deletedTab` Method in `TabEvent` Class:**
+   - Introduced the `deletedTab` method in the `TabEvent` class to handle the deletion of tabs.
+   - Validates the provided event data, fetches the tab to be deleted, and ensures that the tab is marked as deleted.
+   - Proceeds to update associated categories and links to reflect the deletion.
+   - A new private method, `validateDeletedTabEventData`, is added for data validation.
+   - Enhances the application's ability to handle tab deletions gracefully.
+
+### 5. **Implement `farewellEmail` Sending in `UserEvent` Class:**
+   - Introduced the functionality to send a farewell email to users upon the occurrence of the `SEND_FAREWELLS_EMAIL` API event.
+   - The `sendFarewellsEmail` method performs user validation, fetches necessary environment variables, and sends a farewell email using the `farewellEmailRender` template.
+   - A new private method, `validateSendFarewellsEmailEventData`, is added for data validation.
+   - Enables the application to gracefully bid farewell to users through a personalized email.
+
+### 6. **Implement User Deletion in `UserEvent` Class:**
+   - Introduced the functionality to delete a user and associated data upon the occurrence of the `USER_DELETED` API event.
+   - The `deleteUser` method performs user validation, checks if the user is already deleted, and deletes all related tabs, categories, and links with a transactional approach for data integrity.
+   - A private method, `validateDeleteUserEventData`, is added for data validation.
+   - Enables proper handling of user deletion requests in the Bookmark Manager application.
+
+### 7. **Implement Password Reset Success Email Sending in `AuthenticationEvent` Class:**
+   - Introduced the capability to send a password reset success email to users upon a specific API event.
+   - The `sendResetPasswordSuccessEmail` method handles data validation, user retrieval, email template generation, and the actual email sending process.
+   - A private method, `validateSendResetPasswordSuccessEmailData`, is added for data validation.
+   - Ensures users receive confirmation of a successful password reset in the Bookmark Manager application.
+
+### 8. **Implement Password Reset Link Email Sending in `AuthenticationEvent` Class:**
+   - Introduced the ability to send a password reset link email to users upon a specific API event.
+   - The `sendPasswordResetLinkEmail` method handles data validation, user retrieval, password reset link creation, email template generation, and the actual email sending process.
+   - A private method, `validateSendPasswordResetLinkEmailEventData`, is added for data validation.
+   - Ensures users receive a secure and convenient way to reset their passwords in the Bookmark Manager application.
+
+### 9. **Implement Greeting Email Sending in `UserEvent` Class:**
+   - Introduced the capability to send a greeting email to users upon a specific API event.
+   - The `sendGreetingEmail` method handles data validation, user retrieval, email template generation, and the actual email sending process.
+   - A private method, `validateSendGreetingEmailEventData`, is added for data validation.
+   - Aims to provide a welcoming experience for users joining the Bookmark Manager application.
+
+### 10. **Enhancements to `getAllLinks` and `addLink` Methods:**
+   - Extended the `getAllLinks` method to include link tags, providing a more detailed representation of links within a specified tab and category.
+   - Improved the `addLink` method by introducing a new array, `hiddenTags`, and updating the Prisma update block to connect or create hidden tags when adding a new link.
+   - Enhanced functionality for categorizing and organizing links, contributing to a more robust and flexible link management system.
+
+---
+
