@@ -174,11 +174,11 @@ These changes collectively enhance the application's functionality, providing a 
 
    ---
 
-   # Work completed: Application Feature Implementations and Enhancements
+# Work completed: Application Feature Implementations and Enhancements
 
-   ## 29 Jan 2024
+## 29 Jan 2024
 
-   ## Links and Categories Management
+## Links and Categories Management
 
 ### 1. **Endpoint for Adding a New Link to a Category**
    - Introduced a new route ("/links") and corresponding methods in the LinkController class.
