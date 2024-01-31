@@ -174,4 +174,57 @@ These changes collectively enhance the application's functionality, providing a 
 
    ---
 
-   
+   # Work completed: Application Feature Implementations and Enhancements
+
+   ## 29 Jan 2024
+
+   ## Links and Categories Management
+
+### 1. **Endpoint for Adding a New Link to a Category**
+   - Introduced a new route ("/links") and corresponding methods in the LinkController class.
+   - Prisma used for updating the database, associating the link with the specified tab and category.
+   - Thorough validation on the request body to ensure the presence of required parameters and correct input format.
+   - Handles duplicates using the "upsert" Prisma operation.
+   - Provides users with an efficient way to add links, associating them with specific categories and tabs.
+
+### 2. **Endpoint for Retrieving Categories Incrementally**
+   - Introduced a new route ("/categories-incrementally") and corresponding methods in the CategoryController class.
+   - Prisma used for fetching categories, considering lastUpdatedTime when specified.
+   - Validation on the request body to ensure the presence of necessary parameters.
+   - Offers clients flexibility to obtain categories either in full or incrementally, facilitating efficient category synchronization.
+
+### 3. **Endpoint for Deleting a Category from a Specified Tab**
+   - Added a new route ("/categories") and corresponding methods in the CategoryController class.
+   - Prisma used to update the user's tab, marking the specified category as deleted.
+   - Validation on the request body to ensure the presence of essential parameters.
+   - Provides a mechanism for clients to delete categories within specific tabs, improving category data management.
+
+### 4. **Endpoint for Updating an Existing Category in a Specified Tab**
+   - Introduced a new route ("/categories") and corresponding methods in the CategoryController class.
+   - Prisma used to update the user's tab, modifying the specified category with provided details.
+   - Validation on the request body to ensure the presence of essential parameters and order being an integer.
+   - Allows clients to dynamically update category details within specific tabs for better customization.
+
+### 5. **Endpoint for Adding a New Category to a Specified Tab**
+   - Introduced a new route ("/categories") and corresponding methods in the CategoryController class.
+   - Prisma used to update the user's tab, adding a new category with provided details.
+   - Validation on the request body to ensure the presence of essential parameters and order being an integer.
+   - Introduction of a utility function isInteger for order parameter validation.
+   - Enhances the flexibility of tab organization by allowing clients to dynamically add categories to specific tabs.
+
+### 6. **Endpoint for Retrieving All Categories of a Given Tab**
+   - Added a new route ("/categories") and corresponding methods in the CategoryController class.
+   - Prisma used to fetch the user with the specified tab, including information about the tab's associated categories.
+   - Validation on the request body to ensure the required identifier is present.
+   - Provides clients with a way to obtain all categories associated with a specific tab for improved data retrieval and management.
+
+### 7. **Incremental Retrieval of User Tabs**
+   - Introduced a new route ("/tabs-incrementally") and methods in the TabController class.
+   - Controller checks the request body for the lastUpdatedTime parameter and decides whether to return all tabs or only those updated after the specified timestamp.
+   - Proper validation to ensure the required lastUpdatedTime parameter is present.
+   - Fetches and returns tabs with updatedAt timestamps greater than or equal to the provided lastUpdatedTime, improving tab synchronization efficiency.
+
+These enhancements collectively improve the management of links, categories, and tabs within the application, providing users and clients with more flexible and efficient ways to organize and retrieve data.
+
+---
+
