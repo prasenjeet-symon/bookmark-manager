@@ -1,22 +1,28 @@
-# feat: Implement Comprehensive Server Setup, Authentication Middleware, and Utility Functions
+# Work Completed: Application Feature Implementations and Enhancements
 
 ## 25 Jan 2024
 
-This commit represents a substantial step forward in the development of our application. The introduction of a sophisticated server setup using Express.js brings several key features into play. Notably, the server now incorporates CORS handling, ensuring secure cross-origin resource sharing. Middleware for parsing JSON and URL-encoded data has been integrated, enhancing the server's ability to handle diverse content types seamlessly.
+## Comprehensive Server Setup, Authentication Middleware, and Utility Functions
 
-## Authentication Middleware
+### 1. **Server Setup with Express.js**
+   - Implemented a sophisticated server setup using Express.js.
+   - Incorporated CORS handling for secure cross-origin resource sharing.
+   - Integrated middleware for parsing JSON and URL-encoded data, enhancing the server's content type handling capabilities.
 
-In addition to the server setup, a comprehensive authentication middleware has been implemented. This middleware plays a pivotal role in securing our application by verifying and decoding user tokens. It extracts tokens from request headers or query parameters and employs the JWT_SECRET from environment variables to ensure token validity. In the case of successful validation, user information is set in the response object for further processing, while invalid tokens result in a 401 status accompanied by an error message. This authentication layer fortifies protected routes, allowing only authenticated users with valid tokens to access them.
+### 2. **Authentication Middleware**
+   - Introduced a comprehensive authentication middleware for securing the application.
+   - Verifies and decodes user tokens, extracting them from request headers or query parameters.
+   - Utilizes JWT_SECRET from environment variables for token validity checks.
+   - Sets user information in the response object upon successful validation.
+   - Fortifies protected routes, allowing only authenticated users with valid tokens.
 
-## Utility Functions
+### 3. **Utility Functions**
+   - Implemented utility functions contributing to application security and functionality.
+   - Password hashing function using the SHA-256 algorithm for robust user credential security.
+   - Admin user signup functionality ensuring unique admin accounts with secure storage of hashed passwords and customizable full names.
+   - Additional utility functions include checking for an existing admin user, creating JSON Web Tokens (JWT), and implementing a Prisma client singleton pattern for efficient database connections.
 
-Furthermore, this commit introduces utility functions that contribute to the overall security and functionality of the application.
-
-- A password hashing function utilizing the SHA-256 algorithm provides a robust method for securing user credentials.
-- The admin user signup functionality ensures the creation of unique admin accounts, with secure storage of hashed passwords and the flexibility to customize the admin user's full name.
-- Additional utility functions include checking for an existing admin user, creating JSON Web Tokens (JWT), and implementing a Prisma client singleton pattern for efficient database connections.
-
-These implementations collectively lay the groundwork for a secure, modular, and extensible application. The commit not only enhances security but also fosters a maintainable and organized codebase, setting the stage for future development and feature additions.
+This commit marks a significant milestone in the development process, addressing crucial aspects of server setup, authentication, and utility functions to ensure a robust and scalable foundation for the application.
 
 ---
 
@@ -24,46 +30,52 @@ These implementations collectively lay the groundwork for a secure, modular, and
 
 ## 26 Jan 2024
 
-## UserSetting Prisma Model
-- Implemented the `UserSetting` Prisma model, capturing user-specific settings such as dark mode, number of columns, and more.
-- Designed the model with structured fields, contributing to a personalized user experience.
+## Prisma Model Implementation
 
-## UserTab Prisma Model
-- Introduced the `UserTab` Prisma model, allowing users to create and customize individual tabs within the application.
-- Established a relation to associate each tab with a specific user, enhancing content organization.
+### 1. **UserSetting Prisma Model**
+   - Implemented the `UserSetting` Prisma model capturing user-specific settings such as dark mode, number of columns, and more.
+   - Designed the model with structured fields, contributing to a personalized user experience.
 
-## Category Prisma Model
-- Implemented the `Category` Prisma model, representing categories within the application for organizing content.
-- Established relationships with the `UserTab` model to maintain data consistency and flexibility.
+### 2. **UserTab Prisma Model**
+   - Introduced the `UserTab` Prisma model, allowing users to create and customize individual tabs within the application.
+   - Established a relation to associate each tab with a specific user, enhancing content organization.
 
-## Link Prisma Model
-- Introduced the `Link` Prisma model, facilitating the organization and management of individual links within the application.
-- Established relationships with the `Category` model for structured content representation.
+### 3. **Category Prisma Model**
+   - Implemented the `Category` Prisma model, representing categories within the application for organizing content.
+   - Established relationships with the `UserTab` model to maintain data consistency and flexibility.
 
-## Tag and HiddenTag Prisma Models
-- Implemented the `Tag` and `HiddenTag` Prisma models, providing a robust mechanism for categorizing and managing links with user-defined tags and hidden tags.
-- Established many-to-many relationships with the `Link` model for effective content organization.
+### 4. **Link Prisma Model**
+   - Introduced the `Link` Prisma model, facilitating the organization and management of individual links within the application.
+   - Established relationships with the `Category` model for structured content representation.
 
-## User Authentication Functionality
-- Implemented user signup, login, forgot password, and password reset functionalities.
-- Enhanced security through password hashing, JWT generation, and email validation.
-- Enabled users to securely create accounts, log in, and recover passwords.
+### 5. **Tag and HiddenTag Prisma Models**
+   - Implemented the `Tag` and `HiddenTag` Prisma models, providing a robust mechanism for categorizing and managing links with user-defined tags and hidden tags.
+   - Established many-to-many relationships with the `Link` model for effective content organization.
 
-## Google Sign-In and Sign-Up
-- Implemented Google Sign-In and Sign-Up functionalities for enhanced user authentication.
-- Validated Google authentication tokens and created JWTs for secure user sessions.
+## User Authentication
 
-## Token Validity Check
-- Implemented a route to check the validity of provided tokens.
-- Enhanced security by allowing clients to verify token validity before sensitive operations.
+### 6. **User Authentication Functionality**
+   - Implemented user signup, login, forgot password, and password reset functionalities.
+   - Enhanced security through password hashing, JWT generation, and email validation.
+   - Enabled users to securely create accounts, log in, and recover passwords.
 
-## User Settings Management
-- Implemented routes for retrieving and updating user settings.
-- Enhanced the user experience by providing personalized configurations.
+### 7. **Google Sign-In and Sign-Up**
+   - Implemented Google Sign-In and Sign-Up functionalities for enhanced user authentication.
+   - Validated Google authentication tokens and created JWTs for secure user sessions.
 
-## User Tabs Management
-- Implemented routes for retrieving, adding, and updating user tabs.
-- Improved content organization and customization for users.
+### 8. **Token Validity Check**
+   - Implemented a route to check the validity of provided tokens.
+   - Enhanced security by allowing clients to verify token validity before sensitive operations.
+
+## User Settings and Tabs Management
+
+### 9. **User Settings Management**
+   - Implemented routes for retrieving and updating user settings.
+   - Enhanced the user experience by providing personalized configurations.
+
+### 10. **User Tabs Management**
+   - Implemented routes for retrieving, adding, and updating user tabs.
+   - Improved content organization and customization for users.
 
 These features collectively lay the groundwork for a secure, modular, and user-friendly application. The commit not only focuses on enhancing security but also contributes to a more organized and personalized user experience. The implemented functionalities provide a strong foundation for future development and user-centric feature additions.
 
@@ -73,46 +85,52 @@ These features collectively lay the groundwork for a secure, modular, and user-f
 
 ## 27 Jan 2024
 
-### **Implement Google Sign-Up Functionality:**
-   - Introduces a new route ("/google-signup") and a method in the Google class for handling Google Sign-Up requests.
-   - The controller validates the request body, verifies the Google authentication token, and creates a new user if not already existing.
-   - Proper error handling is implemented for invalid tokens or existing users with corresponding credentials.
+## Google Authentication
 
-### **Implement Google Sign-In Functionality:**
-   - Introduces a new route ("/google-signin") and a method in the Google class for handling Google Sign-In requests.
-   - The controller validates the request body, verifies the Google authentication token, and creates a JWT for existing users.
+### 1. **Implement Google Sign-Up Functionality:**
+   - Introduced a new route ("/google-signup") and a method in the Google class for handling Google Sign-Up requests.
+   - Controller validates the request body, verifies the Google authentication token, and creates a new user if not already existing.
+   - Proper error handling for invalid tokens or existing users with corresponding credentials.
+
+### 2. **Implement Google Sign-In Functionality:**
+   - Introduced a new route ("/google-signin") and a method in the Google class for handling Google Sign-In requests.
+   - Controller validates the request body, verifies the Google authentication token, and creates a JWT for existing users.
    - Proper error handling ensures a robust Google Sign-In process using axios to interact with Google's authentication endpoints.
 
-### **Implement Password Reset Functionality:**
-   - Introduces a new route ("/reset-password") and a method in the SignupController class for handling password resets.
-   - The controller validates the request body, verifies the token's validity and expiration, and updates the user's password in the database.
+## Password Management
+
+### 3. **Implement Password Reset Functionality:**
+   - Introduced a new route ("/reset-password") and a method in the SignupController class for handling password resets.
+   - Controller validates the request body, verifies the token's validity and expiration, and updates the user's password in the database.
    - Proper error handling for user not found, token expiration, or decoding errors.
 
-### **Implement Forgot Password Functionality:**
-   - Introduces a new route ("/forgot-password") and a method in the SignupController class for handling forgot password functionality.
+### 4. **Implement Forgot Password Functionality:**
+   - Introduced a new route ("/forgot-password") and a method in the SignupController class for handling forgot password functionality.
    - Validates the request body, generates a temporary token for password reset, and sends it to the user via email.
    - Includes proper error handling and validation for a secure and user-friendly forgot password process.
 
-### **Implement User Login Functionality with Email and Password:**
-   - Introduces a login route ("/login") and a login method in the SignupController class for handling user login requests.
-   - Validates the request body, checks for the existence of a user with the provided email, and verifies the password against the hashed password in the database.
+### 5. **Implement User Login Functionality with Email and Password:**
+   - Introduced a login route ("/login") and a login method in the SignupController class for handling user login requests.
+   - Controller validates the request body, checks for the existence of a user with the provided email, and verifies the password against the hashed password in the database.
    - Generates a JWT for authentication with appropriate error handling and success logging.
 
-### **Implement User Signup Functionality with Email and Password:**
-   - Introduces a signup route ("/signup") and a SignupController class for handling user signup requests.
-   - Validates the request body, checks for existing users with the same email, and creates a new user with hashed passwords.
+### 6. **Implement User Signup Functionality with Email and Password:**
+   - Introduced a signup route ("/signup") and a SignupController class for handling user signup requests.
+   - Controller validates the request body, checks for existing users with the same email, and creates a new user with hashed passwords.
    - Generates a JWT for authentication and includes email and password validation functions.
 
-### **Add Tag and HiddenTag Prisma Models:**
-   - Introduces Tag and HiddenTag Prisma models for organizing links with many-to-many relationships.
-   - Enhances the database structure for categorizing and managing links based on user-defined tags and hidden tags.
+## Prisma Model Enhancement
 
-### **Add Link Prisma Model:**
-   - Introduces the Link Prisma model representing individual links with fields such as id, title, url, order, icon, notes, categoryId, createdAt, updatedAt, and isDeleted.
+### 7. **Add Tag and HiddenTag Prisma Models:**
+   - Introduced Tag and HiddenTag Prisma models for organizing links with many-to-many relationships.
+   - Enhanced the database structure for categorizing and managing links based on user-defined tags and hidden tags.
+
+### 8. **Add Link Prisma Model:**
+   - Introduced the Link Prisma model representing individual links with fields such as id, title, url, order, icon, notes, categoryId, createdAt, updatedAt, and isDeleted.
    - Establishes relationships with the Category model for structured content organization.
 
-### **Add Category Prisma Model:**
-   - Introduces the Category Prisma model representing categories within the application.
+### 9. **Add Category Prisma Model:**
+   - Introduced the Category Prisma model representing categories within the application.
    - Includes fields for name, order, color, icon, tabId, createdAt, updatedAt, and isDeleted.
    - Establishes relationships with the UserTab model for organizing content within tabs.
 
@@ -225,6 +243,70 @@ These changes collectively enhance the application's functionality, providing a 
    - Fetches and returns tabs with updatedAt timestamps greater than or equal to the provided lastUpdatedTime, improving tab synchronization efficiency.
 
 These enhancements collectively improve the management of links, categories, and tabs within the application, providing users and clients with more flexible and efficient ways to organize and retrieve data.
+
+---
+
+# Work completed: Application Feature Implementations and Enhancements
+
+## 30 Jan 2024
+
+## Prisma Model Refinement
+
+### 1. **Define HiddenTag and LinkHiddenTag Models:**
+   - Updated the HiddenTag model, fixing a typo in the field name from 'idetifier' to 'identifier'.
+   - Added fields: 'id', 'name', 'order', 'linkHiddenTags', 'createdAt', 'updatedAt', 'isDeleted'.
+   - 'identifier' and 'name' are unique.
+   - 'isDeleted' is a boolean field, defaulting to false.
+
+   - Introduced the LinkHiddenTag model:
+      - Represents the association between a link and a hidden tag.
+      - Fields include 'id', 'linkIdentifier', 'tagIdentifier', 'createdAt', 'updatedAt'.
+      - Establishes relations with the Link and HiddenTag models.
+      - This commit improves the definition of hidden tags and their association with links.
+
+## User Interaction and Content Management
+
+### 2. **Implement User Logout Functionality:**
+   - Introduced a new endpoint ("/logout") and the corresponding method in the SignupController class to handle user logout.
+   - The logout method removes the specified session token associated with the user, effectively logging them out.
+   - Validation for the logout request body ensures the required token is provided.
+   - Users can securely end their sessions and invalidate associated tokens.
+
+### 3. **Implement Endpoint to Retrieve All Tags of the Application:**
+   - Introduced a new route ("/tags") and the corresponding method in the TagController class to retrieve all tags of the application.
+   - The endpoint fetches tags from the database, excluding those marked as deleted, and returns the list of tags to the client.
+   - Users can view and manage all available tags within the application.
+
+### 4. **Implement Endpoint to Move a Link from the Catalog to a Specific Tab and Category:**
+   - Introduced a new route ("/catalog/move") and the corresponding method in the LinkController class to move a link from the user's catalog to a specified tab and category.
+   - The endpoint validates the request body, ensuring the presence of finalCategoryIdentifier and identifier.
+   - If the validation passes, the link is updated in the database, associating it with the provided tab and category.
+   - Users can organize catalog links into specific tabs and categories, improving link management and categorization.
+
+### 5. **Implement Endpoint to Fetch Links Incrementally Based on Last Updated Time:**
+   - Introduced a new route ("/links-incrementally") and corresponding methods in the LinkController class to retrieve links incrementally.
+   - The endpoint supports fetching all links if no lastUpdatedTime is provided and fetching links updated after the specified lastUpdatedTime.
+   - Efficient synchronization with the server based on the last update timestamp is facilitated.
+
+### 6. **Implement Endpoint to Retrieve All Links Within a Specific Category:**
+   - Introduced a new route ("/links") and associated methods in the LinkController class to fetch all links belonging to a specified category within a given tab.
+   - The implementation utilizes Prisma to query the database and retrieve the list of links associated with the provided tabIdentifier and categoryIdentifier.
+   - Users can obtain all links within a particular category, facilitating a comprehensive view of their organized content.
+
+### 7. **Implement Endpoint to Move a Link from One Category to Another:**
+   - Introduced a new route ("/links/move") and associated methods in the LinkController class to handle the movement of a link from one category to another within a specified tab.
+   - The implementation utilizes Prisma to update the link's category association in the database, ensuring it is accurately reflected in the user's content organization.
+   - Users have the flexibility to reorganize their content by easily moving links between categories, contributing to a more dynamic and customizable user experience.
+
+### 8. **Implement Endpoint to Delete a Link from a Category:**
+   - Introduced a new route ("/links") and associated methods in the LinkController class to handle the deletion of a link from a specified category within a tab.
+   - The implementation utilizes Prisma to mark the link as deleted in the database, ensuring it is excluded from future queries.
+   - Users can seamlessly remove unwanted links, contributing to a more streamlined and organized content management experience.
+
+### 9. **Implement Endpoint to Update a Link Within a Category:**
+   - Introduced a new route ("/links") and corresponding methods in the LinkController class to handle the update of an existing link within a specified category of a tab.
+   - The implementation uses Prisma to update the database, including the ability to modify the link's order, title, URL, icon, notes, and associated tags.
+   - Users can efficiently update link details and associated tags, contributing to better organization and customization of their content.
 
 ---
 
