@@ -67,6 +67,8 @@ These implementations collectively lay the groundwork for a secure, modular, and
 
 These features collectively lay the groundwork for a secure, modular, and user-friendly application. The commit not only focuses on enhancing security but also contributes to a more organized and personalized user experience. The implemented functionalities provide a strong foundation for future development and user-centric feature additions.
 
+---
+
 # Work completed: Application Feature Implementations and Enhancements
 
 ## 27 Jan 2024
@@ -115,3 +117,61 @@ These features collectively lay the groundwork for a secure, modular, and user-f
    - Establishes relationships with the UserTab model for organizing content within tabs.
 
 These changes collectively enhance the application's functionality, providing a secure and structured experience for users in managing authentication and content organization.
+
+---
+
+# Work completed: Application Feature Implementations and Enhancements
+
+## 28 Jan 2024
+
+## Authentication and User Tabs Management
+
+### 1. **Tab Deletion Functionality**
+   - Implemented a new route ("/tabs") and a method in the TabController class for deleting an existing tab.
+   - Controller validates the request body, ensuring the required identifier is present, and soft-deletes the corresponding tab in the database.
+   - Enhances user control by allowing removal of unwanted or obsolete tabs, with soft-deletion for potential recovery or auditing purposes.
+   - Proper validation prevents unauthorized or incomplete deletion attempts for a secure user experience.
+
+### 2. **Tab Update Functionality**
+   - Introduced a new route ("/tabs") and a method in the TabController class for updating an existing tab.
+   - Controller validates the request body, extracts necessary data (identifier, name, and order), and updates the corresponding tab in the database.
+   - Proper validation ensures required fields are present and meet specified criteria, allowing users to dynamically modify tab names and orders.
+   - Enhances user experience by providing dynamic updates to tabs for improved flexibility.
+
+### 3. **Addition of New Tab**
+   - Implemented a new route ("/tabs") and a method in the TabController class for adding a new tab.
+   - Controller validates the request body, extracts necessary data, and creates a new tab in the database.
+   - Proper validation ensures required fields (name and order) are present and meet specified criteria.
+   - Enables users to dynamically add tabs, enhancing organization and customization of content within the application.
+
+### 4. **User Tabs Retrieval**
+   - Introduced a new route ("/tabs") and a method in the TabController class for retrieving user tabs.
+   - Controller uses the authenticated user's email to fetch corresponding tabs from the database and sends them as a response to the client.
+   - Proper error handling for cases where the user is not found.
+   - Allows clients to retrieve and display tabs associated with a specific user for a customized view of content organization.
+
+## User Settings Management
+
+### 5. **User Settings Update**
+   - Implemented a new route ("/user-setting") and a method in the UserSetting class for updating user settings.
+   - Controller validates the request body, extracts necessary data, and updates user settings in the database for the authenticated user.
+   - Proper validation ensures all required fields are present in the request body.
+   - Enables users to customize their settings for a more personalized experience within the application.
+
+### 6. **User Settings Retrieval**
+   - Introduced a new route ("/user-setting") and a method in the UserSetting class for retrieving user settings.
+   - Controller uses the authenticated user's email to fetch corresponding user settings from the database and sends them as a response to the client.
+   - Proper error handling for cases where the user is not found.
+   - Allows clients to retrieve and display user-specific settings for a personalized configuration.
+
+## Authentication System Enhancement
+
+### 7. **Token Validity Check**
+   - Implemented a new route ("/is-token-valid") and a method in the SignupController class to check the validity of a provided token.
+   - Controller validates the request body, checks if the token is expired using the isTokenExpired function, and responds accordingly.
+   - Proper error handling, returning an error response when the token is expired.
+   - Allows clients to verify the validity of a token before performing sensitive operations, enhancing the security of the authentication system.
+
+   ---
+
+   
