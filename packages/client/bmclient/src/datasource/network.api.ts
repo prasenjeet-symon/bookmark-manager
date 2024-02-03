@@ -4,6 +4,7 @@ export class NetworkApi {
   private baseUrl = "http://localhost:8081/server";
   private signUp = `${this.baseUrl}/auth/signup`;
   private signIn = `${this.baseUrl}/auth/login`;
+  private signUpGoolge = `${this.baseUrl}/auth/google-signup`;
 
   /**
    *
@@ -33,6 +34,21 @@ export class NetworkApi {
     };
 
     return HttpManager.request(this.signIn, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Signup with google
+   */
+  public signupGoogle(token: string) {
+    const reqBody = {
+      token: token,
+    };
+
+    return HttpManager.request(this.signUpGoolge, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
