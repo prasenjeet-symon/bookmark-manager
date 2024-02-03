@@ -5,6 +5,7 @@ export class NetworkApi {
   private signUp = `${this.baseUrl}/auth/signup`;
   private signIn = `${this.baseUrl}/auth/login`;
   private signUpGoolge = `${this.baseUrl}/auth/google-signup`;
+  private signInGoogle = `${this.baseUrl}/auth/google-signin`;
 
   /**
    *
@@ -55,7 +56,17 @@ export class NetworkApi {
   }
 
   /**
-   * 
-   * 
+   *
+   * Signin with google
    */
+  public signinGoogle(token: string) {
+    const reqBody = {
+      token: token,
+    };
+
+    return HttpManager.request(this.signInGoogle, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
 }
