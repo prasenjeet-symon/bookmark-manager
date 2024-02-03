@@ -163,3 +163,10 @@ export class Logger {
     this.logWithColor(`Success: ${message}`, "\x1b[32m"); // Green
   }
 }
+/**
+ *
+ * Deep copy list
+ */
+export function deepCopyList<T extends Network<T>>(list: T[]): T[] {
+  return list.map((item) => item.deepCopy());
+}

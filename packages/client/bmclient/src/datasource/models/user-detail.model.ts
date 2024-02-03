@@ -1,8 +1,8 @@
 import { BehaviorSubject } from "rxjs";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
-import { ModelStore, ModelStoreStatus, User } from "../schema";
-import { Constants } from "../utils";
+import { ModelStore, ModelStoreStatus, MutationModelIdentifier, User } from "../schema";
+import { Constants, MutationModel, deepCopyList } from "../utils";
 
 export class UserDetailModel {
   private readonly _nodeId: string; // Node Id : userId;
@@ -18,6 +18,12 @@ export class UserDetailModel {
   private _nextData: User[] = [];
 
   constructor(nodeId: string) {
+    MutationModel.getInstance().observable.subscribe((data) => {
+      if (data.identifier === MutationModelIdentifier.USERS) {
+        this._get();
+      }
+    });
+
     this._nodeId = nodeId;
     this._storeName = "user_detail_store";
 
@@ -88,5 +94,27 @@ export class UserDetailModel {
    */
   public getUserDetails() {
     return this._source.asObservable();
+  }
+
+  /**
+   * Update user
+   */
+  public async updateUser(user: User) {
+    this._prevData = deepCopyList(this._nextData);
+    this._nextData = this._nextData.map((p) => {
+      if (p.userId === user.userId) {
+        return user;
+      } else {
+        return p;
+      }
+    });
+
+    this._emit();
+
+
+    try {
+        
+
+    } catch (error) {}
   }
 }

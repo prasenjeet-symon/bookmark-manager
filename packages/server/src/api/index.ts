@@ -17,6 +17,11 @@ router.get('/', (_req, res) => {
  */
 router.get('/user', (req, res) => new UserController(req, res).getUser());
 /**
+ * 
+ * Update user
+ */
+router.put('/user', (req, res) => new UserController(req, res).updateUser());
+/**
  *
  * Get user settings
  */

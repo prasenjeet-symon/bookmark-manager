@@ -17,6 +17,7 @@ export enum ModelStoreStatus {
  */
 export enum MutationModelIdentifier {
   TABS = "tabs",
+  USERS = "users",
 }
 
 /**
