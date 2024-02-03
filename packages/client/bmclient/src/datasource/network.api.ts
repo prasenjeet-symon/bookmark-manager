@@ -10,6 +10,7 @@ export class NetworkApi {
   private logoutRoute = `${this.baseUrlRoute}/auth/logout`;
   private forgotPasswordRoute = `${this.baseUrlRoute}/auth/forgot-password`;
   private resetPasswordRoute = `${this.baseUrlRoute}/auth/reset-password`;
+  private userRoute = `${this.baseUrlRoute}/api/user`;
 
   /**
    *
@@ -133,6 +134,16 @@ export class NetworkApi {
     return HttpManager.request(this.resetPasswordRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Get user
+   */
+  public getUser() {
+    return HttpManager.request(this.userRoute, {
+      method: "GET",
     });
   }
 }

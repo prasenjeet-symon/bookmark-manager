@@ -1,5 +1,18 @@
+import localforage from "localforage";
 import { Subject } from "rxjs";
 import { MutationModelData } from "./schema";
+
+export class Constants {
+  public static get LOCAL_STORE_VERSION() {
+    return 1;
+  }
+
+  // Default driver
+  public static get DEFAULT_DRIVER() {
+    return localforage.INDEXEDDB;
+  }
+}
+
 /**
  *
  *
