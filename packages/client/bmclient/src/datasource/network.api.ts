@@ -7,6 +7,7 @@ export class NetworkApi {
   private signUpGoolgeRoute = `${this.baseUrlRoute}/auth/google-signup`;
   private signInGoogleRoute = `${this.baseUrlRoute}/auth/google-signin`;
   private isTokenValidRoute = `${this.baseUrlRoute}/auth/is-token-valid`;
+  private logoutRoute = `${this.baseUrlRoute}/auth/logout`;
 
   /**
    *
@@ -81,6 +82,21 @@ export class NetworkApi {
     };
 
     return HttpManager.request(this.isTokenValidRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Logout
+   */
+  public logout(token: string) {
+    const reqBody = {
+      token: token,
+    };
+
+    return HttpManager.request(this.logoutRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
