@@ -1,4 +1,5 @@
 import { BehaviorSubject, defer, mergeMap, Observable } from "rxjs";
+import { ApiResponse } from "../utils";
 
 /**
  *
@@ -71,15 +72,22 @@ export class ApplicationToken {
  */
 export class HttpManager {
   // Reusable function for making HTTP requests
-  private static makeHttpRequest(token: string | null, url: string, options?: RequestInit): Observable<Response> {
+  private static makeHttpRequest(token: string | null, url: string, options?: RequestInit): Observable<ApiResponse> {
     return defer(() => {
       const abortController = new AbortController();
 
       // Fetch operation with the AbortController signal
-      const fetchObservable = new Observable<Response>((observer) => {
-        fetch(url, { ...options, headers: { Authorization: `Bearer ${token}` }, signal: abortController.signal })
-          .then((response) => {
-            observer.next(response);
+      const fetchObservable = new Observable<ApiResponse>((observer) => {
+        fetch(url, { ...options, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, signal: abortController.signal })
+          .then(async (response) => {
+            const jsonData = await response.json();
+            const statusCode = response.status;
+            const statusText = response.statusText;
+
+            return new ApiResponse(statusCode, jsonData, statusText);
+          })
+          .then((data) => {
+            observer.next(data);
             observer.complete();
           })
           .catch((error) => observer.error(error));
@@ -97,7 +105,7 @@ export class HttpManager {
    *
    * Make http request
    */
-  public static request(url: string, options?: RequestInit): Observable<Response> {
+  public static request(url: string, options?: RequestInit): Observable<ApiResponse> {
     return ApplicationToken.getInstance().observable.pipe(
       mergeMap((token) => {
         return HttpManager.makeHttpRequest(token, url, options);

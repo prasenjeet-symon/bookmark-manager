@@ -1,6 +1,21 @@
 import { Subject } from "rxjs";
 import { MutationModelData } from "./schema";
+/**
+ * 
+ * 
+ * Api Response
+ */
+export class ApiResponse {
+  public status: number;
+  public data: any;
+  public statusText: string;
 
+  constructor(status: number, data: any, statusText: string) {
+    this.status = status;
+    this.data = data;
+    this.statusText = statusText;
+  }
+}
 /**
  *
  *
