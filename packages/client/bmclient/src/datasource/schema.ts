@@ -1,3 +1,5 @@
+import { JsonParser, Network } from "./utils";
+
 /**
  *
  * Model Store Status
@@ -90,11 +92,7 @@ export class MutationModelData {
   public data: any;
   public type: MutationType;
 
-  constructor(
-    identifier: MutationModelIdentifier,
-    data: any,
-    type: MutationType
-  ) {
+  constructor(identifier: MutationModelIdentifier, data: any, type: MutationType) {
     this.identifier = identifier;
     this.data = data;
     this.type = type;
@@ -123,11 +121,115 @@ export class ModelStore<T> {
   public status: ModelStoreStatus;
   public data: T;
 
-  public constructor(
-    data: T,
-    status: ModelStoreStatus = ModelStoreStatus.READY
-  ) {
+  public constructor(data: T, status: ModelStoreStatus = ModelStoreStatus.READY) {
     this.data = data;
     this.status = status;
+  }
+}
+/**
+ *
+ *
+ * User
+ */
+export class User implements Network<User> {
+  id: number;
+  email: string;
+  mobile: string | null;
+  fullName: string;
+  profilePicture: string | null;
+  password: string;
+  userId: string;
+  dateOfBirth: Date | null;
+  timeZone: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+  maxSession: number;
+
+  constructor(
+    id: number,
+    email: string,
+    mobile: string | null,
+    fullName: string,
+    profilePicture: string | null,
+    password: string,
+    userId: string,
+    dateOfBirth: Date | null,
+    timeZone: string,
+    createdAt: Date,
+    updatedAt: Date,
+    isDeleted: boolean,
+    maxSession: number
+  ) {
+    this.id = id;
+    this.email = email;
+    this.mobile = mobile;
+    this.fullName = fullName;
+    this.profilePicture = profilePicture;
+    this.password = password;
+    this.userId = userId;
+    this.dateOfBirth = dateOfBirth;
+    this.timeZone = timeZone;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+    this.maxSession = maxSession;
+  }
+
+  static fromJson(json: any): User {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedEmail = JsonParser.parseStrict<string>(json, "email", "string");
+    const parsedMobile = JsonParser.parse<string>(json, "mobile", "string");
+    const parsedFullName = JsonParser.parseStrict<string>(json, "fullName", "string");
+    const parsedProfilePicture = JsonParser.parse<string>(json, "profilePicture", "string");
+    const parsedPassword = JsonParser.parseStrict<string>(json, "password", "string");
+    const parsedUserId = JsonParser.parseStrict<string>(json, "userId", "string");
+    const parsedDateOfBirth = JsonParser.parse<Date>(json, "dateOfBirth", "string");
+    const parsedTimeZone = JsonParser.parseStrict<string>(json, "timeZone", "string");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "string");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "string");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
+    const parsedMaxSession = JsonParser.parseStrict<number>(json, "maxSession", "int");
+
+    return new User(
+      parsedId,
+      parsedEmail,
+      parsedMobile,
+      parsedFullName,
+      parsedProfilePicture,
+      parsedPassword,
+      parsedUserId,
+      parsedDateOfBirth,
+      parsedTimeZone,
+      parsedCreatedAt,
+      parsedUpdatedAt,
+      parsedIsDeleted,
+      parsedMaxSession
+    );
+  }
+
+  toJson(): any {
+    const jsonParsable = {
+      id: this.id,
+      email: this.email,
+      mobile: this.mobile,
+      fullName: this.fullName,
+      profilePicture: this.profilePicture,
+      password: this.password,
+      userId: this.userId,
+      dateOfBirth: this.dateOfBirth,
+      timeZone: this.timeZone,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+      maxSession: this.maxSession,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  // Deep copy
+  public deepCopy(): User {
+    return User.fromJson(this.toJson());
   }
 }

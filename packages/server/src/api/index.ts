@@ -4,12 +4,18 @@ import { LinkController } from './link.controller';
 import { TabController } from './tab.controller';
 import { TagController } from './tag.cotroller';
 import { UserSetting } from './user-setting.controller';
+import { UserController } from './user.controller';
 
 const router = express.Router();
 
 router.get('/', (_req, res) => {
     res.send({ message: 'Hello World' });
 });
+/**
+ * 
+ * Get user
+ */
+router.get('/user', (req, res) => new UserController(req, res).getUser());
 /**
  *
  * Get user settings
