@@ -9,6 +9,7 @@ export class NetworkApi {
   private isTokenValidRoute = `${this.baseUrlRoute}/auth/is-token-valid`;
   private logoutRoute = `${this.baseUrlRoute}/auth/logout`;
   private forgotPasswordRoute = `${this.baseUrlRoute}/auth/forgot-password`;
+  private resetPasswordRoute = `${this.baseUrlRoute}/auth/reset-password`;
 
   /**
    *
@@ -113,6 +114,23 @@ export class NetworkApi {
     };
 
     return HttpManager.request(this.forgotPasswordRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Reset password
+   */
+  public resetPassword(token: string, userId: string, password: string) {
+    const reqBody = {
+      token: token,
+      userId: userId,
+      password: password,
+    };
+
+    return HttpManager.request(this.resetPasswordRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
