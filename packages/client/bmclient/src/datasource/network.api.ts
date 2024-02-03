@@ -1,11 +1,12 @@
 import { HttpManager } from "./http/http.manager";
 
 export class NetworkApi {
-  private baseUrl = "http://localhost:8081/server";
-  private signUp = `${this.baseUrl}/auth/signup`;
-  private signIn = `${this.baseUrl}/auth/login`;
-  private signUpGoolge = `${this.baseUrl}/auth/google-signup`;
-  private signInGoogle = `${this.baseUrl}/auth/google-signin`;
+  private baseUrlRoute = "http://localhost:8081/server";
+  private signUpRoute = `${this.baseUrlRoute}/auth/signup`;
+  private signInRoute = `${this.baseUrlRoute}/auth/login`;
+  private signUpGoolgeRoute = `${this.baseUrlRoute}/auth/google-signup`;
+  private signInGoogleRoute = `${this.baseUrlRoute}/auth/google-signin`;
+  private isTokenValidRoute = `${this.baseUrlRoute}/auth/is-token-valid`;
 
   /**
    *
@@ -18,7 +19,7 @@ export class NetworkApi {
       fullName: fullName,
     };
 
-    return HttpManager.request(this.signUp, {
+    return HttpManager.request(this.signUpRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
@@ -34,7 +35,7 @@ export class NetworkApi {
       password: password,
     };
 
-    return HttpManager.request(this.signIn, {
+    return HttpManager.request(this.signInRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
@@ -49,7 +50,7 @@ export class NetworkApi {
       token: token,
     };
 
-    return HttpManager.request(this.signUpGoolge, {
+    return HttpManager.request(this.signUpGoolgeRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
@@ -64,7 +65,22 @@ export class NetworkApi {
       token: token,
     };
 
-    return HttpManager.request(this.signInGoogle, {
+    return HttpManager.request(this.signInGoogleRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Is token valid
+   */
+  public isTokenValid(token: string) {
+    const reqBody = {
+      token: token,
+    };
+
+    return HttpManager.request(this.isTokenValidRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
