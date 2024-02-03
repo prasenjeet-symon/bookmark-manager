@@ -4,10 +4,11 @@ export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
   private signUpRoute = `${this.baseUrlRoute}/auth/signup`;
   private signInRoute = `${this.baseUrlRoute}/auth/login`;
-  private signUpGoolgeRoute = `${this.baseUrlRoute}/auth/google-signup`;
+  private signUpGoogleRoute = `${this.baseUrlRoute}/auth/google-signup`;
   private signInGoogleRoute = `${this.baseUrlRoute}/auth/google-signin`;
   private isTokenValidRoute = `${this.baseUrlRoute}/auth/is-token-valid`;
   private logoutRoute = `${this.baseUrlRoute}/auth/logout`;
+  private forgotPasswordRoute = `${this.baseUrlRoute}/auth/forgot-password`;
 
   /**
    *
@@ -51,7 +52,7 @@ export class NetworkApi {
       token: token,
     };
 
-    return HttpManager.request(this.signUpGoolgeRoute, {
+    return HttpManager.request(this.signUpGoogleRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
@@ -97,6 +98,21 @@ export class NetworkApi {
     };
 
     return HttpManager.request(this.logoutRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
+   * Forgot password
+   */
+  public forgotPassword(email: string) {
+    const reqBody = {
+      email: email,
+    };
+
+    return HttpManager.request(this.forgotPasswordRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
