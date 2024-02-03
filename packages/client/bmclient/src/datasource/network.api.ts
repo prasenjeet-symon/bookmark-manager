@@ -1,4 +1,5 @@
 import { HttpManager } from "./http/http.manager";
+import { User } from "./schema";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -11,6 +12,7 @@ export class NetworkApi {
   private forgotPasswordRoute = `${this.baseUrlRoute}/auth/forgot-password`;
   private resetPasswordRoute = `${this.baseUrlRoute}/auth/reset-password`;
   private userRoute = `${this.baseUrlRoute}/api/user`;
+  private userSettingRoute = `${this.baseUrlRoute}/api/user-setting`;
 
   /**
    *
@@ -143,6 +145,27 @@ export class NetworkApi {
    */
   public getUser() {
     return HttpManager.request(this.userRoute, {
+      method: "GET",
+    });
+  }
+
+  /**
+   *
+   * Update user
+   */
+  public updateUser(user: User) {
+    return HttpManager.request(this.userRoute, {
+      method: "PUT",
+      body: user.toJson(),
+    });
+  }
+
+  /**
+   *
+   * Get user setting
+   */
+  public getUserSetting() {
+    return HttpManager.request(this.userSettingRoute, {
       method: "GET",
     });
   }

@@ -122,7 +122,7 @@ export class JsonParser {
  * Network interface
  */
 export interface Network<T> {
-  toJson(): Record<string, any>;
+  toJson(): string;
   deepCopy(): T;
 }
 

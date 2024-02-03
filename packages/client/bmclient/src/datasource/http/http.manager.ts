@@ -1,4 +1,4 @@
-import { BehaviorSubject, defer, mergeMap, Observable } from "rxjs";
+import { BehaviorSubject, defer, firstValueFrom, mergeMap, Observable } from "rxjs";
 import { ApiResponse } from "../utils";
 
 /**
@@ -112,4 +112,15 @@ export class HttpManager {
       })
     );
   }
+}
+/**
+ *
+ *
+ * Single call HTTP
+ */
+export async function singleCall(obs: Observable<ApiResponse>) {
+  const result = await firstValueFrom(obs);
+  const { status } = result;
+  if (status !== 200) throw new Error("Failed to fetch data");
+  return result;
 }

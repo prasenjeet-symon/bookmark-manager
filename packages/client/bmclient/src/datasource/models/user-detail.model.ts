@@ -1,8 +1,9 @@
 import { BehaviorSubject } from "rxjs";
+import { singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
-import { ModelStore, ModelStoreStatus, MutationModelIdentifier, User } from "../schema";
-import { Constants, MutationModel, deepCopyList } from "../utils";
+import { ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, User } from "../schema";
+import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
 
 export class UserDetailModel {
   private readonly _nodeId: string; // Node Id : userId;
@@ -111,10 +112,18 @@ export class UserDetailModel {
 
     this._emit();
 
-
     try {
-        
+      await singleCall(new NetworkApi().updateUser(user));
+      await this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.USERS, user, MutationType.UPDATE));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
 
-    } catch (error) {}
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+      return;
+    }
   }
 }

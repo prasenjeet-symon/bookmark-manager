@@ -18,6 +18,7 @@ export enum ModelStoreStatus {
 export enum MutationModelIdentifier {
   TABS = "tabs",
   USERS = "users",
+  USER_SETTING = "user_setting",
 }
 
 /**
@@ -232,5 +233,105 @@ export class User implements Network<User> {
   // Deep copy
   public deepCopy(): User {
     return User.fromJson(this.toJson());
+  }
+}
+/**
+ *
+ *
+ * User setting
+ */
+export class UserSetting implements Network<UserSetting> {
+  id: number;
+  userIdentifier: string;
+  isDarkMode: boolean;
+  numberOfColumns: string;
+  showNumberOfBookmarkInTab: boolean;
+  showNumberOfBookmarkInCategory: boolean;
+  showTagsInTooltip: boolean;
+  showNoteInTooltip: boolean;
+  allowDragDropToMoveLink: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+
+  constructor(
+    id: number,
+    userIdentifier: string,
+    isDarkMode: boolean,
+    numberOfColumns: string,
+    showNumberOfBookmarkInTab: boolean,
+    showNumberOfBookmarkInCategory: boolean,
+    showTagsInTooltip: boolean,
+    showNoteInTooltip: boolean,
+    allowDragDropToMoveLink: boolean,
+    createdAt: Date,
+    updatedAt: Date
+  ) {
+    this.id = id;
+    this.userIdentifier = userIdentifier;
+    this.isDarkMode = isDarkMode;
+    this.numberOfColumns = numberOfColumns;
+    this.showNumberOfBookmarkInTab = showNumberOfBookmarkInTab;
+    this.showNumberOfBookmarkInCategory = showNumberOfBookmarkInCategory;
+    this.showTagsInTooltip = showTagsInTooltip;
+    this.showNoteInTooltip = showNoteInTooltip;
+    this.allowDragDropToMoveLink = allowDragDropToMoveLink;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
+
+  /**
+   * from Json
+   */
+  public static fromJson(json: any): UserSetting {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedUserIdentifier = JsonParser.parseStrict<string>(json, "userIdentifier", "string");
+    const parsedIsDarkMode = JsonParser.parseStrict<boolean>(json, "isDarkMode", "boolean");
+    const parsedNumberOfColumns = JsonParser.parseStrict<string>(json, "numberOfColumns", "string");
+    const parsedShowNumberOfBookmarkInTab = JsonParser.parseStrict<boolean>(json, "showNumberOfBookmarkInTab", "boolean");
+    const parsedShowNumberOfBookmarkInCategory = JsonParser.parseStrict<boolean>(json, "showNumberOfBookmarkInCategory", "boolean");
+    const parsedShowTagsInTooltip = JsonParser.parseStrict<boolean>(json, "showTagsInTooltip", "boolean");
+    const parsedShowNoteInTooltip = JsonParser.parseStrict<boolean>(json, "showNoteInTooltip", "boolean");
+    const parsedAllowDragDropToMoveLink = JsonParser.parseStrict<boolean>(json, "allowDragDropToMoveLink", "boolean");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+
+    return new UserSetting(
+      parsedId,
+      parsedUserIdentifier,
+      parsedIsDarkMode,
+      parsedNumberOfColumns,
+      parsedShowNumberOfBookmarkInTab,
+      parsedShowNumberOfBookmarkInCategory,
+      parsedShowTagsInTooltip,
+      parsedShowNoteInTooltip,
+      parsedAllowDragDropToMoveLink,
+      parsedCreatedAt,
+      parsedUpdatedAt
+    );
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      userIdentifier: this.userIdentifier,
+      isDarkMode: this.isDarkMode,
+      numberOfColumns: this.numberOfColumns,
+      showNumberOfBookmarkInTab: this.showNumberOfBookmarkInTab,
+      showNumberOfBookmarkInCategory: this.showNumberOfBookmarkInCategory,
+      showTagsInTooltip: this.showTagsInTooltip,
+      showNoteInTooltip: this.showNoteInTooltip,
+      allowDragDropToMoveLink: this.allowDragDropToMoveLink,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  /**
+   * deep copy
+   */
+  public deepCopy(): UserSetting {
+    return UserSetting.fromJson(this.toJson());
   }
 }
