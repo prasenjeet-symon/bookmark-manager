@@ -1,8 +1,9 @@
 import { BehaviorSubject, Subscription } from "rxjs";
+import { singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
-import { ModelStore, ModelStoreStatus, MutationModelIdentifier, UserSetting } from "../schema";
-import { Constants, MutationModel } from "../utils";
+import { ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, UserSetting } from "../schema";
+import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
 
 export class UserSettingModel {
   private readonly _nodeId: string; // Node Id : userId;
@@ -99,5 +100,38 @@ export class UserSettingModel {
    */
   public get userSetting() {
     return this._source.asObservable();
+  }
+
+  /**
+   *
+   * Update user setting
+   */
+  public async updateUserSetting(userSetting: UserSetting) {
+    this._prevData = deepCopyList(this._nextData);
+
+    this._nextData = this._nextData.map((p) => {
+      if (p.userIdentifier === userSetting.userIdentifier) {
+        return userSetting;
+      } else {
+        return p;
+      }
+    });
+
+    this._emit();
+
+    try {
+      await singleCall(new NetworkApi().updateUserSetting(userSetting));
+      await this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.USER_SETTING, userSetting, MutationType.UPDATE));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
+
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+
+      return;
+    }
   }
 }

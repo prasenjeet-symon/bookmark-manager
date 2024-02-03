@@ -1,5 +1,5 @@
 import { HttpManager } from "./http/http.manager";
-import { User } from "./schema";
+import { User, UserSetting } from "./schema";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -167,6 +167,17 @@ export class NetworkApi {
   public getUserSetting() {
     return HttpManager.request(this.userSettingRoute, {
       method: "GET",
+    });
+  }
+
+  /**
+   *
+   * Update user settings
+   */
+  public updateUserSetting(userSetting: UserSetting) {
+    return HttpManager.request(this.userSettingRoute, {
+      method: "PUT",
+      body: userSetting.toJson(),
     });
   }
 }
