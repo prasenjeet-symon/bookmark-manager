@@ -335,3 +335,74 @@ export class UserSetting implements Network<UserSetting> {
     return UserSetting.fromJson(this.toJson());
   }
 }
+
+/**
+ *
+ * User's tab
+ */
+/**
+ *  {
+        "id": 1,
+        "identifier": "77803157-7baf-405a-b022-d6a71967ed9a",
+        "userIdentifier": "109dfb0d-af1f-4de1-bcd5-a7d13d2f96a6",
+        "name": "Tab One",
+        "order": 1,
+        "createdAt": "2024-01-30T15:33:31.785Z",
+        "updatedAt": "2024-01-30T15:33:31.785Z",
+        "isDeleted": false
+    }
+ */
+
+export class UserTab implements Network<UserTab> {
+  id: number;
+  identifier: string;
+  userIdentifier: string;
+  name: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+
+  constructor(id: number, identifier: string, userIdentifier: string, name: string, order: number, createdAt: Date, updatedAt: Date, isDeleted: boolean) {
+    this.id = id;
+    this.identifier = identifier;
+    this.userIdentifier = userIdentifier;
+    this.name = name;
+    this.order = order;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+  }
+
+  public static fromJson(json: any): UserTab {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedIdentifier = JsonParser.parseStrict<string>(json, "identifier", "string");
+    const parsedUserIdentifier = JsonParser.parseStrict<string>(json, "userIdentifier", "string");
+    const parsedName = JsonParser.parseStrict<string>(json, "name", "string");
+    const parsedOrder = JsonParser.parseStrict<number>(json, "order", "int");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
+
+    return new UserTab(parsedId, parsedIdentifier, parsedUserIdentifier, parsedName, parsedOrder, parsedCreatedAt, parsedUpdatedAt, parsedIsDeleted);
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      identifier: this.identifier,
+      userIdentifier: this.userIdentifier,
+      name: this.name,
+      order: this.order,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  public deepCopy(): UserTab {
+    return UserTab.fromJson(this.toJson());
+  }
+}

@@ -1,5 +1,7 @@
+import { map } from "rxjs";
 import { HttpManager } from "./http/http.manager";
-import { User, UserSetting } from "./schema";
+import { User, UserSetting, UserTab } from "./schema";
+import { ApiResponse } from "./utils";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -13,6 +15,7 @@ export class NetworkApi {
   private resetPasswordRoute = `${this.baseUrlRoute}/auth/reset-password`;
   private userRoute = `${this.baseUrlRoute}/api/user`;
   private userSettingRoute = `${this.baseUrlRoute}/api/user-setting`;
+  private tabsRoute = `${this.baseUrlRoute}/api/tabs`;
 
   /**
    *
@@ -146,7 +149,18 @@ export class NetworkApi {
   public getUser() {
     return HttpManager.request(this.userRoute, {
       method: "GET",
-    });
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = User.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
   }
 
   /**
@@ -167,7 +181,18 @@ export class NetworkApi {
   public getUserSetting() {
     return HttpManager.request(this.userSettingRoute, {
       method: "GET",
-    });
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = UserSetting.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
   }
 
   /**
@@ -178,6 +203,61 @@ export class NetworkApi {
     return HttpManager.request(this.userSettingRoute, {
       method: "PUT",
       body: userSetting.toJson(),
+    });
+  }
+
+  /**
+   *
+   * Get use's tabs
+   */
+  public getTabs() {
+    return HttpManager.request(this.tabsRoute, {
+      method: "GET",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as Array<any>;
+          const items = parsed.map((item) => UserTab.fromJson(item));
+          return new ApiResponse(status, items, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Add new tab
+   */
+  public addTab(userTab: UserTab) {
+    return HttpManager.request(this.tabsRoute, {
+      method: "POST",
+      body: userTab.toJson(),
+    });
+  }
+
+  /**
+   *
+   * Update tab
+   *
+   */
+  public updateTab(userTab: UserTab) {
+    return HttpManager.request(this.tabsRoute, {
+      method: "PUT",
+      body: userTab.toJson(),
+    });
+  }
+
+  /**
+   *
+   * Delete tab
+   */
+  public deleteTab(userTab: UserTab) {
+    return HttpManager.request(this.tabsRoute, {
+      method: "DELETE",
+      body: userTab.toJson(),
     });
   }
 }
