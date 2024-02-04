@@ -300,6 +300,17 @@ export class NetworkApi {
 
   /**
    *
+   * Update category
+   */
+  public updateCategory(tabCategory: TabCategory) {
+    return HttpManager.request(this.categoriesRoute, {
+      method: "PUT",
+      body: tabCategory.toJson(),
+    });
+  }
+
+  /**
+   *
    *
    *
    */

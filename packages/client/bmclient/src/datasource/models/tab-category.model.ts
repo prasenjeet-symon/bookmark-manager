@@ -128,4 +128,36 @@ export class TabCategoryModel {
       return;
     }
   }
+
+  /**
+   *
+   * Update category
+   */
+  public async updateCategory(category: TabCategory) {
+    this._prevData = deepCopyList(this._nextData);
+
+    this._nextData = this._nextData.map((p) => {
+      if (p.identifier === category.identifier) {
+        return category;
+      } else {
+        return p;
+      }
+    });
+
+    this._emit();
+
+    try {
+      await singleCall(new NetworkApi().updateCategory(category));
+      this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, category, MutationType.UPDATE));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
+
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+      return;
+    }
+  }
 }
