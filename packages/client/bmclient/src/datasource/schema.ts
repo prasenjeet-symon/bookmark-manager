@@ -20,6 +20,7 @@ export enum MutationModelIdentifier {
   USERS = "users",
   USER_SETTING = "user_setting",
   TAB_CATEGORY = "tab_category",
+  CATEGORY_LINK = "category_link",
 }
 
 /**
@@ -590,7 +591,7 @@ export class LinkTag implements Network<LinkTag> {
 }
 
 /**
- * 
+ *
  * Link
  */
 

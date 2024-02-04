@@ -1,6 +1,6 @@
 import { map } from "rxjs";
 import { HttpManager } from "./http/http.manager";
-import { TabCategory, User, UserSetting, UserTab } from "./schema";
+import { Link, TabCategory, User, UserSetting, UserTab } from "./schema";
 import { ApiResponse } from "./utils";
 
 export class NetworkApi {
@@ -17,6 +17,7 @@ export class NetworkApi {
   private userSettingRoute = `${this.baseUrlRoute}/api/user-setting`;
   private tabsRoute = `${this.baseUrlRoute}/api/tabs`;
   private categoriesRoute = `${this.baseUrlRoute}/api/categories`;
+  private linksRoute = `${this.baseUrlRoute}/api/links`;
 
   /**
    *
@@ -318,6 +319,33 @@ export class NetworkApi {
       method: "DELETE",
       body: tabCategory.toJson(),
     });
+  }
+
+  /**
+   *
+   * Get all links of category
+   */
+  public getLinks(tabIdentifier: string, categoryIdentifier: string) {
+    const reqBody = {
+      tabIdentifier: tabIdentifier,
+      categoryIdentifier: categoryIdentifier,
+    };
+
+    return HttpManager.request(this.linksRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as Array<any>;
+          const items = parsed.map((item) => Link.fromJson(item));
+          return new ApiResponse(status, items, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
   }
 
   /**
