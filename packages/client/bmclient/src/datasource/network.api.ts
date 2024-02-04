@@ -18,6 +18,7 @@ export class NetworkApi {
   private tabsRoute = `${this.baseUrlRoute}/api/tabs`;
   private categoriesRoute = `${this.baseUrlRoute}/api/categories`;
   private linksRoute = `${this.baseUrlRoute}/api/links`;
+  private newLinkRoute = `${this.baseUrlRoute}/api/links/new`;
 
   /**
    *
@@ -346,6 +347,23 @@ export class NetworkApi {
         }
       })
     );
+  }
+
+  /**
+   *
+   * Add new link to category
+   */
+  public addLink(tabIdentifier: string, categoryIdentifier: string, link: Link) {
+    const reqBody = {
+      ...link,
+      tabIdentifier: tabIdentifier,
+      categoryIdentifier: categoryIdentifier,
+    };
+
+    return HttpManager.request(this.newLinkRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
   }
 
   /**

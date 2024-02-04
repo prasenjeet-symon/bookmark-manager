@@ -1,8 +1,9 @@
 import { BehaviorSubject, Subscription } from "rxjs";
+import { singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
-import { Link, ModelStore, ModelStoreStatus, MutationModelIdentifier } from "../schema";
-import { Constants, MutationModel } from "../utils";
+import { Link, ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType } from "../schema";
+import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
 
 export class CategoryLinkModel {
   private readonly _nodeId: string; // Node Id : categoryIdentifier;
@@ -92,5 +93,30 @@ export class CategoryLinkModel {
    */
   private _emit() {
     this._source.next(new ModelStore(this._nextData));
+  }
+
+  /**
+   *
+   * Add new link
+   *
+   */
+  public async addLink(link: Link) {
+    this._prevData = deepCopyList(this._nextData);
+    this._nextData.push(link);
+    this._emit();
+
+    try {
+      await singleCall(new NetworkApi().addLink(this._nodeIdP1, this._nodeId, link));
+      this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.CATEGORY_LINK, link, MutationType.CREATE));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
+
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+      return;
+    }
   }
 }
