@@ -193,4 +193,34 @@ export class TabCategoryModel {
       return;
     }
   }
+
+  /**
+   *
+   * Update orders of categories
+   */
+  public async updateOrders(categories: TabCategory[]) {
+    this._prevData = deepCopyList(this._nextData);
+
+    const categoriesWithOrders = categories.map((p, i) => {
+      p.order = i + 1;
+      return p;
+    });
+
+    this._nextData = categoriesWithOrders;
+    this._emit();
+
+    try {
+      await Promise.all(categoriesWithOrders.map((p) => singleCall(new NetworkApi().updateCategory(p))));
+      this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, categoriesWithOrders, MutationType.UPDATE_MANY));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
+
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+      return;
+    }
+  }
 }
