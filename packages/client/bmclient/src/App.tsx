@@ -1,13 +1,43 @@
-import { useEffect } from "react";
-import { Button } from "./components/ui/button";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "./components/shared/ThemeProvider";
+import AuthenticationPage from "./pages/authentication/AuthenticationPage/AuthenticationPage";
+import { DashboardPage } from "./pages/dashboard/DashboardPage/DashboardPage";
+import HomePage from "./pages/dashboard/HomePage/HomePage";
+import SigninPage from "./pages/authentication/SigninPage/SigninPage";
 
-export default function App() {
-  useEffect(() => {}, []); // Empty dependency array means the effect runs once
-
+const routes = createBrowserRouter([
+  {
+    path: "/",
+    element: <SigninPage />,
+  },
+  {
+    path: "auth",
+    element: <AuthenticationPage />,
+    children: [],
+  },
+  {
+    path: "dashboard",
+    element: <DashboardPage />,
+    children: [
+      {
+        path: "",
+        element: <HomePage />,
+      },
+    ],
+  },
+]);
+/**
+ *
+ *
+ *
+ *
+ */
+function App() {
   return (
-    <h1 className="text-3xl font-bold">
-      Hello world!
-      <Button>Click me</Button>
-    </h1>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <RouterProvider router={routes} />
+    </ThemeProvider>
   );
 }
+
+export default App;

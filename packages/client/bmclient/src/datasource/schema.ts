@@ -608,7 +608,7 @@ export class Link implements Network<Link> {
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
-  linkTags: LinkTag[];
+  tags: string[];
 
   constructor(
     id: number,
@@ -623,7 +623,7 @@ export class Link implements Network<Link> {
     createdAt: Date,
     updatedAt: Date,
     isDeleted: boolean,
-    linkTags: LinkTag[]
+    tags: string[]
   ) {
     this.id = id;
     this.identifier = identifier;
@@ -637,7 +637,7 @@ export class Link implements Network<Link> {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.isDeleted = isDeleted;
-    this.linkTags = linkTags;
+    this.tags = tags;
   }
 
   public static fromJson(json: any): Link {
@@ -653,7 +653,7 @@ export class Link implements Network<Link> {
     const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
     const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
     const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
-    const parsedLinkTags = (json["linkTags"] as Array<any>).map((item: any) => LinkTag.fromJson(item));
+    const parsedLinkTags = (json["tags"] as Array<any>).map((p) => String(p));
 
     return new Link(
       parsedId,
@@ -686,7 +686,7 @@ export class Link implements Network<Link> {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       isDeleted: this.isDeleted,
-      linkTags: this.linkTags,
+      tags: this.tags,
     };
 
     return JSON.stringify(jsonParsable);
