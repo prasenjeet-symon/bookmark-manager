@@ -385,6 +385,23 @@ export class NetworkApi {
 
   /**
    *
+   * Delete link
+   */
+  public deleteLink(tabIdentifier: string, categoryIdentifier: string, link: Link) {
+    const reqBody = {
+      ...link,
+      tabIdentifier: tabIdentifier,
+      categoryIdentifier: categoryIdentifier,
+    };
+
+    return HttpManager.request(this.linksRoute, {
+      method: "DELETE",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
    *
    *
    */

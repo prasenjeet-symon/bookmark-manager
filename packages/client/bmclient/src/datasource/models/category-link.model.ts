@@ -151,4 +151,37 @@ export class CategoryLinkModel {
       return;
     }
   }
+
+  /**
+   *
+   * Delete link
+   */
+  public async deleteLink(link: Link) {
+    this._prevData = deepCopyList(this._nextData);
+
+    this._nextData = this._nextData.map((p) => {
+      if (p.identifier === link.identifier) {
+        p.isDeleted = true;
+        return p;
+      } else {
+        return p;
+      }
+    });
+
+    this._emit();
+
+    try {
+      await singleCall(new NetworkApi().deleteLink(this._nodeIdP1, this._nodeId, link));
+      this._saveLocal();
+      MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.CATEGORY_LINK, link, MutationType.DELETE));
+      return;
+    } catch (error) {
+      Logger.getInstance().log(error);
+
+      // Rollback
+      this._nextData = deepCopyList(this._prevData);
+      this._emit();
+      return;
+    }
+  }
 }
