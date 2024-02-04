@@ -184,4 +184,27 @@ export class CategoryLinkModel {
       return;
     }
   }
+
+  /**
+   *
+   * Move delete link
+   */
+  public async moveDeleteLink(link: Link) {
+    this._nextData = this._nextData.filter((p) => {
+      return p.identifier !== link.identifier;
+    });
+
+    this._emit();
+    this._saveLocal();
+  }
+
+  /**
+   * 
+   * Move add link
+   */
+  public async moveAddLink(link: Link) {
+    this._nextData.push(link);
+    this._emit();
+    this._saveLocal();
+  }
 }
