@@ -410,7 +410,7 @@ export class UserTab implements Network<UserTab> {
 /**
  *
  * Tab's category
- * 
+ *
  */
 export class TabCategory implements Network<TabCategory> {
   id: number;
@@ -482,5 +482,109 @@ export class TabCategory implements Network<TabCategory> {
 
   public deepCopy(): TabCategory {
     return TabCategory.fromJson(JSON.parse(this.toJson()));
+  }
+}
+/**
+ *
+ * Tag
+ */
+export class Tag implements Network<Tag> {
+  id: number;
+  identifier: string;
+  name: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+
+  constructor(id: number, identifier: string, name: string, order: number, createdAt: Date, updatedAt: Date, isDeleted: boolean) {
+    this.id = id;
+    this.identifier = identifier;
+    this.name = name;
+    this.order = order;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+  }
+
+  public static fromJson(json: any): Tag {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedIdentifier = JsonParser.parseStrict<string>(json, "identifier", "string");
+    const parsedName = JsonParser.parseStrict<string>(json, "name", "string");
+    const parsedOrder = JsonParser.parseStrict<number>(json, "order", "int");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
+
+    return new Tag(parsedId, parsedIdentifier, parsedName, parsedOrder, parsedCreatedAt, parsedUpdatedAt, parsedIsDeleted);
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      identifier: this.identifier,
+      name: this.name,
+      order: this.order,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  public deepCopy(): Tag {
+    return Tag.fromJson(JSON.parse(this.toJson()));
+  }
+}
+
+/**
+ *
+ * Link Tag
+ */
+
+export class LinkTag implements Network<LinkTag> {
+  id: number;
+  linkIdentifier: string;
+  tagIdentifier: string;
+  createdAt: Date;
+  updatedAt: Date;
+  tag: Tag;
+
+  constructor(id: number, linkIdentifier: string, tagIdentifier: string, createdAt: Date, updatedAt: Date, tag: Tag) {
+    this.id = id;
+    this.linkIdentifier = linkIdentifier;
+    this.tagIdentifier = tagIdentifier;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.tag = tag;
+  }
+
+  public static fromJson(json: any): LinkTag {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedLinkIdentifier = JsonParser.parseStrict<string>(json, "linkIdentifier", "string");
+    const parsedTagIdentifier = JsonParser.parseStrict<string>(json, "tagIdentifier", "string");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+    const parsedTag = Tag.fromJson(json["tag"]);
+
+    return new LinkTag(parsedId, parsedLinkIdentifier, parsedTagIdentifier, parsedCreatedAt, parsedUpdatedAt, parsedTag);
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      linkIdentifier: this.linkIdentifier,
+      tagIdentifier: this.tagIdentifier,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      tag: this.tag,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  public deepCopy(): LinkTag {
+    return LinkTag.fromJson(JSON.parse(this.toJson()));
   }
 }
