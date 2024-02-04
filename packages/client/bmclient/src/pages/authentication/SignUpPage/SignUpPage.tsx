@@ -7,21 +7,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchemaSignin = z.object({
+const formSchema = z.object({
+  fullName: z.string().min(2, { message: "Please enter your full name." }).max(50, { message: "Full name is too long." }),
   email: z.string().email(),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }).max(50, { message: "Password is too long." }),
 });
 
-export default function SigninPage() {
-  const form = useForm<z.infer<typeof formSchemaSignin>>({
-    resolver: zodResolver(formSchemaSignin),
+export default function SignUpPage() {
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchemaSignin>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -30,7 +33,7 @@ export default function SigninPage() {
   return (
     <>
       <Header />
-      {/* Signin Page */}
+      {/* SignUp Page */}
 
       <section>
         <Card className="w-1/3 m-auto mt-10">
@@ -38,12 +41,26 @@ export default function SigninPage() {
             <div className="flex flex-row align-center justify-center">
               {/* left logo and right text */}
               <img className="w-10 h-10 mr-5" src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Logo" />
-              <h1 className="text-2xl font-bold mb-5 text-center">Signin Now </h1>
+              <h1 className="text-2xl font-bold mb-5 text-center">Sign Up Now</h1>
             </div>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input type="text" placeholder="Full Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <br />
                 {/* Email */}
                 <FormField
                   control={form.control}
@@ -57,8 +74,8 @@ export default function SigninPage() {
                     </FormItem>
                   )}
                 />
-                <br />
 
+                <br />
                 {/* Password */}
                 <FormField
                   control={form.control}
@@ -73,10 +90,10 @@ export default function SigninPage() {
                   )}
                 />
 
-                {/* Signin Button full width */}
+                {/* SignUp Button full width */}
                 <div className="flex flex-row align-center justify-stretch pt-5">
                   <Button type="submit" variant="default" className="w-full">
-                    Signin
+                    Sign Up
                   </Button>
                 </div>
               </form>
@@ -89,18 +106,18 @@ export default function SigninPage() {
               <hr className="flex-grow border-t border-slate-500 mx-4" />
             </div>
 
-            {/* Google Login Button */}
+            {/* Google SignUp Button */}
             <div className="flex flex-row align-center justify-center pt-3">
               <button type="button" className="bg-transparent text-foreground font-bold py-2 px-4 rounded-full flex items-center justify-center border border-foreground w-full">
                 <img alt="Google Logo" src="https://img.icons8.com/color/48/000000/google-logo.png" className="w-5 h-5 mr-2" />
-                Signin with Google
+                Sign Up with Google
               </button>
             </div>
 
-            {/* Sign up Link */}
+            {/* Sign in Link */}
             <div className="flex flex-row align-center justify-center pt-5">
               <a href="#" className="text-sm text-slate-400 hover:text-slate-100">
-                Don't have an account? Signup
+                Already have an account? Sign in
               </a>
             </div>
           </CardContent>
