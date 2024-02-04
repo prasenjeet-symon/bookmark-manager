@@ -368,6 +368,23 @@ export class NetworkApi {
 
   /**
    *
+   * Update link
+   */
+  public updateLink(tabIdentifier: string, categoryIdentifier: string, link: Link) {
+    const reqBody = {
+      ...link,
+      tabIdentifier: tabIdentifier,
+      categoryIdentifier: categoryIdentifier,
+    };
+
+    return HttpManager.request(this.linksRoute, {
+      method: "PUT",
+      body: JSON.stringify(reqBody),
+    });
+  }
+
+  /**
+   *
    *
    *
    */
