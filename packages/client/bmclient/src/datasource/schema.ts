@@ -588,3 +588,110 @@ export class LinkTag implements Network<LinkTag> {
     return LinkTag.fromJson(JSON.parse(this.toJson()));
   }
 }
+
+/**
+ * 
+ * Link
+ */
+
+export class Link implements Network<Link> {
+  id: number;
+  identifier: string;
+  title: string | null;
+  url: string;
+  order: number;
+  icon: string | null;
+  notes: string | null;
+  categoryIdentifier: string;
+  userIdentifier: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+  linkTags: LinkTag[];
+
+  constructor(
+    id: number,
+    identifier: string,
+    title: string | null,
+    url: string,
+    order: number,
+    icon: string | null,
+    notes: string | null,
+    categoryIdentifier: string,
+    userIdentifier: string,
+    createdAt: Date,
+    updatedAt: Date,
+    isDeleted: boolean,
+    linkTags: LinkTag[]
+  ) {
+    this.id = id;
+    this.identifier = identifier;
+    this.title = title;
+    this.url = url;
+    this.order = order;
+    this.icon = icon;
+    this.notes = notes;
+    this.categoryIdentifier = categoryIdentifier;
+    this.userIdentifier = userIdentifier;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+    this.linkTags = linkTags;
+  }
+
+  public static fromJson(json: any): Link {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedIdentifier = JsonParser.parseStrict<string>(json, "identifier", "string");
+    const parsedTitle = JsonParser.parseStrict<string | null>(json, "title", "string");
+    const parsedUrl = JsonParser.parseStrict<string>(json, "url", "string");
+    const parsedOrder = JsonParser.parseStrict<number>(json, "order", "int");
+    const parsedIcon = JsonParser.parse<string>(json, "icon", "string");
+    const parsedNotes = JsonParser.parse<string>(json, "notes", "string");
+    const parsedCategoryIdentifier = JsonParser.parseStrict<string>(json, "categoryIdentifier", "string");
+    const parsedUserIdentifier = JsonParser.parseStrict<string>(json, "userIdentifier", "string");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
+    const parsedLinkTags = (json["linkTags"] as Array<any>).map((item: any) => LinkTag.fromJson(item));
+
+    return new Link(
+      parsedId,
+      parsedIdentifier,
+      parsedTitle,
+      parsedUrl,
+      parsedOrder,
+      parsedIcon,
+      parsedNotes,
+      parsedCategoryIdentifier,
+      parsedUserIdentifier,
+      parsedCreatedAt,
+      parsedUpdatedAt,
+      parsedIsDeleted,
+      parsedLinkTags
+    );
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      identifier: this.identifier,
+      title: this.title,
+      url: this.url,
+      order: this.order,
+      icon: this.icon,
+      notes: this.notes,
+      categoryIdentifier: this.categoryIdentifier,
+      userIdentifier: this.userIdentifier,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+      linkTags: this.linkTags,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  deepCopy(): Link {
+    return Link.fromJson(JSON.parse(this.toJson()));
+  }
+}
