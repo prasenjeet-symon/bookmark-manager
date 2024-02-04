@@ -311,6 +311,17 @@ export class NetworkApi {
 
   /**
    *
+   * Delete category
+   */
+  public deleteCategory(tabCategory: TabCategory) {
+    return HttpManager.request(this.categoriesRoute, {
+      method: "DELETE",
+      body: tabCategory.toJson(),
+    });
+  }
+
+  /**
+   *
    *
    *
    */
