@@ -1,6 +1,6 @@
 import { map } from "rxjs";
 import { HttpManager } from "./http/http.manager";
-import { User, UserSetting, UserTab } from "./schema";
+import { TabCategory, User, UserSetting, UserTab } from "./schema";
 import { ApiResponse } from "./utils";
 
 export class NetworkApi {
@@ -16,6 +16,7 @@ export class NetworkApi {
   private userRoute = `${this.baseUrlRoute}/api/user`;
   private userSettingRoute = `${this.baseUrlRoute}/api/user-setting`;
   private tabsRoute = `${this.baseUrlRoute}/api/tabs`;
+  private categoriesRoute = `${this.baseUrlRoute}/api/categories`;
 
   /**
    *
@@ -260,4 +261,46 @@ export class NetworkApi {
       body: userTab.toJson(),
     });
   }
+
+  /**
+   * Get tab's categories
+   */
+  public getCategories(tabIdentifier: string) {
+    const reqBody = {
+      tabIdentifier: tabIdentifier,
+    };
+
+    return HttpManager.request(this.categoriesRoute, {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as Array<any>;
+          const items = parsed.map((item) => TabCategory.fromJson(item));
+          return new ApiResponse(status, items, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Add new category
+   */
+  public addCategory(tabCategory: TabCategory) {
+    return HttpManager.request(this.categoriesRoute, {
+      method: "POST",
+      body: tabCategory.toJson(),
+    });
+  }
+
+  /**
+   *
+   *
+   *
+   */
 }

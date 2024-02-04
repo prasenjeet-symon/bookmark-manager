@@ -19,6 +19,7 @@ export enum MutationModelIdentifier {
   TABS = "tabs",
   USERS = "users",
   USER_SETTING = "user_setting",
+  TAB_CATEGORY = "tab_category",
 }
 
 /**
@@ -404,5 +405,82 @@ export class UserTab implements Network<UserTab> {
 
   public deepCopy(): UserTab {
     return UserTab.fromJson(this.toJson());
+  }
+}
+/**
+ *
+ * Tab's category
+ * 
+ */
+export class TabCategory implements Network<TabCategory> {
+  id: number;
+  identifier: string;
+  name: string;
+  order: number;
+  color: string | null;
+  icon: string | null;
+  tabIdentifier: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+
+  constructor(
+    id: number,
+    identifier: string,
+    name: string,
+    order: number,
+    color: string | null,
+    icon: string | null,
+    tabIdentifier: string,
+    createdAt: Date,
+    updatedAt: Date,
+    isDeleted: boolean
+  ) {
+    this.id = id;
+    this.identifier = identifier;
+    this.name = name;
+    this.order = order;
+    this.color = color;
+    this.icon = icon;
+    this.tabIdentifier = tabIdentifier;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+  }
+
+  public static fromJson(json: any): TabCategory {
+    const parsedId = JsonParser.parseStrict<number>(json, "id", "int");
+    const parsedIdentifier = JsonParser.parseStrict<string>(json, "identifier", "string");
+    const parsedName = JsonParser.parseStrict<string>(json, "name", "string");
+    const parsedOrder = JsonParser.parseStrict<number>(json, "order", "int");
+    const parsedColor = JsonParser.parse<string>(json, "color", "string");
+    const parsedIcon = JsonParser.parse<string>(json, "icon", "string");
+    const parsedTabIdentifier = JsonParser.parseStrict<string>(json, "tabIdentifier", "string");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
+
+    return new TabCategory(parsedId, parsedIdentifier, parsedName, parsedOrder, parsedColor, parsedIcon, parsedTabIdentifier, parsedCreatedAt, parsedUpdatedAt, parsedIsDeleted);
+  }
+
+  public toJson(): string {
+    const jsonParsable = {
+      id: this.id,
+      identifier: this.identifier,
+      name: this.name,
+      order: this.order,
+      color: this.color,
+      icon: this.icon,
+      tabIdentifier: this.tabIdentifier,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  public deepCopy(): TabCategory {
+    return TabCategory.fromJson(JSON.parse(this.toJson()));
   }
 }
