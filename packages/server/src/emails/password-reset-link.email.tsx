@@ -9,7 +9,7 @@ export function PasswordResetEmail(props: { user: any; link: string }) {
             <Head title="Password Reset Request" />
             <Body>
                 <Heading>Password Reset Request</Heading>
-                <p>Dear {user.name},</p>
+                <p>Dear {user.fullName},</p>
                 <p>We received a request to reset your password for your account at Bookmark Manager.</p>
                 <p>Please click the following link to reset your password:</p>
                 <p>

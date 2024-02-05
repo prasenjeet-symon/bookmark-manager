@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { singleCall } from "@/datasource/http/http.manager";
+import { NetworkApi } from "@/datasource/network.api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const formSchemaSignin = z.object({
@@ -13,6 +17,15 @@ const formSchemaSignin = z.object({
 });
 
 export default function SigninPage() {
+  const navigate = useNavigate();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      const token = tokenResponse.access_token;
+      singleCall(new NetworkApi().signinGoogle(token))
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchemaSignin>>({
     resolver: zodResolver(formSchemaSignin),
     defaultValues: {
@@ -22,9 +35,26 @@ export default function SigninPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchemaSignin>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const email = values.email;
+    const password = values.password;
+
+    singleCall(new NetworkApi().signin(email, password)).then(() => {
+      navigate("/dashboard");
+    });
+  }
+
+  // Clear stack and nav to signup screen
+  function clearStackAndNavigateToSignup() {
+    navigate("/auth/sign-up", {
+      replace: true,
+    });
+  }
+
+  // Nav to forgot password screen
+  function navigateToForgotPassword() {
+    navigate("/auth/forgot-password", {
+      replace: true,
+    });
   }
 
   return (
@@ -73,6 +103,13 @@ export default function SigninPage() {
                   )}
                 />
 
+                {/* Forget Password */}
+                <div className="flex flex-row align-center justify-end pt-4 pb-2">
+                  <a onClick={navigateToForgotPassword} className="text-sm text-slate-500 hover:text-slate-300 hover:underline hover:cursor-pointer">
+                    Forget Password?
+                  </a>
+                </div>
+
                 {/* Signin Button full width */}
                 <div className="flex flex-row align-center justify-stretch pt-5">
                   <Button type="submit" variant="default" className="w-full">
@@ -91,7 +128,7 @@ export default function SigninPage() {
 
             {/* Google Login Button */}
             <div className="flex flex-row align-center justify-center pt-3">
-              <button type="button" className="bg-transparent text-foreground font-bold py-2 px-4 rounded-full flex items-center justify-center border border-foreground w-full">
+              <button onClick={() => googleLogin()} type="button" className="bg-transparent text-foreground font-bold py-2 px-4 rounded-full flex items-center justify-center border border-foreground w-full">
                 <img alt="Google Logo" src="https://img.icons8.com/color/48/000000/google-logo.png" className="w-5 h-5 mr-2" />
                 Signin with Google
               </button>
@@ -99,7 +136,7 @@ export default function SigninPage() {
 
             {/* Sign up Link */}
             <div className="flex flex-row align-center justify-center pt-5">
-              <a href="#" className="text-sm text-slate-400 hover:text-slate-100">
+              <a onClick={clearStackAndNavigateToSignup} className="text-sm text-slate-400 hover:text-slate-100 hover: cursor-pointer hover:underline">
                 Don't have an account? Signup
               </a>
             </div>

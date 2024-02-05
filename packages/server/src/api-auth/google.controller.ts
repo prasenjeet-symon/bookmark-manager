@@ -53,7 +53,7 @@ export class Google {
         });
 
         if (!user) {
-            this.res.status(400).json({ error: 'User not found' });
+            this.res.status(400).json({ error: 'User not found' }); 
             Logger.getInstance().logError('User not found');
             return;
         }
@@ -141,8 +141,8 @@ export class Google {
         });
 
         if (user) {
-            this.res.status(400).json({ error: 'User already exist' });
-            Logger.getInstance().logError('User already exist');
+            this.res.status(400).json({ error: 'User already exists' });
+            Logger.getInstance().logError('User already exists');
             return;
         }
 

@@ -9,7 +9,7 @@ export function PasswordResetSuccessEmail(props: { user: any }) {
             <Head title="Password Reset Successful" />
             <Body>
                 <Heading>Password Reset Successful</Heading>
-                <p>Dear {user.name},</p>
+                <p>Dear {user.fullName},</p>
                 <p>Your password has been successfully reset for your account at Bookmark Manager.</p>
                 <p>If you have any further questions or concerns, please feel free to contact our support team.</p>
                 <p>Thank you for using Bookmark Manager!</p>

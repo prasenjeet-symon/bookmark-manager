@@ -1,8 +1,21 @@
+import { ApplicationToken } from "@/datasource/http/http.manager";
+import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export function DashboardPage() {
-  const isAuthenticated = true;
-  const isLoading = false;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const subscription = ApplicationToken.getInstance().observable.subscribe((token) => {
+      setIsAuthenticated(!!token);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -13,7 +26,7 @@ export function DashboardPage() {
       </div>
     );
   } else if (!isAuthenticated) {
-    return <Navigate to="/auth/sign-in" />;
+    return <Navigate to="/auth/signin" />;
   } else {
     return <Outlet />;
   }

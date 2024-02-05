@@ -1,7 +1,9 @@
-import { map } from "rxjs";
-import { HttpManager } from "./http/http.manager";
-import { Link, TabCategory, User, UserSetting, UserTab } from "./schema";
-import { ApiResponse } from "./utils";
+import { map, tap } from "rxjs";
+import { ErrorManager } from "./http/error.manager";
+import { ApplicationToken, HttpManager } from "./http/http.manager";
+import { SuccessManager } from "./http/success.manager";
+import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, TabCategory, User, UserSetting, UserTab } from "./schema";
+import { ApiResponse, ApiResponseMessage } from "./utils";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -34,7 +36,46 @@ export class NetworkApi {
     return HttpManager.request(this.signUpRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      map((val) => {
+        const { status, statusText, data } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = AuthenticationClass.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const parsed = JSON.parse(data) as any;
+          const error = ApiMutationError.fromJson(parsed);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as AuthenticationClass;
+          ApplicationToken.getInstance().saveToken(responseData.token);
+          SuccessManager.getInstance().dispatch("Welcome to Bookmark Manager!");
+        } else {
+          const responseData = data as ApiMutationError;
+          const error = responseData.error.trim().toLowerCase();
+          console.log(error);
+
+          switch (error) {
+            case ApiResponseMessage.USER_EXISTS.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("User already exists. Please login.");
+              break;
+          }
+        }
+      })
+    );
   }
 
   /**
@@ -50,7 +91,53 @@ export class NetworkApi {
     return HttpManager.request(this.signInRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      map((val) => {
+        const { status, statusText, data } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = AuthenticationClass.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const parsed = JSON.parse(data) as any;
+          const error = ApiMutationError.fromJson(parsed);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+
+        if (status === 200) {
+          const responseData = data as AuthenticationClass;
+          ApplicationToken.getInstance().saveToken(responseData.token);
+          SuccessManager.getInstance().dispatch("Welcome back to Bookmark Manager!");
+        } else {
+          const responseData = data as ApiMutationError;
+          const error = responseData.error.trim().toLowerCase();
+
+          switch (error) {
+            case ApiResponseMessage.USER_NOT_FOUND.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("User not found. Please signup.");
+              break;
+            case ApiResponseMessage.INVALID_PASSWORD.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("Wrong password. Please try again.");
+              break;
+
+            default:
+              ErrorManager.getInstance().dispatch("Something went wrong. Please try again.");
+              break;
+          }
+        }
+      })
+    );
   }
 
   /**
@@ -65,7 +152,50 @@ export class NetworkApi {
     return HttpManager.request(this.signUpGoogleRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      map((val) => {
+        const { status, statusText, data } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = AuthenticationClass.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const parsed = JSON.parse(data) as any;
+          const error = ApiMutationError.fromJson(parsed);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+
+        if (status === 200) {
+          const responseData = data as AuthenticationClass;
+          ApplicationToken.getInstance().saveToken(responseData.token);
+          SuccessManager.getInstance().dispatch("Welcome to Bookmark Manager!");
+        } else {
+          const responseData = data as ApiMutationError;
+          const error = responseData.error.trim().toLowerCase();
+
+          switch (error) {
+            case ApiResponseMessage.USER_EXISTS.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("User already exists. Please login.");
+              break;
+
+            default:
+              ErrorManager.getInstance().dispatch("Something went wrong. Please try again.");
+              break;
+          }
+        }
+      })
+    );
   }
 
   /**
@@ -80,7 +210,50 @@ export class NetworkApi {
     return HttpManager.request(this.signInGoogleRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      map((val) => {
+        const { status, statusText, data } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = AuthenticationClass.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const parsed = JSON.parse(data) as any;
+          const error = ApiMutationError.fromJson(parsed);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+
+        if (status === 200) {
+          const responseData = data as AuthenticationClass;
+          ApplicationToken.getInstance().saveToken(responseData.token);
+          SuccessManager.getInstance().dispatch("Welcome back to Bookmark Manager!");
+        } else {
+          const responseData = data as ApiMutationError;
+          const error = responseData.error.trim().toLowerCase();
+
+          switch (error) {
+            case ApiResponseMessage.USER_NOT_FOUND.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("User not found. Please signup.");
+              break;
+
+            default:
+              ErrorManager.getInstance().dispatch("Something went wrong. Please try again.");
+              break;
+          }
+        }
+      })
+    );
   }
 
   /**
@@ -102,7 +275,9 @@ export class NetworkApi {
    *
    * Logout
    */
-  public logout(token: string) {
+  public logout() {
+    const token = ApplicationToken.getInstance().getToken;
+
     const reqBody = {
       token: token,
     };
@@ -110,7 +285,15 @@ export class NetworkApi {
     return HttpManager.request(this.logoutRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      tap((val) => {
+        const { status } = val;
+        if (status === 200) {
+          ApplicationToken.getInstance().deleteToken();
+          SuccessManager.getInstance().dispatch("Logged out successfully");
+        }
+      })
+    );
   }
 
   /**
@@ -125,7 +308,49 @@ export class NetworkApi {
     return HttpManager.request(this.forgotPasswordRoute, {
       method: "POST",
       body: JSON.stringify(reqBody),
-    });
+    }).pipe(
+      map((val) => {
+        const { status, statusText, data } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as any;
+          const item = ApiMutationSuccess.fromJson(parsed);
+          return new ApiResponse(status, item, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const parsed = JSON.parse(data) as any;
+          const error = ApiMutationError.fromJson(parsed);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("Email sent successfully. Please check your email.");
+        } else {
+          const responseData = data as ApiMutationError;
+          const error = responseData.error.trim().toLowerCase();
+
+          switch (error) {
+            case ApiResponseMessage.USER_NOT_FOUND.trim().toLowerCase():
+              ErrorManager.getInstance().dispatch("User not found. Please signup.");
+              break;
+
+            default:
+              ErrorManager.getInstance().dispatch("Something went wrong. Please try again.");
+              break;
+          }
+        }
+      })
+    );
   }
 
   /**

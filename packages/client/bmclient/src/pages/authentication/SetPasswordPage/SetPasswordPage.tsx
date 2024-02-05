@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ErrorManager } from "@/datasource/http/error.manager";
+import { singleCall } from "@/datasource/http/http.manager";
+import { NetworkApi } from "@/datasource/network.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -13,6 +17,10 @@ const formSchema = z.object({
 });
 
 export default function SetNewPasswordPage() {
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -21,10 +29,25 @@ export default function SetNewPasswordPage() {
     },
   });
 
+  // Access query parameters
+  const token = new URLSearchParams(location.search).get("token");
+  const userId = new URLSearchParams(location.search).get("userId");
+
+  console.log(token, userId);
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const password = values.password;
+    const confirmPassword = values.confirmPassword;
+
+    if (password === confirmPassword) {
+      singleCall(new NetworkApi().resetPassword(token || "", userId || "", password)).then(() => {
+        navigate("/auth/set-password-success", {
+          replace: true,
+        });
+      });
+    } else {
+      ErrorManager.getInstance().dispatch("Passwords do not match.");
+    }
   }
 
   return (

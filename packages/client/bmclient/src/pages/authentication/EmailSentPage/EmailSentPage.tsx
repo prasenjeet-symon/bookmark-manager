@@ -3,8 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 export default function EmailSentPage() {
+  const navigate = useNavigate();
+
+  // Clear stack and nav to login screen
+  function goToSigninPage() {
+    navigate("/auth/signin", {
+      replace: true,
+    });
+  }
+
   return (
     <>
       <Header />
@@ -27,7 +37,7 @@ export default function EmailSentPage() {
 
             {/* Back to Sign In Button */}
             <div className="flex flex-col align-center justify-center pt-4">
-              <Button variant="default" className="w-full">
+              <Button onClick={goToSigninPage} variant="default" className="w-full">
                 Back to Sign In
               </Button>
             </div>

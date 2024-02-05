@@ -1,7 +1,23 @@
+import { ApplicationToken } from "@/datasource/http/http.manager";
+import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export default function AuthenticationPage() {
-  const { isAuthenticated, isLoading } = { isAuthenticated: true, isLoading: false };
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log('AUTHENTICATION USE EFFECT');
+    const subscription = ApplicationToken.getInstance().observable.subscribe((token) => {
+      console.log('FROM AUTHENTICATION');
+      setIsAuthenticated(!!token);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []); // Empty dependency array means this effect runs once on mount
 
   if (isLoading) {
     return (

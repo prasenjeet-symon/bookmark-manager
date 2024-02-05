@@ -10,7 +10,7 @@ import {
     getJwtExpirationDate,
     getUserAgent,
     hashPassword,
-    isTokenExpired,
+    isTokenActive,
     isValidEmail,
     isValidPassword,
 } from '../utils';
@@ -65,8 +65,8 @@ export class SignupController {
                 userSetting: {
                     create: {
                         numberOfColumns: 'THREE',
-                    }
-                }
+                    },
+                },
             },
             select: {
                 userId: true,
@@ -316,8 +316,8 @@ export class SignupController {
             Logger.getInstance().logError('User not found');
             return;
         }
-         
-        const token = await createJwt(user.userId, user.email, false, '10m', null);
+
+        const token = await createJwt(user.userId, user.email, false, '1d', null);
 
         this.res.status(200).json({
             message: 'Forgot password link sent to your email',
@@ -357,9 +357,9 @@ export class SignupController {
             return;
         }
 
-        const isTokenActive = isTokenExpired(token);
+        const isTokenAct = isTokenActive(token);
 
-        if (!isTokenActive) {
+        if (!isTokenAct) {
             this.res.status(400).json({ error: 'Token expired' });
             Logger.getInstance().logError('Token expired');
             return;
@@ -388,7 +388,7 @@ export class SignupController {
                 sessions: {
                     upsert: {
                         where: { sessionToken: jwtToken },
-                        create:  {
+                        create: {
                             sessionToken: jwtToken,
                             expires: getJwtExpirationDate(jwtToken),
                             ipAddress: getClientIP(this.req),
@@ -401,7 +401,7 @@ export class SignupController {
                             region: ipLocation?.region || '',
                             timezone: ipLocation?.timezone || '',
                         },
-                        update:  {
+                        update: {
                             expires: getJwtExpirationDate(jwtToken),
                             ipAddress: getClientIP(this.req),
                             userAgent: getUserAgent(this.req),
@@ -413,7 +413,7 @@ export class SignupController {
                             region: ipLocation?.region || '',
                             timezone: ipLocation?.timezone || '',
                         },
-                    }
+                    },
                 },
             },
         });
@@ -433,7 +433,6 @@ export class SignupController {
             email: user.email,
         });
 
-
         // TODO We need to logout from all devices after password reset
         return;
     }
@@ -450,9 +449,9 @@ export class SignupController {
 
         const { token } = this.req.body;
 
-        const isExpired = isTokenExpired(token);
+        const isActiveToken = isTokenActive(token);
 
-        if (isExpired) {
+        if (!isActiveToken) {
             this.res.status(400).json({ error: 'Token expired' });
             Logger.getInstance().logError('Token expired');
             return;

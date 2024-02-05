@@ -246,27 +246,19 @@ export function isValidPassword(password: string): { valid: boolean; message?: s
  *
  * Is JWT expired
  */
-export function isTokenExpired(token: string): boolean {
+export function isTokenActive(token: string): boolean {
     try {
         const jwt = require('jsonwebtoken');
-        const decodedToken: any = jwt.decode(token);
-
-        if (!decodedToken || !decodedToken.exp) {
-            // Token or expiration claim is missing
-            return true;
-        }
-
-        // Convert expiration time from seconds to milliseconds (assuming it's already in UTC)
-        const expirationTimeUTC = decodedToken.exp * 1000;
-
-        // Get the current time in UTC
-        const currentTimeUTC = new Date().getTime();
-
-        // Check if the token has expired
-        return currentTimeUTC > expirationTimeUTC;
-    } catch (error) {
-        // An error occurred while decoding the token
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || '', {
+            ignoreExpiration: false,
+        });
+       
         return true;
+    } catch (error) {
+        console.error(error);
+        // An error occurred while decoding the token
+        return false;
     }
 }
 

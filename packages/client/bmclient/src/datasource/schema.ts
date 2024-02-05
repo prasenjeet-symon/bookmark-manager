@@ -1,5 +1,88 @@
 import { JsonParser, Network } from "./utils";
+/**
+ *
+ * Api Mutation Success class
+ */
+export class ApiMutationSuccess implements Network<ApiMutationSuccess> {
+  constructor(public message: string) {}
 
+  public static fromJson(json: any): ApiMutationSuccess {
+    const parsedMessage = JsonParser.parseStrict<string>(json, "message", "string");
+
+    return new ApiMutationSuccess(parsedMessage);
+  }
+
+  public toJson() {
+    const jsonParsable = {
+      message: this.message,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  deepCopy(): ApiMutationSuccess {
+    return ApiMutationSuccess.fromJson(JSON.parse(this.toJson()));
+  }
+}
+/**
+ *
+ * Api mutation error class
+ */
+export class ApiMutationError implements Network<ApiMutationError> {
+  constructor(public error: string) {}
+
+  public static fromJson(json: any): ApiMutationError {
+    const parsedError = JsonParser.parseStrict<string>(json, "error", "string");
+
+    return new ApiMutationError(parsedError);
+  }
+
+  public toJson() {
+    const jsonParsable = {
+      error: this.error,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  deepCopy(): ApiMutationError {
+    return ApiMutationError.fromJson(JSON.parse(this.toJson()));
+  }
+}
+
+/**
+ *
+ * Authentication Class
+ */
+export class AuthenticationClass implements Network<AuthenticationClass> {
+  constructor(public token: string, public userId: string, public email: string, public fullName: string, public timeZone: string | null) {}
+
+  public static fromJson(json: any): AuthenticationClass {
+    const parsedToken = JsonParser.parseStrict<string>(json, "token", "string");
+    const parsedUserId = JsonParser.parseStrict<string>(json, "userId", "string");
+    const parsedEmail = JsonParser.parseStrict<string>(json, "email", "string");
+    const parsedFullName = JsonParser.parseStrict<string>(json, "fullName", "string");
+    const parsedTimeZone = JsonParser.parse<string>(json, "timeZone", "string");
+
+    return new AuthenticationClass(parsedToken, parsedUserId, parsedEmail, parsedFullName, parsedTimeZone);
+  }
+
+  public toJson() {
+    const jsonParsable = {
+      token: this.token,
+      userId: this.userId,
+      email: this.email,
+      fullName: this.fullName,
+      timeZone: this.timeZone,
+    };
+
+    return JSON.stringify(jsonParsable);
+  }
+
+  public deepCopy(): AuthenticationClass {
+    return AuthenticationClass.fromJson(JSON.parse(this.toJson()));
+  }
+}
 /**
  *
  * Model Store Status

@@ -62,6 +62,7 @@ export class ApplicationToken {
     if (token) {
       this.token = token;
       this.tokenSubject.next(token);
+      console.log("BOOT UP DONE");
     }
   }
 }
@@ -83,14 +84,17 @@ export class HttpManager {
             const jsonData = await response.json();
             const statusCode = response.status;
             const statusText = response.statusText;
+            const stringJSON = JSON.stringify(jsonData || {});
 
-            return new ApiResponse(statusCode, jsonData, statusText);
+            return new ApiResponse(statusCode, stringJSON, statusText);
           })
           .then((data) => {
             observer.next(data);
             observer.complete();
           })
-          .catch((error) => observer.error(error));
+          .catch((error) => {
+            observer.error(error);
+          });
 
         return () => {
           abortController.abort();

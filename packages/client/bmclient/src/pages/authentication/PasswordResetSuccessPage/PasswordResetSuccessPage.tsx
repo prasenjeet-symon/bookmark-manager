@@ -1,10 +1,20 @@
 import Header from "@/components/shared/Header/Header";
-import { Card, CardHeader } from "@/components/ui/card";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 export default function PasswordResetSuccessPage() {
+  const navigate = useNavigate();
+
+  // Clear stack and nav to login screen
+  const goToSigninPage = () => {
+    navigate("/auth/signin", {
+      replace: true,
+    });
+  };
+
   return (
     <>
       <Header />
@@ -22,14 +32,12 @@ export default function PasswordResetSuccessPage() {
 
             {/* Message */}
             <div className="flex flex-col align-center justify-center pt-4">
-              <p className="text-sm text-gray-600 mb-4 text-center">
-                Your password has been successfully reset. You can now sign in with your new password.
-              </p>
+              <p className="text-sm text-gray-600 mb-4 text-center">Your password has been successfully reset. You can now sign in with your new password.</p>
             </div>
 
             {/* Back to Sign In Button */}
             <div className="flex flex-col align-center justify-center pt-4">
-              <Button variant="default" className="w-full">
+              <Button onClick={goToSigninPage} variant="default" className="w-full">
                 Back to Sign In
               </Button>
             </div>

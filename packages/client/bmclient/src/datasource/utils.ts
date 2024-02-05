@@ -1,7 +1,20 @@
 import localforage from "localforage";
 import { Subject } from "rxjs";
 import { MutationModelData } from "./schema";
+/**
+ *
+ * Api response message
+ */
+export class ApiResponseMessage {
+  public static readonly USER_EXISTS = "User already exists";
+  public static readonly USER_NOT_FOUND = "User not found";
+  public static readonly INVALID_PASSWORD = "Invalid password";
+}
 
+/**
+ *
+ *
+ */
 export class Constants {
   public static get LOCAL_STORE_VERSION() {
     return 1;

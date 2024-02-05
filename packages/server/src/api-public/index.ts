@@ -8,7 +8,7 @@ router.get('/', (_req, res) => {
 });
 
 router.get('/hello', (_req, res) => {
-    res.send(HTML('http://localhost:3000/verify-email'));
+    res.send({ message: 'Hello World from Public' });
 });
 
 export default router;

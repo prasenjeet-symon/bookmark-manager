@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { singleCall } from "@/datasource/http/http.manager";
+import { NetworkApi } from "@/datasource/network.api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -14,7 +18,14 @@ const formSchema = z.object({
 });
 
 export default function SignUpPage() {
-  
+  const navigate = useNavigate();
+  const signUpGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      const token = tokenResponse.access_token;
+      singleCall(new NetworkApi().signupGoogle(token));
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -25,9 +36,19 @@ export default function SignUpPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    const fullName = values.fullName;
+    const email = values.email;
+    const password = values.password;
+    singleCall(new NetworkApi().signup(email, password, fullName)).then(() => {
+      navigate("/dashboard");
+    });
+  }
+
+  // Clear stack and nav to login screen
+  function clearStackAndNavigateToLogin() {
+    navigate("/auth/signin", {
+      replace: true,
+    });
   }
 
   return (
@@ -108,7 +129,11 @@ export default function SignUpPage() {
 
             {/* Google SignUp Button */}
             <div className="flex flex-row align-center justify-center pt-3">
-              <button type="button" className="bg-transparent text-foreground font-bold py-2 px-4 rounded-full flex items-center justify-center border border-foreground w-full">
+              <button
+                onClick={() => signUpGoogle()}
+                type="button"
+                className="bg-transparent text-foreground font-bold py-2 px-4 rounded-full flex items-center justify-center border border-foreground w-full"
+              >
                 <img alt="Google Logo" src="https://img.icons8.com/color/48/000000/google-logo.png" className="w-5 h-5 mr-2" />
                 Sign Up with Google
               </button>
@@ -116,7 +141,7 @@ export default function SignUpPage() {
 
             {/* Sign in Link */}
             <div className="flex flex-row align-center justify-center pt-5">
-              <a href="#" className="text-sm text-slate-400 hover:text-slate-100">
+              <a onClick={clearStackAndNavigateToLogin} className="text-sm text-slate-400 hover:text-slate-100 hover:underline hover:cursor-pointer">
                 Already have an account? Sign in
               </a>
             </div>
