@@ -113,11 +113,13 @@ export class TabController {
                         where: { identifier: this.req.body.identifier },
                         create: {
                             name: this.req.body.name,
+                            color: this.req.body.color || null,
                             order: +this.req.body.order,
                             identifier: this.req.body.identifier,
                         },
                         update: {
                             name: this.req.body.name,
+                            color: this.req.body.color || null, 
                             order: +this.req.body.order,
                             identifier: this.req.body.identifier,
                         },
@@ -154,6 +156,7 @@ export class TabController {
                         },
                         data: {
                             name: this.req.body.name,
+                            color: this.req.body.color || null,
                             order: +this.req.body.order,
                         },
                     },
@@ -206,7 +209,7 @@ export class TabController {
      *
      */
     validateAddUpdateTabReqBody(): boolean {
-        const { name, order, identifier } = this.req.body;
+        const { name, order, identifier, color } = this.req.body;
 
         if (name === undefined || order === undefined || identifier === undefined) {
             this.res.status(400).json({ error: 'Missing parameters' });

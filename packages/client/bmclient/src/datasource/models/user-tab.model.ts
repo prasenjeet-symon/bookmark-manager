@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subscription } from "rxjs";
+import { BehaviorSubject, Subscription, map } from "rxjs";
 import { singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
@@ -102,7 +102,12 @@ export class UserTabModel {
    * Get tabs
    */
   public getTabs() {
-    return this._source.asObservable();
+    return this._source.asObservable().pipe(
+      map((data) => {
+        const nonDeleted = data.data.filter((p) => !p.isDeleted);
+        return new ModelStore(nonDeleted, data.status);
+      })
+    );
   }
 
   /**

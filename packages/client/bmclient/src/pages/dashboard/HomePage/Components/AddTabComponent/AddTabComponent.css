@@ -1,0 +1,14 @@
+.add-tab-dialog {
+  min-width: 200px;
+}
+
+.add-tab-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+
+.add-tab-form {
+    padding: 10px 0px;
+}

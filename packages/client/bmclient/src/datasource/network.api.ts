@@ -61,7 +61,7 @@ export class NetworkApi {
         const { data, status } = val;
         if (status === 200) {
           const responseData = data as AuthenticationClass;
-          ApplicationToken.getInstance().saveToken(responseData.token);
+          ApplicationToken.getInstance().saveToken(responseData.token, responseData.userId);
           SuccessManager.getInstance().dispatch("Welcome to Bookmark Manager!");
         } else {
           const responseData = data as ApiMutationError;
@@ -117,7 +117,7 @@ export class NetworkApi {
 
         if (status === 200) {
           const responseData = data as AuthenticationClass;
-          ApplicationToken.getInstance().saveToken(responseData.token);
+          ApplicationToken.getInstance().saveToken(responseData.token, responseData.userId);
           SuccessManager.getInstance().dispatch("Welcome back to Bookmark Manager!");
         } else {
           const responseData = data as ApiMutationError;
@@ -178,7 +178,7 @@ export class NetworkApi {
 
         if (status === 200) {
           const responseData = data as AuthenticationClass;
-          ApplicationToken.getInstance().saveToken(responseData.token);
+          ApplicationToken.getInstance().saveToken(responseData.token, responseData.userId);
           SuccessManager.getInstance().dispatch("Welcome to Bookmark Manager!");
         } else {
           const responseData = data as ApiMutationError;
@@ -236,7 +236,7 @@ export class NetworkApi {
 
         if (status === 200) {
           const responseData = data as AuthenticationClass;
-          ApplicationToken.getInstance().saveToken(responseData.token);
+          ApplicationToken.getInstance().saveToken(responseData.token, responseData.userId);
           SuccessManager.getInstance().dispatch("Welcome back to Bookmark Manager!");
         } else {
           const responseData = data as ApiMutationError;

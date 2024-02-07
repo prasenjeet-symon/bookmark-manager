@@ -10,10 +10,16 @@ export class ApplicationToken {
   private static instance: ApplicationToken;
 
   private token: string | null = null;
+  private userId: string | null = null;
   private tokenSubject = new BehaviorSubject<string | null>(null);
+  private userIdSubject = new BehaviorSubject<string | null>(null);
 
   public get observable() {
     return this.tokenSubject.asObservable();
+  }
+
+  public get userIdObservable() {
+    return this.userIdSubject.asObservable();
   }
 
   private constructor() {}
@@ -29,10 +35,13 @@ export class ApplicationToken {
    *
    * Save token
    */
-  public saveToken(token: string) {
+  public saveToken(token: string, userId: string) {
     this.token = token;
+    this.userId = userId;
     this.tokenSubject.next(token);
+    this.userIdSubject.next(userId);
     localStorage.setItem("token", token);
+    localStorage.setItem("userId", userId);
   }
 
   /**
@@ -44,13 +53,23 @@ export class ApplicationToken {
   }
 
   /**
+   * Get user id
+   */
+  public get getUserId() {
+    return this.userId;
+  }
+
+  /**
    *
    * Delete token
    */
   public deleteToken() {
     this.token = null;
+    this.userId = null;
     this.tokenSubject.next(null);
+    this.userIdSubject.next(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
   }
 
   /**
@@ -62,7 +81,12 @@ export class ApplicationToken {
     if (token) {
       this.token = token;
       this.tokenSubject.next(token);
-      console.log("BOOT UP DONE");
+    }
+
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      this.userId = userId;
+      this.userIdSubject.next(userId);
     }
   }
 }
@@ -76,7 +100,7 @@ export class HttpManager {
   private static makeHttpRequest(token: string | null, url: string, options?: RequestInit): Observable<ApiResponse> {
     return defer(() => {
       const abortController = new AbortController();
-
+      
       // Fetch operation with the AbortController signal
       const fetchObservable = new Observable<ApiResponse>((observer) => {
         fetch(url, { ...options, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, signal: abortController.signal })
@@ -93,6 +117,7 @@ export class HttpManager {
             observer.complete();
           })
           .catch((error) => {
+            console.error(error);
             observer.error(error);
           });
 

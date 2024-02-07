@@ -112,6 +112,8 @@ export enum MutationModelIdentifier {
  */
 export enum ApplicationMutationIdentifier {
   ADD_TAB = "add_tab",
+  DELETE_TAB = "delete_tab",
+  UPDATE_TAB = "update_tab",
 }
 
 /**
@@ -317,7 +319,7 @@ export class User implements Network<User> {
 
   // Deep copy
   public deepCopy(): User {
-    return User.fromJson(this.toJson());
+    return User.fromJson(JSON.parse(this.toJson()));
   }
 }
 /**
@@ -417,7 +419,7 @@ export class UserSetting implements Network<UserSetting> {
    * deep copy
    */
   public deepCopy(): UserSetting {
-    return UserSetting.fromJson(this.toJson());
+    return UserSetting.fromJson(JSON.parse(this.toJson()));
   }
 }
 
@@ -443,16 +445,18 @@ export class UserTab implements Network<UserTab> {
   identifier: string;
   userIdentifier: string;
   name: string;
+  color: string | null;
   order: number;
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
 
-  constructor(id: number, identifier: string, userIdentifier: string, name: string, order: number, createdAt: Date, updatedAt: Date, isDeleted: boolean) {
+  constructor(id: number, identifier: string, userIdentifier: string, name: string, color: string | null, order: number, createdAt: Date, updatedAt: Date, isDeleted: boolean) {
     this.id = id;
     this.identifier = identifier;
     this.userIdentifier = userIdentifier;
     this.name = name;
+    this.color = color;
     this.order = order;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -464,12 +468,13 @@ export class UserTab implements Network<UserTab> {
     const parsedIdentifier = JsonParser.parseStrict<string>(json, "identifier", "string");
     const parsedUserIdentifier = JsonParser.parseStrict<string>(json, "userIdentifier", "string");
     const parsedName = JsonParser.parseStrict<string>(json, "name", "string");
+    const parsedColor = JsonParser.parse<string>(json, "color", "string");
     const parsedOrder = JsonParser.parseStrict<number>(json, "order", "int");
     const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
     const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
     const parsedIsDeleted = JsonParser.parseStrict<boolean>(json, "isDeleted", "boolean");
 
-    return new UserTab(parsedId, parsedIdentifier, parsedUserIdentifier, parsedName, parsedOrder, parsedCreatedAt, parsedUpdatedAt, parsedIsDeleted);
+    return new UserTab(parsedId, parsedIdentifier, parsedUserIdentifier, parsedName, parsedColor, parsedOrder, parsedCreatedAt, parsedUpdatedAt, parsedIsDeleted);
   }
 
   public toJson(): string {
@@ -478,6 +483,7 @@ export class UserTab implements Network<UserTab> {
       identifier: this.identifier,
       userIdentifier: this.userIdentifier,
       name: this.name,
+      color: this.color,
       order: this.order,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
@@ -488,7 +494,7 @@ export class UserTab implements Network<UserTab> {
   }
 
   public deepCopy(): UserTab {
-    return UserTab.fromJson(this.toJson());
+    return UserTab.fromJson(JSON.parse(this.toJson()));
   }
 }
 /**

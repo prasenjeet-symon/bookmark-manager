@@ -86,6 +86,7 @@ model UserTab {
     userIdentifier String     @db.VarChar(37)
     user           User       @relation(fields: [userIdentifier], references: [userId])
     name           String
+    color          String?
     order          Int
     categories     Category[]
     createdAt      DateTime   @default(now())
@@ -98,7 +99,7 @@ model Category {
     identifier    String   @unique @db.VarChar(37)
     name          String
     order         Int
-    color         String
+    color         String?
     icon          String?
     tabIdentifier String   @db.VarChar(37)
     tab           UserTab  @relation(fields: [tabIdentifier], references: [identifier])

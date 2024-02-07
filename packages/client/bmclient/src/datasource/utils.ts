@@ -183,3 +183,22 @@ export class Logger {
 export function deepCopyList<T extends Network<T>>(list: T[]): T[] {
   return list.map((item) => item.deepCopy());
 }
+
+/**
+ *
+ * Give me int id
+ */
+export function getRandomIntId(): number {
+  return Math.floor(+new Date() / 1000);
+}
+/**
+ * 
+ * 
+ */
+export function trimText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return text.slice(0, maxLength) + '...';
+  }
+}
