@@ -1,9 +1,9 @@
-import { BehaviorSubject, Subscription } from "rxjs";
+import { BehaviorSubject, Subscription, map } from "rxjs";
 import { singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
 import { NetworkApi } from "../network.api";
 import { Link, ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType } from "../schema";
-import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
+import { Constants, Logger, MutationModel, deepCopyList, onlyActiveItemsModelStore } from "../utils";
 
 export class CategoryLinkModel {
   private readonly _nodeId: string; // Node Id : categoryIdentifier;
@@ -48,7 +48,7 @@ export class CategoryLinkModel {
     const data = rowItems
       .filter((item) => item !== null)
       .map((item) => {
-        return Link.fromJson(JSON.parse(item!));
+        return Link.fromJson(item!);
       });
 
     this._prevData = data;
@@ -62,6 +62,7 @@ export class CategoryLinkModel {
    * Save local data
    */
   private async _saveLocal() {
+    await this._database.clear();
     await Promise.all(this._nextData.map((item) => this._database.setItem(item.identifier, item.toJson())));
   }
 
@@ -92,7 +93,9 @@ export class CategoryLinkModel {
    * Emit
    */
   private _emit() {
-    this._source.next(new ModelStore(this._nextData));
+    this._source.value.data = this._nextData;
+    this._source.value.status = ModelStoreStatus.READY;
+    this._source.next(this._source.value);
   }
 
   /**
@@ -107,7 +110,7 @@ export class CategoryLinkModel {
 
     try {
       await singleCall(new NetworkApi().addLink(this._nodeIdP1, this._nodeId, link));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.CATEGORY_LINK, link, MutationType.CREATE));
       return;
     } catch (error) {
@@ -139,7 +142,7 @@ export class CategoryLinkModel {
 
     try {
       await singleCall(new NetworkApi().updateLink(this._nodeIdP1, this._nodeId, link));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.CATEGORY_LINK, link, MutationType.UPDATE));
       return;
     } catch (error) {
@@ -172,7 +175,7 @@ export class CategoryLinkModel {
 
     try {
       await singleCall(new NetworkApi().deleteLink(this._nodeIdP1, this._nodeId, link));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.CATEGORY_LINK, link, MutationType.DELETE));
       return;
     } catch (error) {
@@ -195,16 +198,24 @@ export class CategoryLinkModel {
     });
 
     this._emit();
-    this._saveLocal();
+    await this._saveLocal();
   }
 
   /**
-   * 
+   *
    * Move add link
    */
   public async moveAddLink(link: Link) {
     this._nextData.push(link);
     this._emit();
-    this._saveLocal();
+    await this._saveLocal();
+  }
+
+  /**
+   *
+   * Get category link
+   */
+  public getCategoryLink() {
+    return this._source.pipe(map(onlyActiveItemsModelStore));
   }
 }

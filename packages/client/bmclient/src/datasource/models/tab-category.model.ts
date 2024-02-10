@@ -1,9 +1,10 @@
-import { BehaviorSubject, Subscription } from "rxjs";
-import { singleCall } from "../http/http.manager";
+import { BehaviorSubject, Subscription, combineLatest, map, of, switchMap } from "rxjs";
+import { ApplicationToken, singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
+import { CategoryToLinkMapping, UserToSettingMapping } from "../mapping";
 import { NetworkApi } from "../network.api";
-import { ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, TabCategory } from "../schema";
-import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
+import { Link, ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, TabCategory } from "../schema";
+import { Constants, Logger, MutationModel, deepCopyList, onlyActiveItemsModelStore } from "../utils";
 
 export class TabCategoryModel {
   private readonly _nodeId: string; // Node Id : tabIdentifier;
@@ -51,7 +52,7 @@ export class TabCategoryModel {
     const data = rowItems
       .filter((item) => item !== null)
       .map((item) => {
-        return TabCategory.fromJson(JSON.parse(item!));
+        return TabCategory.fromJson(item!);
       });
 
     this._prevData = data;
@@ -65,6 +66,7 @@ export class TabCategoryModel {
    * Save local data
    */
   private async _saveLocal() {
+    await this._database.clear();
     await Promise.all(this._nextData.map((item) => this._database.setItem(item.identifier, item.toJson())));
   }
 
@@ -94,14 +96,78 @@ export class TabCategoryModel {
    * Emit
    */
   private _emit() {
-    this._source.next(new ModelStore(this._nextData));
+    this._source.value.data = this._nextData;
+    this._source.value.status = ModelStoreStatus.READY;
+    this._source.next(this._source.value);
   }
 
   /**
    * Get tab's category
    */
   public getCategories() {
-    return this._source.asObservable();
+    const userToSettingMapping = UserToSettingMapping.getInstance();
+    const userId = ApplicationToken.getInstance().getUserId;
+    const settingModel = userToSettingMapping.get(userId || "");
+
+    const onlyActiveCategories$ = this._source.pipe(map(onlyActiveItemsModelStore)).pipe(
+      switchMap((categoriesStore) => {
+        const allCategories = categoriesStore.data;
+        if (allCategories.length === 0) {
+          return of([]);
+        }
+
+        const allCategoriesLength$ = allCategories.map((category: TabCategory) => {
+          const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
+          const linkModel = categoryToLinkMapping.get(category.identifier, category.tabIdentifier);
+
+          return linkModel
+            .getCategoryLink()
+            .pipe(
+              map((linksStore) => {
+                return linksStore.data as Link[];
+              })
+            )
+            .pipe(
+              map((links) => {
+                return links.length;
+              })
+            );
+        });
+
+        return combineLatest(allCategoriesLength$).pipe(
+          map((linksLength) => {
+            return linksLength.map((linkLength, i) => {
+              const data = allCategories[i] as TabCategory;
+              data.linkCount = linkLength;
+              return data;
+            });
+          })
+        );
+      })
+    );
+
+    return settingModel.userSetting.pipe(
+      switchMap((userSettingStore) => {
+        const { data, status } = userSettingStore;
+        if (status !== ModelStoreStatus.READY || data.length === 0) {
+          return of(new ModelStore([]));
+        }
+
+        const settingFinal = data[0];
+        return onlyActiveCategories$.pipe(
+          map((categories) => {
+            const finalData = categories.map((category) => {
+              category.canShowLinkCount = settingFinal.showNumberOfBookmarkInCategory;
+              category.canShowTagInTooltip = settingFinal.showTagsInTooltip;
+              category.canShowNoteInTooltip = settingFinal.showNoteInTooltip;
+              return category;
+            });
+
+            return new ModelStore(finalData);
+          })
+        );
+      })
+    );
   }
 
   /**
@@ -116,10 +182,11 @@ export class TabCategoryModel {
 
     try {
       await singleCall(new NetworkApi().addCategory(category));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, category, MutationType.CREATE));
       return;
     } catch (error) {
+      console.log(error);
       Logger.getInstance().log(error);
 
       // Rollback
@@ -148,7 +215,7 @@ export class TabCategoryModel {
 
     try {
       await singleCall(new NetworkApi().updateCategory(category));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, category, MutationType.UPDATE));
       return;
     } catch (error) {
@@ -181,7 +248,7 @@ export class TabCategoryModel {
 
     try {
       await singleCall(new NetworkApi().deleteCategory(category));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, category, MutationType.DELETE));
       return;
     } catch (error) {
@@ -211,7 +278,7 @@ export class TabCategoryModel {
 
     try {
       await Promise.all(categoriesWithOrders.map((p) => singleCall(new NetworkApi().updateCategory(p))));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TAB_CATEGORY, categoriesWithOrders, MutationType.UPDATE_MANY));
       return;
     } catch (error) {

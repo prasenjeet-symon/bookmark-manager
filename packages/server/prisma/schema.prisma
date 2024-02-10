@@ -117,6 +117,7 @@ model Link {
     order              Int
     icon               String?
     notes              String?
+    color              String?
     linkTags           LinkTag[]
     linkHiddenTags     LinkHiddenTag[]
     categoryIdentifier String?          @db.VarChar(37)

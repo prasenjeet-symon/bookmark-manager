@@ -38,7 +38,7 @@ export default function UpdateTabComponent({ tab }: { tab: UserTab }) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <FontAwesomeIcon onClick={() => setIsOpen(true)} icon={faEdit} />
+      <FontAwesomeIcon onClick={() => setIsOpen(true)} className="ml-3" size="sm" icon={faEdit} />
       </DialogTrigger>
       <DialogContent className="add-tab-dialog" onInteractOutside={() => setIsOpen(false)}>
         <DialogHeader>

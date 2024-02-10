@@ -47,9 +47,9 @@ export class UserSettingModel {
   private async _getLocal() {
     // Get all items
     const keys = await this._database.keys();
-    const rowItems = await Promise.all(keys.map((key) => this._database.getItem(key)));
-    const data = rowItems.map((item) => {
-      return UserSetting.fromJson(item);
+    const rowItems = await Promise.all(keys.map((key) => this._database.getItem<string>(key)));
+    const data = rowItems.filter((item) => item !== null).map((item) => {
+      return UserSetting.fromJson(item!);
     });
 
     this._prevData = data;
@@ -63,6 +63,7 @@ export class UserSettingModel {
    * Save local data
    */
   private async _saveLocal() {
+    await this._database.clear();
     await Promise.all(this._nextData.map((item) => this._database.setItem(item.userIdentifier, item.toJson())));
   }
 
@@ -78,8 +79,8 @@ export class UserSettingModel {
     this._subscription = new NetworkApi().getUserSetting().subscribe((val) => {
       const { data, status } = val;
       if (status === 200) {
-        this._nextData = data;
-        this._prevData = data;
+        this._nextData = [data];
+        this._prevData = [data];
         this._emit();
         this._saveLocal();
       }
@@ -91,7 +92,9 @@ export class UserSettingModel {
    * Emit
    */
   private _emit() {
-    this._source.next(new ModelStore(this._nextData));
+    this._source.value.data = this._nextData;
+    this._source.value.status = ModelStoreStatus.READY;
+    this._source.next(this._source.value);
   }
 
   /**
@@ -99,7 +102,7 @@ export class UserSettingModel {
    * Get user setting, stream
    */
   public get userSetting() {
-    return this._source.asObservable();
+    return this._source;
   }
 
   /**

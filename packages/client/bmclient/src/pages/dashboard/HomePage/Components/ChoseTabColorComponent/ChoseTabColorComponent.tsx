@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { UserTab } from "@/datasource/schema";
-import { faColonSign, faPallet, faPenClip, faPenFancy, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenFancy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { ChooseTabColorComponentController } from "./ChoseTabColorComponent.component";
@@ -42,7 +42,7 @@ export default function ChooseTabColorComponent({ tab }: { tab: UserTab }) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <FontAwesomeIcon onClick={() => setIsOpen(true)} icon={faPenFancy} />
+      <FontAwesomeIcon onClick={() => setIsOpen(true)} className="ml-3" size="sm" icon={faPenFancy} />
       </DialogTrigger>
       <DialogContent className="add-tab-dialog" onInteractOutside={() => setIsOpen(false)}>
         <DialogHeader>

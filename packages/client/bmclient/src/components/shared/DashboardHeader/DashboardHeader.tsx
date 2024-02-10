@@ -24,7 +24,7 @@ export default function DashboardHeader() {
   }
 
   function goToSettings() {
-    navigate("/settings", {
+    navigate("/dashboard/settings", {
       replace: true,
     });
   }
@@ -93,7 +93,7 @@ export default function DashboardHeader() {
 
           {/* Settings */}
           <div className="nav-item">
-            <a href="#" className="text-base hover:underline">
+            <a onClick={goToSettings} className="text-base hover:underline">
               Settings
             </a>
           </div>

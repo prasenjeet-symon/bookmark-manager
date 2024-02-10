@@ -46,9 +46,11 @@ export class UserDetailModel {
   private async _getLocal() {
     // Get all items
     const keys = await this._database.keys();
-    const rowItems = await Promise.all(keys.map((key) => this._database.getItem(key)));
-    const data = rowItems.map((item) => {
-      return User.fromJson(item);
+    const rowItems = await Promise.all(keys.map((key) => this._database.getItem<string>(key)));
+    const data = rowItems
+    .filter((item) => item !== null)
+    .map((item) => {
+      return User.fromJson(item!);
     });
 
     this._prevData = data;
@@ -62,6 +64,7 @@ export class UserDetailModel {
    * Save local data
    */
   private async _saveLocal() {
+    await this._database.clear();
     await Promise.all(this._nextData.map((item) => this._database.setItem(item.userId, item.toJson())));
   }
 
@@ -86,7 +89,9 @@ export class UserDetailModel {
    * Emit
    */
   private _emit() {
-    this._source.next(new ModelStore(this._nextData));
+    this._source.value.data = this._nextData;
+    this._source.value.status = ModelStoreStatus.READY;
+    this._source.next(this._source.value);
   }
 
   /**
@@ -94,7 +99,7 @@ export class UserDetailModel {
    * Get user details
    */
   public getUserDetails() {
-    return this._source.asObservable();
+    return this._source;
   }
 
   /**

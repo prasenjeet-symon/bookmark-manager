@@ -1,6 +1,6 @@
 import localforage from "localforage";
 import { Subject } from "rxjs";
-import { MutationModelData } from "./schema";
+import { ModelStore, MutationModelData } from "./schema";
 /**
  *
  * Api response message
@@ -53,7 +53,7 @@ export class MutationModel {
   private subject = new Subject<MutationModelData>();
 
   public get observable() {
-    return this.subject.asObservable();
+    return this.subject;
   }
 
   private constructor() {}
@@ -136,6 +136,7 @@ export class JsonParser {
  */
 export interface Network<T> {
   toJson(): string;
+  toRecord(): any;
   deepCopy(): T;
 }
 
@@ -192,13 +193,97 @@ export function getRandomIntId(): number {
   return Math.floor(+new Date() / 1000);
 }
 /**
- * 
- * 
+ *
+ *
  */
 export function trimText(text: string, maxLength: number): string {
   if (text.length <= maxLength) {
     return text;
   } else {
-    return text.slice(0, maxLength) + '...';
+    return text.slice(0, maxLength) + "...";
+  }
+}
+
+/**
+ *
+ *
+ */
+export function getRandomInt(n: number): number {
+  return Math.floor(Math.random() * n) + 1;
+}
+
+/**
+ *
+ *
+ *
+ */
+export async function getIcoIcon(link: string): Promise<string | null> {
+  try {
+    // Send a GET request to the website with no cors
+    const response = await fetch(link, { mode: "no-cors" });
+    const html = await response.text();
+
+    // Parse the HTML content
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    // Find the link to the ICO icon
+    let iconLink: string | null = null;
+    const iconTags = doc.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+    iconTags.forEach((tag) => {
+      iconLink = tag.getAttribute("href");
+      if (iconLink) {
+        // If the link is relative, convert it to absolute
+        if (!iconLink.startsWith("http")) {
+          const baseUrl = new URL(link);
+          iconLink = new URL(iconLink, baseUrl).href;
+        }
+      }
+    });
+
+    return iconLink;
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+}
+
+/**
+ *
+ * Only active item
+ */
+export function onlyActiveItems<T extends ApiResponse>(data: T) {
+  const oldData = data.data;
+  const status = data.status;
+
+  if (status !== 200) {
+    return data;
+  }
+
+  if (!Array.isArray(oldData)) {
+    return data;
+  }
+
+  const nonDeletedItems = (oldData as Array<any>).filter((p) => p.isDeleted === false);
+  return new ApiResponse(data.status, nonDeletedItems, data.statusText);
+}
+
+/**
+ *
+ * Only active item for model store
+ */
+export function onlyActiveItemsModelStore<T extends Array<any>>(data: ModelStore<T>) {
+  const allItems = data.data;
+  const nonDeletedItems = allItems.filter((p) => p.isDeleted === false);
+  return new ModelStore(nonDeletedItems, data.status);
+}
+/**
+ *
+ * Open all links to new tab
+ */
+
+export function openUrlsInInterval(urlList: string[]): void {
+  for (let i = 0; i < urlList.length; i++) {
+    window.open(urlList[i], "_blank");
   }
 }

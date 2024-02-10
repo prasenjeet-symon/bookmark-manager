@@ -1,0 +1,9 @@
+.update-link-component-style .update-link-form {
+  margin-top: 25px;
+}
+
+.update-link-component-style .update-link-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

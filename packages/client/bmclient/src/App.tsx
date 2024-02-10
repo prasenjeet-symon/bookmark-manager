@@ -16,6 +16,7 @@ import SigninPage from "./pages/authentication/SigninPage/SigninPage";
 import { DashboardPage } from "./pages/dashboard/DashboardPage/DashboardPage";
 import { default as DashboardHomePage } from "./pages/dashboard/HomePage/HomePage";
 import HomePage from "./pages/HomePage/HomePage";
+import SettingsPage from "./pages/dashboard/SettingsPage/SettingsPage";
 
 const routes = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const routes = createBrowserRouter([
         path: "",
         element: <DashboardHomePage />,
       },
+      {
+        path: 'settings',
+        element: <SettingsPage/>
+      }
     ],
   },
 ]);

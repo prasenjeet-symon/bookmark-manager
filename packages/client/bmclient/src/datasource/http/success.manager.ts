@@ -5,7 +5,7 @@ export class SuccessManager {
   private message: Subject<string> = new Subject();
 
   public get observable() {
-    return this.message.asObservable();
+    return this.message;
   }
 
   private constructor() {}

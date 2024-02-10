@@ -11,7 +11,7 @@ export class LinkController {
         this.res = res;
     }
     /**
-     * 
+     *
      * Get all catalog links
      */
     async getAllCatalogLinks() {
@@ -26,13 +26,19 @@ export class LinkController {
                 links: {
                     where: {
                         category: {
-                            is: null
-                        }
-                    }
+                            is: null,
+                        },
+                    },
+                    include: {
+                        linkTags: {
+                            include: {
+                                tag: true,
+                            },
+                        },
+                    },
                 },
             },
         });
-        
 
         if (!userWithLinks) {
             this.res.status(400).json({ error: 'User not found' });
@@ -40,7 +46,12 @@ export class LinkController {
             return;
         }
 
-        const links = userWithLinks.links;
+        const links = userWithLinks.links.map((link) => {
+            return {
+                ...link,
+                tags: link.linkTags.map((s) => s.tag.name),
+            };
+        });
 
         this.res.status(200).json(links);
         return;
@@ -57,14 +68,19 @@ export class LinkController {
 
         const email = this.res.locals.email;
         const prisma = PrismaClientSingleton.prisma;
-        const hiddenTags = ['uncategorized', 'catalog', 'other', `catalog__${getCurrentTimestampInSecondsUTC()}__${v4()}`];
+        const hiddenTags = [
+            'uncategorized',
+            'catalog',
+            'other',
+            `catalog__${getCurrentTimestampInSecondsUTC()}__${v4()}`,
+        ];
 
         await prisma.user.update({
             where: { email: email },
             data: {
                 links: {
                     upsert: {
-                        where: {identifier: this.req.body.identifier},
+                        where: { identifier: this.req.body.identifier },
                         create: {
                             identifier: this.req.body.identifier,
                             order: +this.req.body.order,
@@ -72,6 +88,7 @@ export class LinkController {
                             url: this.req.body.url,
                             icon: this.req.body.icon || null,
                             notes: this.req.body.notes || null,
+                            color: this.req.body.color || null,
                             linkTags: {
                                 create: [
                                     ...(this.req.body.tags as string[]).map((tag) => ({
@@ -108,10 +125,11 @@ export class LinkController {
                         update: {
                             order: +this.req.body.order,
                             title: this.req.body.title,
+                            color: this.req.body.color || null,
                             url: this.req.body.url,
                             icon: this.req.body.icon || null,
                             notes: this.req.body.notes || null,
-                        }
+                        },
                     },
                 },
             },
@@ -193,7 +211,12 @@ export class LinkController {
             return;
         }
 
-        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links;
+        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links.map((link) => {
+            return {
+                ...link,
+                tags: link.linkTags.map((linkTag) => linkTag.tag.name),
+            };
+        });
 
         this.res.status(200).json(links);
         return;
@@ -255,7 +278,12 @@ export class LinkController {
             return;
         }
 
-        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links;
+        const links = userWithTabWithCategoryWithLinks.userTabs[0].categories[0].links.map((link) => {
+            return {
+                ...link,
+                tags: link.linkTags.map((linkTag) => linkTag.tag.name),
+            };
+        })
 
         this.res.status(200).json(links);
         return;
@@ -299,6 +327,7 @@ export class LinkController {
                                                     url: this.req.body.url,
                                                     icon: this.req.body.icon || null,
                                                     notes: this.req.body.notes || null,
+                                                    color: this.req.body.color || null,
                                                     linkTags: {
                                                         create: [
                                                             ...(tags as string[]).map((tag) => ({
@@ -342,6 +371,7 @@ export class LinkController {
                                                     url: this.req.body.url,
                                                     icon: this.req.body.icon || null,
                                                     notes: this.req.body.notes || null,
+                                                    color: this.req.body.color || null,
                                                 },
                                             },
                                         },
@@ -423,6 +453,7 @@ export class LinkController {
                                                     url: this.req.body.url,
                                                     icon: this.req.body.icon || null,
                                                     notes: this.req.body.notes || null,
+                                                    color: this.req.body.color || null,
                                                     linkTags: {
                                                         create: [
                                                             ...(tags as string[]).map((tag) => ({
@@ -720,7 +751,7 @@ export class LinkController {
             categoryIdentifier === undefined ||
             finalCategoryIdentifier === undefined ||
             identifier === undefined
-        ) { 
+        ) {
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;
@@ -834,7 +865,7 @@ export class LinkController {
             return false;
         }
 
-        const { order, title, url, icon, notes, tags } = this.req.body;
+        const { order, title, url, icon, notes, color, tags } = this.req.body;
 
         if (order === undefined || title === undefined || url === undefined || tags === undefined) {
             this.res.status(400).json({ error: 'Invalid parameters' });

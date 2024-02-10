@@ -1,0 +1,9 @@
+.update-category-component-style .update-category-form {
+  margin-top: 25px;
+}
+
+.update-category-component-style .update-category-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

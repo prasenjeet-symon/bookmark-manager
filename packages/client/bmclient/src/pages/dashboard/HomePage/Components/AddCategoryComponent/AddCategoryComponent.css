@@ -1,0 +1,26 @@
+.add-category-form {
+  margin-top: 15px;
+}
+
+.add-category-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.add-category-item-component-style {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 10px 0px;
+  padding: 30px 10px;
+
+  div:nth-of-type(1) {
+    margin-top: 10px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+}

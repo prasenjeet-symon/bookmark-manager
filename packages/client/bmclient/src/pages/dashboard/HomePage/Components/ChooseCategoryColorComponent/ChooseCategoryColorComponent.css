@@ -1,0 +1,11 @@
+.choose-category-color-component-style .category-choose-color-dialog-content {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-gap: 10px;
+  margin-top: 25px;
+}
+
+.choose-category-color-component-style .color-item {
+  padding: 10px;
+  cursor: pointer;
+}

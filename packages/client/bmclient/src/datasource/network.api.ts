@@ -3,7 +3,7 @@ import { ErrorManager } from "./http/error.manager";
 import { ApplicationToken, HttpManager } from "./http/http.manager";
 import { SuccessManager } from "./http/success.manager";
 import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, TabCategory, User, UserSetting, UserTab } from "./schema";
-import { ApiResponse, ApiResponseMessage } from "./utils";
+import { ApiResponse, ApiResponseMessage, onlyActiveItems } from "./utils";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -19,6 +19,7 @@ export class NetworkApi {
   private userSettingRoute = `${this.baseUrlRoute}/api/user-setting`;
   private tabsRoute = `${this.baseUrlRoute}/api/tabs`;
   private categoriesRoute = `${this.baseUrlRoute}/api/categories`;
+  private newCategoryRoute = `${this.baseUrlRoute}/api/categories/new`;
   private linksRoute = `${this.baseUrlRoute}/api/links`;
   private newLinkRoute = `${this.baseUrlRoute}/api/links/new`;
 
@@ -40,8 +41,7 @@ export class NetworkApi {
       map((val) => {
         const { status, statusText, data } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = AuthenticationClass.fromJson(parsed);
+          const item = AuthenticationClass.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -50,8 +50,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status !== 200) {
-          const parsed = JSON.parse(data) as any;
-          const error = ApiMutationError.fromJson(parsed);
+          const error = ApiMutationError.fromJson(data);
           return new ApiResponse(status, error, statusText);
         } else {
           return val;
@@ -95,8 +94,7 @@ export class NetworkApi {
       map((val) => {
         const { status, statusText, data } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = AuthenticationClass.fromJson(parsed);
+          const item = AuthenticationClass.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -105,8 +103,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status !== 200) {
-          const parsed = JSON.parse(data) as any;
-          const error = ApiMutationError.fromJson(parsed);
+          const error = ApiMutationError.fromJson(data);
           return new ApiResponse(status, error, statusText);
         } else {
           return val;
@@ -156,8 +153,7 @@ export class NetworkApi {
       map((val) => {
         const { status, statusText, data } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = AuthenticationClass.fromJson(parsed);
+          const item = AuthenticationClass.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -166,8 +162,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status !== 200) {
-          const parsed = JSON.parse(data) as any;
-          const error = ApiMutationError.fromJson(parsed);
+          const error = ApiMutationError.fromJson(data);
           return new ApiResponse(status, error, statusText);
         } else {
           return val;
@@ -214,8 +209,7 @@ export class NetworkApi {
       map((val) => {
         const { status, statusText, data } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = AuthenticationClass.fromJson(parsed);
+          const item = AuthenticationClass.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -224,8 +218,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status !== 200) {
-          const parsed = JSON.parse(data) as any;
-          const error = ApiMutationError.fromJson(parsed);
+          const error = ApiMutationError.fromJson(data);
           return new ApiResponse(status, error, statusText);
         } else {
           return val;
@@ -312,8 +305,7 @@ export class NetworkApi {
       map((val) => {
         const { status, statusText, data } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = ApiMutationSuccess.fromJson(parsed);
+          const item = ApiMutationSuccess.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -322,8 +314,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status !== 200) {
-          const parsed = JSON.parse(data) as any;
-          const error = ApiMutationError.fromJson(parsed);
+          const error = ApiMutationError.fromJson(data);
           return new ApiResponse(status, error, statusText);
         } else {
           return val;
@@ -381,8 +372,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = User.fromJson(parsed);
+          const item = User.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -413,8 +403,7 @@ export class NetworkApi {
       map((val) => {
         const { data, status, statusText } = val;
         if (status === 200) {
-          const parsed = JSON.parse(data) as any;
-          const item = UserSetting.fromJson(parsed);
+          const item = UserSetting.fromJson(data);
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
@@ -446,12 +435,12 @@ export class NetworkApi {
         const { data, status, statusText } = val;
         if (status === 200) {
           const parsed = JSON.parse(data) as Array<any>;
-          const items = parsed.map((item) => UserTab.fromJson(item));
+          const items = parsed.map((item) => UserTab.fromJson(JSON.stringify(item)));
           return new ApiResponse(status, items, statusText);
         } else {
           return val;
         }
-      })
+      }),
     );
   }
 
@@ -505,12 +494,13 @@ export class NetworkApi {
         const { data, status, statusText } = val;
         if (status === 200) {
           const parsed = JSON.parse(data) as Array<any>;
-          const items = parsed.map((item) => TabCategory.fromJson(item));
+          const items = parsed.map((item) => TabCategory.fromJson(JSON.stringify(item)));
           return new ApiResponse(status, items, statusText);
         } else {
           return val;
         }
-      })
+      }),
+    
     );
   }
 
@@ -519,7 +509,7 @@ export class NetworkApi {
    * Add new category
    */
   public addCategory(tabCategory: TabCategory) {
-    return HttpManager.request(this.categoriesRoute, {
+    return HttpManager.request(this.newCategoryRoute, {
       method: "POST",
       body: tabCategory.toJson(),
     });
@@ -565,12 +555,13 @@ export class NetworkApi {
         const { data, status, statusText } = val;
         if (status === 200) {
           const parsed = JSON.parse(data) as Array<any>;
-          const items = parsed.map((item) => Link.fromJson(item));
+          const items = parsed.map((item) => Link.fromJson(JSON.stringify(item)));
           return new ApiResponse(status, items, statusText);
         } else {
           return val;
         }
-      })
+      }),
+     
     );
   }
 

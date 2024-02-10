@@ -1,0 +1,9 @@
+.add-link-component-style {
+  margin-top: 25px;
+}
+
+.add-link-component-style .add-link-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

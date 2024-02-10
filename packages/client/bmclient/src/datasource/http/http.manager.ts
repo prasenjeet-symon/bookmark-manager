@@ -15,11 +15,11 @@ export class ApplicationToken {
   private userIdSubject = new BehaviorSubject<string | null>(null);
 
   public get observable() {
-    return this.tokenSubject.asObservable();
+    return this.tokenSubject;
   }
 
   public get userIdObservable() {
-    return this.userIdSubject.asObservable();
+    return this.userIdSubject;
   }
 
   private constructor() {}
@@ -70,6 +70,7 @@ export class ApplicationToken {
     this.userIdSubject.next(null);
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.clear();
   }
 
   /**

@@ -1,0 +1,44 @@
+.link-item-component-style {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0px;
+  padding: 3px;
+}
+
+.link-item-component-style > div:nth-of-type(1) {
+  display: flex;
+  align-items: center;
+}
+
+.link-item-component-style > div:nth-of-type(1) img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.link-item-component-style > div:nth-of-type(1) .link-text {
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.link-item-component-style > div:nth-of-type(2) {
+  position: relative;
+  cursor: pointer;
+  padding: 0px 0px 0px 15px;
+}
+
+.link-item-component-style > div:nth-of-type(2) .link-item-more-menu {
+  position: absolute;
+  z-index: +5;
+  display: none;
+  top: 105%;
+  right: -10px;
+  min-width: 200px;
+  padding: 10px;
+}
+
+.link-item-component-style > div:nth-of-type(2):hover .link-item-more-menu {
+  display: block;
+}

@@ -156,14 +156,14 @@ export class CategoryController {
                                 upsert: {
                                     where: { identifier: this.req.body.identifier },
                                     create: {
-                                        color: this.req.body.color,
+                                        color: this.req.body.color || null,
                                         identifier: this.req.body.identifier,
                                         name: this.req.body.name,
                                         order: +this.req.body.order,
                                         icon: this.req.body.icon || null,
                                     },
                                     update: {
-                                        color: this.req.body.color,
+                                        color: this.req.body.color || null,
                                         name: this.req.body.name,
                                         order: +this.req.body.order,
                                         icon: this.req.body.icon || null,
@@ -294,7 +294,6 @@ export class CategoryController {
         const { color, identifier, name, order, tabIdentifier, icon } = this.req.body;
 
         if (
-            color === undefined ||
             identifier === undefined ||
             name === undefined ||
             order === undefined ||

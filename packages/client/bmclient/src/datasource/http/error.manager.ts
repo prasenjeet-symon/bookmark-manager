@@ -5,7 +5,7 @@ export class ErrorManager {
   private errorMessage: Subject<string> = new Subject();
 
   public get observable() {
-    return this.errorMessage.asObservable();
+    return this.errorMessage;
   }
 
   private constructor() {}

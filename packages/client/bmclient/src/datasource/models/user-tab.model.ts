@@ -1,9 +1,10 @@
-import { BehaviorSubject, Subscription, map } from "rxjs";
-import { singleCall } from "../http/http.manager";
+import { BehaviorSubject, Subscription, combineLatest, map, of, switchMap } from "rxjs";
+import { ApplicationToken, singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
+import { TabToCategoryMapping, UserToSettingMapping } from "../mapping";
 import { NetworkApi } from "../network.api";
 import { ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, UserTab } from "../schema";
-import { Constants, Logger, MutationModel, deepCopyList } from "../utils";
+import { Constants, Logger, MutationModel, deepCopyList, onlyActiveItemsModelStore } from "../utils";
 
 export class UserTabModel {
   private readonly _nodeId: string; // Node Id : userId;
@@ -51,7 +52,7 @@ export class UserTabModel {
     const data = rowItems
       .filter((item) => item !== null)
       .map((item) => {
-        return UserTab.fromJson(JSON.parse(item!));
+        return UserTab.fromJson(item!);
       });
 
     this._prevData = data;
@@ -65,6 +66,7 @@ export class UserTabModel {
    * Save local data
    */
   private async _saveLocal() {
+    await this._database.clear();
     await Promise.all(this._nextData.map((item) => this._database.setItem(item.identifier, item.toJson())));
   }
 
@@ -94,7 +96,9 @@ export class UserTabModel {
    * Emit
    */
   private _emit() {
-    this._source.next(new ModelStore(this._nextData));
+    this._source.value.data = this._nextData;
+    this._source.value.status = ModelStoreStatus.READY;
+    this._source.next(this._source.value);
   }
 
   /**
@@ -102,10 +106,74 @@ export class UserTabModel {
    * Get tabs
    */
   public getTabs() {
-    return this._source.asObservable().pipe(
-      map((data) => {
-        const nonDeleted = data.data.filter((p) => !p.isDeleted);
-        return new ModelStore(nonDeleted, data.status);
+    const userId = ApplicationToken.getInstance().getUserId;
+    const userToSettingMapping = UserToSettingMapping.getInstance();
+    const settingModel = userToSettingMapping.get(userId || "");
+
+    const tabsWithLinksCount$ = this._source.pipe(map(onlyActiveItemsModelStore)).pipe(
+      switchMap((tabsState) => {
+        if (tabsState.data.length === 0) {
+          return of(new ModelStore([]));
+        }
+
+        const allTabs = tabsState.data as UserTab[];
+
+        const tabsWithLinkCount$ = combineLatest(
+          allTabs.map((tab) => {
+            const tabToCategoryMapping = TabToCategoryMapping.getInstance();
+            const categoryModel = tabToCategoryMapping.get(tab.identifier);
+            return categoryModel
+              .getCategories()
+              .pipe(
+                map((categoriesState) => {
+                  const allCategories = categoriesState.data;
+                  return allCategories.map((cat) => cat.linkCount);
+                })
+              )
+              .pipe(
+                map((linksCount) => {
+                  return linksCount.reduce((a, b) => a + b, 0);
+                })
+              );
+          })
+        )
+          .pipe(
+            map((linksCount) => {
+              return allTabs.map((tab, index) => {
+                tab.linkCount = linksCount[index];
+                return tab;
+              });
+            })
+          )
+          .pipe(
+            map((val) => {
+              return new ModelStore(val, tabsState.status);
+            })
+          );
+
+        return tabsWithLinkCount$;
+      })
+    );
+
+    return settingModel.userSetting.pipe(
+      switchMap((settingState) => {
+        if (settingState.data.length === 0 || settingState.status !== ModelStoreStatus.READY) {
+          return of(new ModelStore([]));
+        }
+
+        const settingFinal = settingState.data[0];
+
+        return tabsWithLinksCount$.pipe(
+          map((tabsState) => {
+            const tabs = tabsState.data as UserTab[];
+            const finalTabs = tabs.map((p) => {
+              p.canShowLinkCount = settingFinal.showNumberOfBookmarkInTab;
+              return p;
+            });
+
+            return new ModelStore(finalTabs, tabsState.status);
+          })
+        );
       })
     );
   }
@@ -121,7 +189,7 @@ export class UserTabModel {
 
     try {
       await singleCall(new NetworkApi().addTab(tab));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TABS, tab, MutationType.CREATE));
       return;
     } catch (error) {
@@ -153,7 +221,7 @@ export class UserTabModel {
 
     try {
       await singleCall(new NetworkApi().updateTab(tab));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TABS, tab, MutationType.UPDATE));
       return;
     } catch (error) {
@@ -185,7 +253,7 @@ export class UserTabModel {
 
     try {
       await singleCall(new NetworkApi().deleteTab(tab));
-      this._saveLocal();
+      await this._saveLocal();
       MutationModel.getInstance().dispatch(new MutationModelData(MutationModelIdentifier.TABS, tab, MutationType.DELETE));
       return;
     } catch (error) {
