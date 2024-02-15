@@ -1,0 +1,22 @@
+.selection-header-component-style {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin: 20px 0px;
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.selection-header-component-style > div:nth-of-type(2) {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 20px 10px 10px;
+}
+
+.selection-header-component-style > div:nth-of-type(2) :nth-child(1) {
+  margin-right: 15px;
+}

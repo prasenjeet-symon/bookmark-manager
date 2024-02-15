@@ -26,7 +26,7 @@ export class UserDetailModel {
     });
 
     this._nodeId = nodeId;
-    this._storeName = "user_detail_store";
+    this._storeName = `user_detail_store_${nodeId}`;
 
     this._database = LocalDatabase.getInstance().database.createInstance({
       description: "Store for user detail",
@@ -48,10 +48,10 @@ export class UserDetailModel {
     const keys = await this._database.keys();
     const rowItems = await Promise.all(keys.map((key) => this._database.getItem<string>(key)));
     const data = rowItems
-    .filter((item) => item !== null)
-    .map((item) => {
-      return User.fromJson(item!);
-    });
+      .filter((item) => item !== null)
+      .map((item) => {
+        return User.fromJson(item!);
+      });
 
     this._prevData = data;
     this._nextData = data;
@@ -89,9 +89,7 @@ export class UserDetailModel {
    * Emit
    */
   private _emit() {
-    this._source.value.data = this._nextData;
-    this._source.value.status = ModelStoreStatus.READY;
-    this._source.next(this._source.value);
+    this._source.next(new ModelStore(this._nextData, ModelStoreStatus.READY));
   }
 
   /**

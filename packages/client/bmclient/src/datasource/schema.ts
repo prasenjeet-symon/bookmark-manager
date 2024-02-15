@@ -1,4 +1,49 @@
 import { JsonParser, Network } from "./utils";
+
+/**
+ *
+ *
+ * Task tracker data
+ */
+export class TaskTrackerData {
+  public status: TaskManagerStatus;
+  public message: string | null;
+  public error: string | null;
+  public progress: number;
+
+  constructor(status: TaskManagerStatus, message: string | null, error: string | null, progress: number) {
+    this.status = status;
+    this.message = message;
+    this.error = error;
+    this.progress = progress;
+  }
+}
+
+/**
+ *
+ * Task data
+ */
+export class TaskData {
+  public identifier: TaskDataIdentifier;
+  public data: any;
+  public taskUUID: string;
+
+  constructor(identifier: TaskDataIdentifier, data: any, taskUUID: string) {
+    this.identifier = identifier;
+    this.data = data;
+    this.taskUUID = taskUUID;
+  }
+}
+/**
+ *
+ *
+ * Task data identifier
+ */
+export enum TaskDataIdentifier {
+  IMPORT_BOOKMARK = "import_bookmark",
+  EXPORT_BOOKMARK = "export_bookmark",
+}
+
 /**
  *
  * Api Mutation Success class
@@ -147,6 +192,7 @@ export enum MutationModelIdentifier {
   USER_SETTING = "user_setting",
   TAB_CATEGORY = "tab_category",
   CATEGORY_LINK = "category_link",
+  CATALOG = "catalog",
 }
 
 /**
@@ -164,6 +210,8 @@ export enum ApplicationMutationIdentifier {
   UPDATE_LINK = "update_link",
   DELETE_LINK = "delete_link",
   USER_SETTING = "user_setting",
+  DELETE_CATALOG_LINK = "delete_catalog_link",
+  MOVE_CATALOG_LINK = "move_catalog_link",
 }
 
 /**
@@ -954,12 +1002,14 @@ export class Link implements Network<Link> {
   icon: string | null;
   notes: string | null;
   color: string | null;
-  categoryIdentifier: string;
+  categoryIdentifier: string | null;
   userIdentifier: string;
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
   tags: string[];
+
+  selected: boolean = false;
 
   constructor(
     id: number,
@@ -970,7 +1020,7 @@ export class Link implements Network<Link> {
     icon: string | null,
     notes: string | null,
     color: string | null,
-    categoryIdentifier: string,
+    categoryIdentifier: string | null,
     userIdentifier: string,
     createdAt: Date,
     updatedAt: Date,
@@ -1004,7 +1054,7 @@ export class Link implements Network<Link> {
     const parsedIcon = JsonParser.parse<string>(json, "icon", "string");
     const parsedNotes = JsonParser.parse<string>(json, "notes", "string");
     const parsedColor = JsonParser.parse<string>(json, "color", "string");
-    const parsedCategoryIdentifier = JsonParser.parseStrict<string>(json, "categoryIdentifier", "string");
+    const parsedCategoryIdentifier = JsonParser.parse<string>(json, "categoryIdentifier", "string");
     const parsedUserIdentifier = JsonParser.parseStrict<string>(json, "userIdentifier", "string");
     const parsedCreatedAt = JsonParser.parseStrict<Date>(json, "createdAt", "datetime");
     const parsedUpdatedAt = JsonParser.parseStrict<Date>(json, "updatedAt", "datetime");
@@ -1039,7 +1089,7 @@ export class Link implements Network<Link> {
     const parsedIcon = JsonParser.parse<string>(record, "icon", "string");
     const parsedNotes = JsonParser.parse<string>(record, "notes", "string");
     const parsedColor = JsonParser.parse<string>(record, "color", "string");
-    const parsedCategoryIdentifier = JsonParser.parseStrict<string>(record, "categoryIdentifier", "string");
+    const parsedCategoryIdentifier = JsonParser.parse<string>(record, "categoryIdentifier", "string");
     const parsedUserIdentifier = JsonParser.parseStrict<string>(record, "userIdentifier", "string");
     const parsedCreatedAt = JsonParser.parseStrict<Date>(record, "createdAt", "datetime");
     const parsedUpdatedAt = JsonParser.parseStrict<Date>(record, "updatedAt", "datetime");
@@ -1110,5 +1160,153 @@ export class Link implements Network<Link> {
 
   public deepCopy(): Link {
     return Link.fromRecord(this.toRecord());
+  }
+}
+
+/**
+ *
+ *
+ * Task Tracker
+ */
+export enum TaskManagerStatus {
+  Initial = "initial",
+  Success = "success",
+  Error = "error",
+  Uploading = "uploading",
+  Processing = "processing",
+}
+
+export namespace TaskManagerStatus {
+  // From key
+  export function fromKey(key: string): TaskManagerStatus {
+    switch (key) {
+      case "initial":
+        return TaskManagerStatus.Initial;
+      case "success":
+        return TaskManagerStatus.Success;
+      case "error":
+        return TaskManagerStatus.Error;
+      case "uploading":
+        return TaskManagerStatus.Uploading;
+      case "processing":
+        return TaskManagerStatus.Processing;
+      default:
+        return TaskManagerStatus.Initial;
+    }
+  }
+
+  /**
+   * Get the key of a TaskManagerStatus enum value
+   * @param status - The TaskManagerStatus value
+   * @returns The key of the TaskManagerStatus value
+   */
+  export function getKey(status: TaskManagerStatus): string {
+    switch (status) {
+      case TaskManagerStatus.Initial:
+        return "initial";
+      case TaskManagerStatus.Success:
+        return "success";
+      case TaskManagerStatus.Error:
+        return "error";
+      case TaskManagerStatus.Uploading:
+        return "uploading";
+      case TaskManagerStatus.Processing:
+        return "processing";
+      default:
+        return "initial";
+    }
+  }
+}
+/**
+ *
+ *
+ */
+export class TaskTracker implements Network<TaskTracker> {
+  id: number;
+  userIdentifier: string;
+  identifier: string;
+  status: TaskManagerStatus;
+  message: string;
+  error: string;
+  progress: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+
+  constructor(
+    id: number,
+    userIdentifier: string,
+    identifier: string,
+    status: TaskManagerStatus,
+    message: string,
+    error: string,
+    progress: number,
+    createdAt: Date,
+    updatedAt: Date,
+    isDeleted: boolean
+  ) {
+    this.id = id;
+    this.userIdentifier = userIdentifier;
+    this.identifier = identifier;
+    this.status = status;
+    this.message = message;
+    this.error = error;
+    this.progress = progress;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isDeleted = isDeleted;
+  }
+
+  public static fromRecord(record: any): TaskTracker {
+    const parsedId = JsonParser.parseStrict<number>(record, "id", "int");
+    const parsedUserIdentifier = JsonParser.parseStrict<string>(record, "userIdentifier", "string");
+    const parsedIdentifier = JsonParser.parseStrict<string>(record, "identifier", "string");
+    const parsedStatus = TaskManagerStatus.fromKey(JsonParser.parseStrict<string>(record, "status", "string"));
+    const parsedMessage = JsonParser.parseStrict<string>(record, "message", "string");
+    const parsedError = JsonParser.parseStrict<string>(record, "error", "string");
+    const parsedProgress = JsonParser.parseStrict<number>(record, "progress", "float");
+    const parsedCreatedAt = JsonParser.parseStrict<Date>(record, "createdAt", "datetime");
+    const parsedUpdatedAt = JsonParser.parseStrict<Date>(record, "updatedAt", "datetime");
+    const parsedIsDeleted = JsonParser.parseStrict<boolean>(record, "isDeleted", "boolean");
+
+    return new TaskTracker(
+      parsedId,
+      parsedUserIdentifier,
+      parsedIdentifier,
+      parsedStatus,
+      parsedMessage,
+      parsedError,
+      parsedProgress,
+      parsedCreatedAt,
+      parsedUpdatedAt,
+      parsedIsDeleted
+    );
+  }
+
+  public static fromJson(json: string): TaskTracker {
+    return TaskTracker.fromRecord(JSON.parse(json));
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.toRecord());
+  }
+
+  public toRecord(): any {
+    return {
+      id: this.id,
+      userIdentifier: this.userIdentifier,
+      identifier: this.identifier,
+      status: TaskManagerStatus.getKey(this.status),
+      message: this.message,
+      error: this.error,
+      progress: this.progress,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isDeleted: this.isDeleted,
+    };
+  }
+
+  public deepCopy(): TaskTracker {
+    return TaskTracker.fromRecord(this.toRecord());
   }
 }

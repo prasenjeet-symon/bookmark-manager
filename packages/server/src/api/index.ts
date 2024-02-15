@@ -1,8 +1,11 @@
 import express from 'express';
 import { CategoryController } from './category.controller';
+import { ExportBookmarkController } from './export-bookmark.controller';
+import { ImportBookmarkController } from './import-bookmark.controller';
 import { LinkController } from './link.controller';
 import { TabController } from './tab.controller';
 import { TagController } from './tag.cotroller';
+import { TaskManagerController } from './task-manager.controller';
 import { UserSetting } from './user-setting.controller';
 import { UserController } from './user.controller';
 
@@ -12,12 +15,12 @@ router.get('/', (_req, res) => {
     res.send({ message: 'Hello World' });
 });
 /**
- * 
+ *
  * Get user
  */
 router.get('/user', (req, res) => new UserController(req, res).getUser());
 /**
- * 
+ *
  * Update user
  */
 router.put('/user', (req, res) => new UserController(req, res).updateUser());
@@ -81,7 +84,9 @@ router.delete('/categories', (req, res) => new CategoryController(req, res).dele
  *
  * Get categories incrementally
  */
-router.post('/categories-incrementally', (req, res) => new CategoryController(req, res).getAllCategoriesIncrementally());
+router.post('/categories-incrementally', (req, res) =>
+    new CategoryController(req, res).getAllCategoriesIncrementally()
+);
 /**
  *
  * Add new link
@@ -96,6 +101,11 @@ router.put('/links', (req, res) => new LinkController(req, res).updateLink());
  *
  */
 router.delete('/links', (req, res) => new LinkController(req, res).deleteLink());
+/** 
+ * 
+ * Delete catalog link
+ */
+router.delete('/catalog/link', (req, res) => new LinkController(req, res).deleteCatalogLink());
 /**
  * Move a link to another category
  */
@@ -129,6 +139,29 @@ router.get('/catalog', (req, res) => new LinkController(req, res).getAllCatalogL
  * Get all tags of application
  */
 router.get('/tags', (req, res) => new TagController(req, res).getAllTags());
+/**
+ *
+ * Import bookmark by uploading HTML file
+ */
+router.post('/import-bookmark', ImportBookmarkController.bookmarkStorage(), (req, res) =>
+    new ImportBookmarkController(req, res).uploadBookmark()
+);
+/**
+ *
+ * 
+ * Export user's bookmark to HTML
+ */
+router.post('/export-bookmark', (req, res) => new ExportBookmarkController(req, res).exportBookmarkHTML());
+/**
+ *
+ * Get task status
+ */
+router.get('/task', (req, res) => new TaskManagerController(req, res).getTaskStatus());
+/**
+ *
+ * Delete task
+ */
+router.delete('/task', (req, res) => new TaskManagerController(req, res).deleteTask());
 /**
  *
  *

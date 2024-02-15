@@ -20,7 +20,7 @@ export default function LinkItemComponent({ link, tabIdentifier, canShowNotes, c
         <div>
           <img className="mr-2" src={link.icon || "https://placehold.jp/150x150"} alt="" />
           <HoverCardTrigger>
-            <button type="button" style={{ backgroundColor: link.color ? link.color : "" }} className="text-base link-text">
+            <button type="button" style={{ backgroundColor: link.color ? link.color : "" }} className="text-base link-text text-left">
               {link.title}
             </button>
           </HoverCardTrigger>

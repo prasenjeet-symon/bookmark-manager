@@ -17,6 +17,9 @@ import { DashboardPage } from "./pages/dashboard/DashboardPage/DashboardPage";
 import { default as DashboardHomePage } from "./pages/dashboard/HomePage/HomePage";
 import HomePage from "./pages/HomePage/HomePage";
 import SettingsPage from "./pages/dashboard/SettingsPage/SettingsPage";
+import ImportBookmarkPage from "./pages/dashboard/ImportBookmarkPage/ImportBookmarkPage";
+import ExportBookmarkPage from "./pages/dashboard/ExportBookmarkPage/ExportBookmarkPage";
+import MyBookmarkPage from "./pages/dashboard/MyBookmarkPage/MyBookmarkPage";
 
 const routes = createBrowserRouter([
   {
@@ -68,6 +71,18 @@ const routes = createBrowserRouter([
       {
         path: 'settings',
         element: <SettingsPage/>
+      },
+      {
+        path:'import-bookmark',
+        element: <ImportBookmarkPage/>
+      },
+      {
+        path: 'export-bookmark',
+        element: <ExportBookmarkPage/>
+      },
+      {
+        path: 'my-bookmark',
+        element: <MyBookmarkPage/>
       }
     ],
   },

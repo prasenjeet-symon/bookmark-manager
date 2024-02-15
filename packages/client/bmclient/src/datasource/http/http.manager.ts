@@ -98,13 +98,13 @@ export class ApplicationToken {
  */
 export class HttpManager {
   // Reusable function for making HTTP requests
-  private static makeHttpRequest(token: string | null, url: string, options?: RequestInit): Observable<ApiResponse> {
+  private static makeHttpRequest(token: string | null, url: string, isFile: boolean, options?: RequestInit, ): Observable<ApiResponse> {
     return defer(() => {
       const abortController = new AbortController();
       
       // Fetch operation with the AbortController signal
       const fetchObservable = new Observable<ApiResponse>((observer) => {
-        fetch(url, { ...options, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, signal: abortController.signal })
+        fetch(url, { ...options, headers: isFile ? {Authorization: `Bearer ${token}`} : { Authorization: `Bearer ${token}`,  "Content-Type": "application/json" }, signal: abortController.signal })
           .then(async (response) => {
             const jsonData = await response.json();
             const statusCode = response.status;
@@ -138,7 +138,19 @@ export class HttpManager {
   public static request(url: string, options?: RequestInit): Observable<ApiResponse> {
     return ApplicationToken.getInstance().observable.pipe(
       mergeMap((token) => {
-        return HttpManager.makeHttpRequest(token, url, options);
+        return HttpManager.makeHttpRequest(token, url, false, options);
+      })
+    );
+  }
+
+  /** 
+   * 
+   * Request file
+   */
+  public static requestFile(url: string, options?: RequestInit): Observable<ApiResponse> {
+    return ApplicationToken.getInstance().observable.pipe(
+      mergeMap((token) => {
+        return HttpManager.makeHttpRequest(token, url, true, options);
       })
     );
   }

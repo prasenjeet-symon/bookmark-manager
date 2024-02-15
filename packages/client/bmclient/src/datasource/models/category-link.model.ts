@@ -29,7 +29,7 @@ export class CategoryLinkModel {
 
     this._nodeId = nodeId;
     this._nodeIdP1 = nodeIdP1;
-    this._storeName = "category_link_store";
+    this._storeName = `category_link_store_${nodeId}_${nodeIdP1}`;
 
     this._database = LocalDatabase.getInstance().database.createInstance({
       description: "Store for category link",
@@ -93,9 +93,7 @@ export class CategoryLinkModel {
    * Emit
    */
   private _emit() {
-    this._source.value.data = this._nextData;
-    this._source.value.status = ModelStoreStatus.READY;
-    this._source.next(this._source.value);
+    this._source.next(new ModelStore(this._nextData, ModelStoreStatus.READY));
   }
 
   /**

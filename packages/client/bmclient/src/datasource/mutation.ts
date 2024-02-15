@@ -1,6 +1,6 @@
 import { Subject } from "rxjs";
 import { ApplicationToken } from "./http/http.manager";
-import { CategoryToLinkMapping, TabToCategoryMapping, UserToSettingMapping, UserToTabMapping } from "./mapping";
+import { CategoryToLinkMapping, TabToCategoryMapping, UserToCatalogMapping, UserToSettingMapping, UserToTabMapping } from "./mapping";
 import { ApplicationMutationData, ApplicationMutationIdentifier, Link, TabCategory, UserSetting, UserTab } from "./schema";
 import { Logger, getIcoIcon } from "./utils";
 
@@ -51,6 +51,14 @@ export class ApplicationMutation {
 
         case ApplicationMutationIdentifier.USER_SETTING:
           MutationQueue.getInstance().add(ApplicationMutation._updateUserSetting(data.data as UserSetting));
+          break;
+
+        case ApplicationMutationIdentifier.DELETE_CATALOG_LINK:
+          MutationQueue.getInstance().add(ApplicationMutation._deleteCatalogLink(data.data as Link));
+          break;
+
+        case ApplicationMutationIdentifier.MOVE_CATALOG_LINK:
+          MutationQueue.getInstance().add(ApplicationMutation._moveCatalogLink(data.data.link as Link, data.data.category as TabCategory));
           break;
       }
     });
@@ -136,29 +144,29 @@ export class ApplicationMutation {
    */
   private static async _addLink(link: Link, tabIdentifier: string) {
     const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
-    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier, tabIdentifier);
+    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier || "", tabIdentifier);
     const iconLink = await getIcoIcon(link.url);
     console.log(iconLink);
     link.icon = iconLink;
     await linkModel.addLink(link);
   }
   /**
-   * 
+   *
    * Update link
    */
   private static async _updateLink(link: Link, tabIdentifier: string) {
     const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
-    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier, tabIdentifier);
+    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier || "", tabIdentifier);
     await linkModel.updateLink(link);
   }
 
   /**
-   * 
+   *
    * Delete link
    */
   private static async _deleteLink(link: Link, tabIdentifier: string) {
     const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
-    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier, tabIdentifier);
+    const linkModel = categoryToLinkMapping.get(link.categoryIdentifier || "", tabIdentifier);
     await linkModel.deleteLink(link);
   }
 
@@ -174,6 +182,36 @@ export class ApplicationMutation {
     const userToSettingMapping = UserToSettingMapping.getInstance();
     const settingModel = userToSettingMapping.get(userId);
     await settingModel.updateUserSetting(setting);
+  }
+
+  /**
+   *
+   * _deleteCatalogLink
+   */
+  private static async _deleteCatalogLink(link: Link) {
+    const userId = ApplicationToken.getInstance().getUserId;
+    if (!userId) {
+      return;
+    }
+
+    const userToCatalogMapping = UserToCatalogMapping.getInstance();
+    const catalogModel = userToCatalogMapping.get(userId);
+    await catalogModel.deleteLink(link);
+  }
+
+  /**
+   *
+   * Move catalog link to category
+   */
+  private static async _moveCatalogLink(link: Link, category: TabCategory) {
+    const userId = ApplicationToken.getInstance().getUserId;
+    if (!userId) {
+      return;
+    }
+
+    const userToCatalogMapping = UserToCatalogMapping.getInstance();
+    const catalogModel = userToCatalogMapping.get(userId);
+    await catalogModel.moveLinkToCategory(link, category);
   }
 
   /**

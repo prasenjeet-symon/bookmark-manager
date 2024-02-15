@@ -20,23 +20,24 @@ model Admin {
 }
 
 model User {
-    id             Int          @id @default(autoincrement())
-    email          String       @unique
+    id             Int           @id @default(autoincrement())
+    email          String        @unique
     mobile         String?
     fullName       String
     profilePicture String?
     password       String
-    userId         String       @unique @db.VarChar(37)
+    userId         String        @unique @db.VarChar(37)
     dateOfBirth    DateTime?
-    timeZone       String       @default("IST")
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
+    timeZone       String        @default("IST")
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
     userSetting    UserSetting?
-    isDeleted      Boolean      @default(false)
+    isDeleted      Boolean       @default(false)
     links          Link[]
     userTabs       UserTab[]
     sessions       Session[]
-    maxSession     Int          @default(5)
+    tasks          TaskManager[]
+    maxSession     Int           @default(5)
 }
 
 model Session {
@@ -57,6 +58,28 @@ model Session {
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
     isDeleted      Boolean  @default(false)
+}
+
+model TaskManager {
+    id             Int               @id @default(autoincrement())
+    userIdentifier String            @db.VarChar(37)
+    user           User              @relation(fields: [userIdentifier], references: [userId])
+    identifier     String            @unique
+    status         TaskManagerStatus @default(initial)
+    message        String            @db.MediumText
+    error          String            @db.MediumText
+    progress       Float             @default(0.00)
+    createdAt      DateTime          @default(now())
+    updatedAt      DateTime          @updatedAt
+    isDeleted      Boolean           @default(false)
+}
+
+enum TaskManagerStatus {
+    initial
+    success
+    error
+    uploading
+    processing
 }
 
 enum ColumnNumber {
@@ -111,17 +134,17 @@ model Category {
 
 model Link {
     id                 Int             @id @default(autoincrement())
-    identifier         String          @unique @db.VarChar(37)
-    title              String
+    identifier         String          @unique @db.VarChar(100)
+    title              String          @db.MediumText
     url                String
     order              Int
-    icon               String?
-    notes              String?
+    icon               String?         @db.LongText
+    notes              String?         @db.MediumText
     color              String?
     linkTags           LinkTag[]
     linkHiddenTags     LinkHiddenTag[]
-    categoryIdentifier String?          @db.VarChar(37)
-    category           Category?        @relation(fields: [categoryIdentifier], references: [identifier])
+    categoryIdentifier String?         @db.VarChar(37)
+    category           Category?       @relation(fields: [categoryIdentifier], references: [identifier])
     userIdentifier     String          @db.VarChar(37)
     user               User            @relation(fields: [userIdentifier], references: [userId])
     createdAt          DateTime        @default(now())
@@ -142,7 +165,7 @@ model Tag {
 
 model LinkTag {
     id             Int      @id @default(autoincrement())
-    linkIdentifier String   @db.VarChar(37)
+    linkIdentifier String   @db.VarChar(100)
     link           Link     @relation(fields: [linkIdentifier], references: [identifier])
     tagIdentifier  String   @db.VarChar(37)
     tag            Tag      @relation(fields: [tagIdentifier], references: [identifier])
@@ -163,7 +186,7 @@ model HiddenTag {
 
 model LinkHiddenTag {
     id             Int       @id @default(autoincrement())
-    linkIdentifier String    @db.VarChar(37)
+    linkIdentifier String    @db.VarChar(100)
     link           Link      @relation(fields: [linkIdentifier], references: [identifier])
     tagIdentifier  String    @db.VarChar(300)
     tag            HiddenTag @relation(fields: [tagIdentifier], references: [identifier])

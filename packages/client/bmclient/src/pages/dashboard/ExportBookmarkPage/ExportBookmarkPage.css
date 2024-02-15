@@ -1,0 +1,22 @@
+.export-bookmark-page-style .export-bookmark-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+}
+
+
+.export-bookmark-page-style .export-bookmark-card > div:nth-of-type(1) img {
+    width: 120px;
+}
+
+.export-bookmark-page-style .export-bookmark-card > div:nth-of-type(2){
+    font-size: 22px;
+    font-weight: 600;
+    margin: 20px 0px;
+}
+
+.export-bookmark-page-style .export-bookmark-card > button{
+    font-size: 18px;
+
+}

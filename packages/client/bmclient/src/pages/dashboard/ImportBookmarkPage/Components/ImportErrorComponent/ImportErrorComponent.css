@@ -1,0 +1,26 @@
+.import-error-component-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.import-error-component-style > div:nth-of-type(1) img {
+  width: 200px;
+}
+
+.import-error-component-style > div:nth-of-type(2) {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0px 0px 10px 0px;
+}
+
+.import-error-component-style > div:nth-of-type(3) {
+  width: 40%;
+  margin: 15px auto;
+  text-align: center;
+}
+
+.import-error-component-style > div:nth-of-type(4){
+    margin: 0px 0px 20px 0px;
+}

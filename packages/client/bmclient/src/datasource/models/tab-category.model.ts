@@ -28,7 +28,7 @@ export class TabCategoryModel {
     });
 
     this._nodeId = nodeId;
-    this._storeName = "tab_category_store";
+    this._storeName = `tab_category_store_${nodeId}`;
 
     this._database = LocalDatabase.getInstance().database.createInstance({
       description: "Store for tab category",
@@ -96,9 +96,7 @@ export class TabCategoryModel {
    * Emit
    */
   private _emit() {
-    this._source.value.data = this._nextData;
-    this._source.value.status = ModelStoreStatus.READY;
-    this._source.next(this._source.value);
+    this._source.next(new ModelStore(this._nextData, ModelStoreStatus.READY));
   }
 
   /**

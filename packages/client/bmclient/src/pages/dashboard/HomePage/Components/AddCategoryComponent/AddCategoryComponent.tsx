@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -41,13 +40,14 @@ export default function AddCategoryComponent({ tabIdentifier }: { tabIdentifier:
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Card onClick={() => setIsOpen(true)} className="add-category-item-component-style">
-            {/* Plus icon to add new category */}
-            <FontAwesomeIcon icon={faPlus} size="2x" />
-
-            {/* A text  */}
-            <div>Add new category</div>
-          </Card>
+          <div className="flex items-center justify-end">
+            <Button className="my-3 inline" onClick={(e) => {
+              e.preventDefault();
+              setIsOpen(true);
+            }} variant="outline">
+              <FontAwesomeIcon className="mr-2" icon={faPlus} /> Add new category
+            </Button>
+          </div>
         </DialogTrigger>
         <DialogContent onInteractOutside={() => setIsOpen(false)}>
           <DialogHeader>

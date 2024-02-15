@@ -161,7 +161,7 @@ export async function createJwt(
 ): Promise<string> {
     const jwt = require('jsonwebtoken');
     const JWT_SECRET = process.env.JWT_SECRET;
-    const JWT_EXPIRES_IN = (expiresIn || process.env.JWT_EXPIRES_IN) || '1d';
+    const JWT_EXPIRES_IN = expiresIn || process.env.JWT_EXPIRES_IN || '1d';
 
     if (!JWT_SECRET) {
         Logger.getInstance().logError('JWT_SECRET not set in the environment variables');
@@ -249,11 +249,11 @@ export function isValidPassword(password: string): { valid: boolean; message?: s
 export function isTokenActive(token: string): boolean {
     try {
         const jwt = require('jsonwebtoken');
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET || '', {
             ignoreExpiration: false,
         });
-       
+
         return true;
     } catch (error) {
         console.error(error);
@@ -274,7 +274,6 @@ export function isInteger(value: any): boolean {
  * Send email with resend
  */
 export async function sendEmail(data: EmailOptions): Promise<string | undefined> {
-    
     const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
     const API_KEY = process.env.RESEND_API_KEY || '';
     const resend = new Resend(API_KEY);
@@ -343,7 +342,7 @@ export async function getClientLocation(req: Request): Promise<LocationInfo | un
 
     const clientIP = getClientIP(req);
     console.log('Client IP: ' + clientIP);
-    
+
     try {
         // Make a request to the ipinfo.io API to get location information
         const response = await axios.get<LocationInfo>(`https://ipinfo.io/${clientIP}?token=${IPINFO_TOKEN}`);
@@ -352,4 +351,40 @@ export async function getClientLocation(req: Request): Promise<LocationInfo | un
         Logger.getInstance().logError('Error getting client location : ' + error);
         return;
     }
+}
+
+/**
+ *
+ *
+ */
+export function isDefined(value: any): boolean {
+    return value !== undefined && value !== null;
+}
+/**
+ *
+ *
+ */
+export function generateChecksum(input: string): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(input);
+    return hash.digest('hex');
+}
+
+/**
+ *
+ *
+ */
+export function timestampToDate(timestampInSeconds: number): Date {
+    // Multiply by 1000 to convert seconds to milliseconds
+    const milliseconds = timestampInSeconds * 1000;
+    return new Date(milliseconds);
+}
+/**
+ *
+ *
+ * Date to timestamp
+ */
+export function dateToTimestampInSeconds(date: Date): number {
+    // Get the time in milliseconds using getTime(), and then convert to seconds
+    return Math.floor(date.getTime() / 1000);
 }

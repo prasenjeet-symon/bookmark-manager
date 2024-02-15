@@ -28,7 +28,7 @@ export class UserTabModel {
     });
 
     this._nodeId = nodeId;
-    this._storeName = "user_tab_store";
+    this._storeName = `user_tab_store_${nodeId}`;
 
     this._database = LocalDatabase.getInstance().database.createInstance({
       description: "Store for user tab",
@@ -96,9 +96,7 @@ export class UserTabModel {
    * Emit
    */
   private _emit() {
-    this._source.value.data = this._nextData;
-    this._source.value.status = ModelStoreStatus.READY;
-    this._source.next(this._source.value);
+    this._source.next(new ModelStore(this._nextData, ModelStoreStatus.READY));
   }
 
   /**

@@ -18,7 +18,7 @@ export default function DashboardHeader() {
   }
 
   function goToBookmarks() {
-    navigate("/bookmarks", {
+    navigate("/dashboard/my-bookmark", {
       replace: true,
     });
   }
@@ -30,13 +30,13 @@ export default function DashboardHeader() {
   }
 
   function goToImportBookmarks() {
-    navigate("/import-bookmarks", {
+    navigate("/dashboard/import-bookmark", {
       replace: true,
     });
   }
 
   function goToExportBookmarks() {
-    navigate("/export-bookmarks", {
+    navigate("/dashboard/export-bookmark", {
       replace: true,
     });
   }
@@ -67,14 +67,14 @@ export default function DashboardHeader() {
         <div className="flex items-center">
           {/* Dashboard */}
           <div className="nav-item">
-            <a href="#" className="text-base hover:underline">
+            <a onClick={goToDashboard} className="text-base hover:underline">
               Dashboard
             </a>
           </div>
 
           {/* My Bookmarks */}
           <div className="nav-item">
-            <a href="#" className="text-base hover:underline">
+            <a onClick={goToBookmarks} className="text-base hover:underline">
               My Bookmarks
             </a>
           </div>
@@ -85,8 +85,8 @@ export default function DashboardHeader() {
               Tools
             </a>
             <div className="more-menu bg-background">
-              <div className="menu-item text-base">Import Bookmarks</div>
-              <div className="menu-item text-base">Export Bookmarks</div>
+              <div className="menu-item text-base" onClick={goToImportBookmarks}>Import Bookmarks</div>
+              <div className="menu-item text-base" onClick={goToExportBookmarks}>Export Bookmarks</div>
               <div className="menu-item text-base">Install Browser Button</div>
             </div>
           </div>

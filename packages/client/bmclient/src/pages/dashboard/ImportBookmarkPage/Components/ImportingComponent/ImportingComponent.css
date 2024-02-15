@@ -1,0 +1,23 @@
+.importing-component-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+}
+
+.importing-component-style > div:nth-of-type(1) img {
+  width: 120px;
+  height: auto;
+}
+
+.importing-component-style>div:nth-of-type(2) {
+    font-size: 25px;
+    font-weight: 600;
+    margin: 15px 0px 5px 0px;
+}
+
+.importing-component-style > div:nth-of-type(3) {
+    width: 40%;
+    margin: 15px auto;
+    text-align: center;
+}

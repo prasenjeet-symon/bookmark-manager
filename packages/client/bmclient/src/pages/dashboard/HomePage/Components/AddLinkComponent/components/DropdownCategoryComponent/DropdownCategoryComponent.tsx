@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { DropdownCategoryComponentController } from "./DropdownCategoryComponent.controller";
 import "./DropdownCategoryComponent.css";
 
-export default function DropdownCategoryComponent({ tab }: { tab: UserTab }) {
+export default function DropdownCategoryComponent({ tab, selectedCategory }: { tab: UserTab, selectedCategory: (category: TabCategory | null) => void }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
@@ -16,6 +16,7 @@ export default function DropdownCategoryComponent({ tab }: { tab: UserTab }) {
 
   useEffect(() => {
     const subscription = new DropdownCategoryComponentController().getCategories(tab.identifier).subscribe((categories) => {
+      console.log(categories.data);
       setCategories(categories.data);
       setIsLoading(categories.status === ModelStoreStatus.READY ? false : true);
     });
@@ -45,11 +46,13 @@ export default function DropdownCategoryComponent({ tab }: { tab: UserTab }) {
                 value={category.identifier}
                 onSelect={(currentValue) => {
                   setValue(currentValue === value ? "" : currentValue);
+                  const targetCategory = currentValue === value ? null : categories.find((category) => category.identifier === currentValue);
+                  selectedCategory(targetCategory || null);
                   setOpen(false);
                 }}
               >
                 <Check className={cn("mr-2 h-4 w-4", value === category.identifier ? "opacity-100" : "opacity-0")} />
-                {tab.name}
+                {category.name}
               </CommandItem>
             ))}
           </CommandGroup>

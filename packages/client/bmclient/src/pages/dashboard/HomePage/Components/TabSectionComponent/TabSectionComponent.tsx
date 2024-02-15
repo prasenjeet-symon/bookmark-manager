@@ -4,6 +4,8 @@ import AddCategoryComponent from "../AddCategoryComponent/AddCategoryComponent";
 import CategoryItemComponent from "../CategoryItemComponent/CategoryItemComponent";
 import { TabSectionComponentController } from "./TabSectionComponent.controller";
 import "./TabSectionComponent.css";
+import EmptyDataComponent from "@/components/shared/EmptyDataComponent/EmptyDataComponent";
+import NoCategoryImage from '../../../../../assets/categories.png';
 
 export default function TabSectionComponent({ tab }: { tab: UserTab }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,9 +24,13 @@ export default function TabSectionComponent({ tab }: { tab: UserTab }) {
     return <div>Loading...</div>;
   }
 
-  return (
+ 
+
+  return <>
+    <AddCategoryComponent tabIdentifier={tab.identifier} />
+    { categories.length === 0 && !isLoading ? <EmptyDataComponent title="No categories found" description="Looks like you don't have any categories yet. Please add some by clicking the button above" img={NoCategoryImage} />: null }
     <ThreeColumnLayout tabCategories={categories} tabIdentifier={tab.identifier} />
-  );
+    </>
 }
 
 /**
@@ -66,7 +72,7 @@ const ThreeColumnLayout: React.FC<{ tabCategories: TabCategory[]; tabIdentifier:
   return (
     <div className="three-column-layout-style">
       <div>
-        <AddCategoryComponent tabIdentifier={tabIdentifier} />
+        
         {firstColumnItems.map((category) => (
           <CategoryItemComponent key={category.identifier} category={category} />
         ))}

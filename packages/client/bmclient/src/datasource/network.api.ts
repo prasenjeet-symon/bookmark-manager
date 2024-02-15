@@ -2,8 +2,8 @@ import { map, tap } from "rxjs";
 import { ErrorManager } from "./http/error.manager";
 import { ApplicationToken, HttpManager } from "./http/http.manager";
 import { SuccessManager } from "./http/success.manager";
-import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, TabCategory, User, UserSetting, UserTab } from "./schema";
-import { ApiResponse, ApiResponseMessage, onlyActiveItems } from "./utils";
+import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, TabCategory, TaskTracker, User, UserSetting, UserTab } from "./schema";
+import { ApiResponse, ApiResponseMessage } from "./utils";
 
 export class NetworkApi {
   private baseUrlRoute = "http://localhost:8081/server";
@@ -22,6 +22,10 @@ export class NetworkApi {
   private newCategoryRoute = `${this.baseUrlRoute}/api/categories/new`;
   private linksRoute = `${this.baseUrlRoute}/api/links`;
   private newLinkRoute = `${this.baseUrlRoute}/api/links/new`;
+  private catalogRoute = `${this.baseUrlRoute}/api/catalog`;
+  private taskRoute = `${this.baseUrlRoute}/api/task`;
+  private catalogLinkRoute = `${this.baseUrlRoute}/api/catalog/link`;
+  private catalogMoveRoute = `${this.baseUrlRoute}/api/catalog/move`;
 
   /**
    *
@@ -440,7 +444,7 @@ export class NetworkApi {
         } else {
           return val;
         }
-      }),
+      })
     );
   }
 
@@ -499,8 +503,7 @@ export class NetworkApi {
         } else {
           return val;
         }
-      }),
-    
+      })
     );
   }
 
@@ -560,8 +563,7 @@ export class NetworkApi {
         } else {
           return val;
         }
-      }),
-     
+      })
     );
   }
 
@@ -619,6 +621,187 @@ export class NetworkApi {
   /**
    *
    *
-   *
+   * Get user's catalog links
    */
+  public getCatalog() {
+    return HttpManager.request(this.catalogRoute, {
+      method: "GET",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as Array<any>;
+          const items = parsed.map((item) => Link.fromJson(JSON.stringify(item)));
+          return new ApiResponse(status, items, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Task long pulling
+   */
+  public getTaskProgressTracker() {
+    return HttpManager.request(this.taskRoute, {
+      method: "GET",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          const parsed = JSON.parse(data) as Array<any>;
+          const items = parsed.map((item) => TaskTracker.fromJson(JSON.stringify(item)));
+          return new ApiResponse(status, items, statusText);
+        } else {
+          return val;
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Delete task
+   */
+  public deleteTask(taskUUID: string) {
+    return HttpManager.request(this.taskRoute, {
+      method: "DELETE",
+      body: JSON.stringify({ taskUUID: taskUUID }),
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("Task deleted successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   *
+   * Delete catalog link
+   */
+  public deleteCatalogLink(link: Link) {
+    return HttpManager.request(this.catalogLinkRoute, {
+      method: "DELETE",
+      body: JSON.stringify({ identifier: link.identifier }),
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("Link deleted successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Move catalog link to category
+   */
+  public moveCatalogLink(link: Link, finalCategoryIdentifier: string) {
+    const reqBody = {
+      identifier: link.identifier,
+      finalCategoryIdentifier: finalCategoryIdentifier,
+    };
+
+    return HttpManager.request(this.catalogMoveRoute, {
+      method: "PUT",
+      body: JSON.stringify(reqBody),
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("Link moved successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
 }

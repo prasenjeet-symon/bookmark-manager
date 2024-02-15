@@ -23,3 +23,11 @@ export interface LocationInfo {
     postal: string;
     timezone: string;
 }
+
+export interface Bookmark {
+    url: string;
+    icon: string | null;
+    checksum: string;
+    datetime: Date;
+    title: string;
+}

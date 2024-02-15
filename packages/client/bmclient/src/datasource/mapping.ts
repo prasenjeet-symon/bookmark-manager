@@ -1,5 +1,6 @@
 import { CategoryLinkModel } from "./models/category-link.model";
 import { TabCategoryModel } from "./models/tab-category.model";
+import { UserCatalogModel } from "./models/user-catalog.model";
 import { UserSettingModel } from "./models/user-setting.model";
 import { UserTabModel } from "./models/user-tab.model";
 import { Logger } from "./utils";
@@ -120,5 +121,35 @@ export class CategoryToLinkMapping {
     const link = new CategoryLinkModel(key, tabIdentifier);
     this.categoryToLinkMap.set(key, link);
     return link;
+  }
+}
+/**
+ *
+ * User to catalog mapping
+ */
+export class UserToCatalogMapping {
+  private static instance: UserToCatalogMapping;
+  private userToCatalogMap: Map<string, UserCatalogModel> = new Map();
+
+  private constructor() {}
+
+  public static getInstance(): UserToCatalogMapping {
+    if (!UserToCatalogMapping.instance) {
+      Logger.getInstance().logSuccess("UserToCatalogMapping instance created");
+      UserToCatalogMapping.instance = new UserToCatalogMapping();
+    }
+    return UserToCatalogMapping.instance;
+  }
+
+  // Get catalog model
+  get(key: string): UserCatalogModel {
+    if (this.userToCatalogMap.has(key)) {
+      return this.userToCatalogMap.get(key)!;
+    }
+
+    const catalog = new UserCatalogModel(key);
+    this.userToCatalogMap.set(key, catalog);
+
+    return catalog;
   }
 }

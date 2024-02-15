@@ -287,3 +287,45 @@ export function openUrlsInInterval(urlList: string[]): void {
     window.open(urlList[i], "_blank");
   }
 }
+
+/**  
+ * 
+ * 
+ */
+export function fileToBlob(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    // Get the selected file
+    if (!file) {
+      reject(new Error('No file selected'));
+      return;
+    }
+
+    // Create a new FileReader object
+    const reader = new FileReader();
+
+    // Define a function to handle the file loading
+    reader.onload = (event) => {
+      // Access the result property of the FileReader object, which contains the file data
+      const fileData = event.target?.result;
+
+      if (!fileData) {
+        reject(new Error('Failed to read file data'));
+        return;
+      }
+
+      // Create a Blob object from the file data
+      const blob = new Blob([fileData], { type: file.type });
+
+      // Resolve the Promise with the Blob object
+      resolve(blob);
+    };
+
+    // Define an error handler for the FileReader
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    // Read the file as a data URL (base64 encoded string)
+    reader.readAsDataURL(file);
+  });
+}

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { v4 } from 'uuid';
-import { Logger, PrismaClientSingleton, getCurrentTimestampInSecondsUTC, isInteger } from '../utils';
+import { Logger, PrismaClientSingleton, getCurrentTimestampInSecondsUTC, isDefined, isInteger } from '../utils';
 
 export class LinkController {
     private req: Request;
@@ -10,6 +10,38 @@ export class LinkController {
         this.req = req;
         this.res = res;
     }
+    /**
+     *
+     * Delete catalog link
+     */
+    async deleteCatalogLink() {
+        if (!this.validateDeleteCatalogLinkReqBody()) {
+            Logger.getInstance().logError('Error validating delete link method');
+            return;
+        }
+
+        const prisma = PrismaClientSingleton.prisma;
+        const email = this.res.locals.email;
+
+        await prisma.user.update({
+            where: { email: email },
+            data: {
+                links: {
+                    update: {
+                        where: { identifier: this.req.body.identifier },
+                        data: {
+                            isDeleted: true,
+                        },
+                    },
+                },
+            },
+        });
+
+        this.res.status(200).json({ message: 'Link deleted successfully' });
+        Logger.getInstance().logSuccess('Delete link successfully');
+        return;
+    }
+
     /**
      *
      * Get all catalog links
@@ -283,7 +315,7 @@ export class LinkController {
                 ...link,
                 tags: link.linkTags.map((linkTag) => linkTag.tag.name),
             };
-        })
+        });
 
         this.res.status(200).json(links);
         return;
@@ -736,6 +768,7 @@ export class LinkController {
         });
 
         this.res.status(200).json({ message: 'Link moved successfully' });
+        Logger.getInstance().logSuccess('Link moved successfully');
         return;
     }
     /**
@@ -905,6 +938,28 @@ export class LinkController {
         const { finalCategoryIdentifier, identifier } = this.req.body;
 
         if (finalCategoryIdentifier === undefined || identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     * Delete catalog link
+     */
+    validateDeleteCatalogLinkReqBody(): boolean {
+        const { identifier } = this.req.body;
+
+        if (identifier === undefined) {
+            this.res.status(400).json({ error: 'Missing parameters' });
+            Logger.getInstance().logError('Missing parameters');
+            return false;
+        }
+
+        if (!isDefined(identifier)) {
             this.res.status(400).json({ error: 'Missing parameters' });
             Logger.getInstance().logError('Missing parameters');
             return false;

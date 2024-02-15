@@ -1,0 +1,54 @@
+.my-bookmark-page-style {
+  width: 60%;
+  margin: 20 auto;
+}
+
+.my-bookmark-page-style .search-input {
+  padding: 10px 0px;  
+  position: sticky;
+  position: -webkit-sticky;
+  top: 50px;
+  z-index: 1;
+}
+
+.my-bookmark-page-style .catalog-links-holder {
+  margin: 10px 0px;
+}
+
+.my-bookmark-page-style .catalog-links-holder .catalog-link-card {
+  margin: 15px 0px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(1) {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(2) {
+  cursor: pointer;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(1) > div:nth-of-type(2) {
+  flex: 1;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(1) > div:nth-of-type(1) img {
+  margin-right: 10px;
+  width: 25px;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.my-bookmark-page-style .catalog-link-card > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) {
+  font-size: 14px;
+  margin-bottom: 2px;
+  text-overflow: ellipsis;
+}
