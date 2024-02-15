@@ -9,35 +9,56 @@ datasource db {
 }
 
 model Admin {
-    id             Int      @id @default(autoincrement())
-    email          String   @unique
+    id             Int               @id @default(autoincrement())
+    email          String            @unique
     fullName       String
     profilePicture String?
     password       String
-    userId         String   @db.VarChar(37)
-    createdAt      DateTime @default(now())
-    updatedAt      DateTime @updatedAt
+    userId         String            @unique @db.VarChar(37)
+    createdAt      DateTime          @default(now())
+    updatedAt      DateTime          @updatedAt
+    isDeleted      Boolean           @default(false)
+    subscription   SubscriptionPlan?
+}
+
+model SubscriptionPlan {
+    id              Int      @id @default(autoincrement())
+    identifier      String   @unique @db.VarChar(37)
+    name            String
+    planId          String
+    description     String
+    price           Float // price in US dollars in cents
+    currency        String   @default("USD")
+    interval        String   @default("month")
+    intervalCount   Int      @default(1)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    isDeleted       Boolean  @default(false)
+    adminIdentifier String   @unique @db.VarChar(37)
+    admin           Admin    @relation(fields: [adminIdentifier], references: [userId])
 }
 
 model User {
-    id             Int           @id @default(autoincrement())
-    email          String        @unique
-    mobile         String?
-    fullName       String
-    profilePicture String?
-    password       String
-    userId         String        @unique @db.VarChar(37)
-    dateOfBirth    DateTime?
-    timeZone       String        @default("IST")
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
-    userSetting    UserSetting?
-    isDeleted      Boolean       @default(false)
-    links          Link[]
-    userTabs       UserTab[]
-    sessions       Session[]
-    tasks          TaskManager[]
-    maxSession     Int           @default(5)
+    id                      Int                      @id @default(autoincrement())
+    email                   String                   @unique
+    mobile                  String?
+    fullName                String
+    profilePicture          String?
+    password                String
+    userId                  String                   @unique @db.VarChar(37)
+    dateOfBirth             DateTime?
+    timeZone                String                   @default("IST")
+    createdAt               DateTime                 @default(now())
+    updatedAt               DateTime                 @updatedAt
+    userSetting             UserSetting?
+    isDeleted               Boolean                  @default(false)
+    links                   Link[]
+    userTabs                UserTab[]
+    sessions                Session[]
+    tasks                   TaskManager[]
+    maxSession              Int                      @default(5)
+    Subscription            Subscription?
+    SubscriptionTransaction SubscriptionTransaction?
 }
 
 model Session {
@@ -58,6 +79,40 @@ model Session {
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
     isDeleted      Boolean  @default(false)
+}
+
+model Subscription {
+    id             Int      @id @default(autoincrement())
+    identifier     String   @unique
+    userIdentifier String   @unique @db.VarChar(37)
+    user           User     @relation(fields: [userIdentifier], references: [userId])
+    name           String
+    planId         String
+    description    String
+    price          Float // price in US dollars in cents
+    currency       String   @default("USD")
+    interval       String   @default("month")
+    intervalCount  Int      @default(1)
+    isDeleted      Boolean  @default(false)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+}
+
+
+model SubscriptionTransaction {
+    id             Int      @id @default(autoincrement())
+    userIdentifier String   @unique @db.VarChar(37)
+    user           User     @relation(fields: [userIdentifier], references: [userId])
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    isDeleted      Boolean  @default(false)
+    price          Float    @default(0.00)
+    currency       String   @default("USD")
+    isPaid         Boolean  @default(false)
+    isFailed       Boolean  @default(false)
+    error          String?  @db.LongText
+    webhookEvent   String
+    webhookId      String
 }
 
 model TaskManager {

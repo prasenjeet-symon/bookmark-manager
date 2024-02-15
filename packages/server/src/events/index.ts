@@ -1,7 +1,9 @@
 import { BehaviorSubject } from 'rxjs';
+import { AdminPaymentEvent } from './admin-payment.event';
 import { AuthenticationEvent } from './authentication.event';
 import { CategoryEvent } from './category.event';
 import { TabEvent } from './tab.event';
+import { UserPaymentEvent } from './user-payment.event';
 import { UserEvent } from './user.event';
 
 export interface ApiEventData {
@@ -25,6 +27,8 @@ export class ApiEventNames {
     public static readonly USER_DELETED = 'user_deleted';
     public static readonly USER_CREATED = 'user_created';
     public static readonly USER_LOGIN = 'user_login';
+    public static readonly INIT_USER_SUBSCRIPTION = 'init_user_subscription';
+    public static readonly ADMIN_PLAN_CREATION = 'admin_plan_creation';
 }
 
 export class ApiEvent {
@@ -68,6 +72,14 @@ export class ApiEvent {
 
                 case ApiEventNames.CATEGORY_DELETED:
                     new CategoryEvent(data).deletedCategory();
+                    break;
+
+                case ApiEventNames.INIT_USER_SUBSCRIPTION:
+                    new UserPaymentEvent(data).startSubscription();
+                    break;
+
+                case ApiEventNames.ADMIN_PLAN_CREATION:
+                    new AdminPaymentEvent(data).newSubscriptionPlan();
                     break;
             }
         });
