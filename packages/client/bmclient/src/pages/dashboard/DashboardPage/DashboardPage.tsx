@@ -1,19 +1,28 @@
-import { ApplicationToken } from "@/datasource/http/http.manager";
+import { ApplicationToken, Subscription } from "@/datasource/http/http.manager";
+import { ESubscriptionStatus } from "@/datasource/schema";
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export function DashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState<ESubscriptionStatus>(ESubscriptionStatus.FREE_TRIAL);
 
   useEffect(() => {
+    Subscription.getInstance().bootUp();
+
     const subscription = ApplicationToken.getInstance().observable.subscribe((token) => {
       setIsAuthenticated(!!token);
       setIsLoading(false);
     });
 
+    const subscription2 = Subscription.getInstance().status$.subscribe((status) => {
+      setPaymentStatus(status);
+    });
+
     return () => {
       subscription.unsubscribe();
+      subscription2.unsubscribe();
     };
   }, []);
 
@@ -27,6 +36,8 @@ export function DashboardPage() {
     );
   } else if (!isAuthenticated) {
     return <Navigate to="/auth/signin" />;
+  } else if (isAuthenticated && paymentStatus === ESubscriptionStatus.INACTIVE) {
+    return <Navigate to="/payment-required" />;
   } else {
     return <Outlet />;
   }

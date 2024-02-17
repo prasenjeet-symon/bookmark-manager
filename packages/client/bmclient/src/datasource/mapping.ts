@@ -1,6 +1,7 @@
 import { CategoryLinkModel } from "./models/category-link.model";
 import { TabCategoryModel } from "./models/tab-category.model";
 import { UserCatalogModel } from "./models/user-catalog.model";
+import { UserDetailModel } from "./models/user-detail.model";
 import { UserSettingModel } from "./models/user-setting.model";
 import { UserTabModel } from "./models/user-tab.model";
 import { Logger } from "./utils";
@@ -151,5 +152,37 @@ export class UserToCatalogMapping {
     this.userToCatalogMap.set(key, catalog);
 
     return catalog;
+  }
+}
+
+/**
+ *
+ *
+ * Root to user detail model mapping
+ */
+export class UserToUserDetailMapping {
+  private static instance: UserToUserDetailMapping;
+  private userToUserDetailMap: Map<string, UserDetailModel> = new Map();
+
+  private constructor() {}
+
+  public static getInstance(): UserToUserDetailMapping {
+    if (!UserToUserDetailMapping.instance) {
+      Logger.getInstance().logSuccess("UserToUserDetailMapping instance created");
+      UserToUserDetailMapping.instance = new UserToUserDetailMapping();
+    }
+    return UserToUserDetailMapping.instance;
+  }
+
+  // Get user detail model
+  get(key: string): UserDetailModel {
+    if (this.userToUserDetailMap.has(key)) {
+      return this.userToUserDetailMap.get(key)!;
+    }
+
+    const userDetail = new UserDetailModel(key);
+    this.userToUserDetailMap.set(key, userDetail);
+
+    return userDetail;
   }
 }

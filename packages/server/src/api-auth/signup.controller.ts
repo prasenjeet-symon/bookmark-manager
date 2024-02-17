@@ -133,6 +133,10 @@ export class SignupController {
             email: newUser.email,
         });
 
+        ApiEvent.getInstance().dispatch(ApiEventNames.INIT_USER_FREE_TRIAL, {
+            email: newUser.email,
+        });
+
         return;
     }
     /**

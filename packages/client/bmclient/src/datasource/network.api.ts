@@ -2,7 +2,7 @@ import { map, tap } from "rxjs";
 import { ErrorManager } from "./http/error.manager";
 import { ApplicationToken, HttpManager } from "./http/http.manager";
 import { SuccessManager } from "./http/success.manager";
-import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, TabCategory, TaskTracker, User, UserSetting, UserTab } from "./schema";
+import { ApiMutationError, ApiMutationSuccess, AuthenticationClass, Link, SubscriptionStatus, TabCategory, TaskTracker, User, UserSetting, UserTab } from "./schema";
 import { ApiResponse, ApiResponseMessage } from "./utils";
 
 export class NetworkApi {
@@ -26,6 +26,8 @@ export class NetworkApi {
   private taskRoute = `${this.baseUrlRoute}/api/task`;
   private catalogLinkRoute = `${this.baseUrlRoute}/api/catalog/link`;
   private catalogMoveRoute = `${this.baseUrlRoute}/api/catalog/move`;
+  private subscribeRoute = `${this.baseUrlRoute}/api/subscribe`;
+  private freeTrialRoute = `${this.baseUrlRoute}/api/free-trial`;
 
   /**
    *
@@ -380,6 +382,29 @@ export class NetworkApi {
           return new ApiResponse(status, item, statusText);
         } else {
           return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("User fetched successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
         }
       })
     );
@@ -800,6 +825,194 @@ export class NetworkApi {
         if (status !== 200) {
           const responseData = data as ApiMutationError;
           ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   *
+   * Subscribe to premium
+   */
+  public subscribeToPremium() {
+    return HttpManager.request(this.subscribeRoute, {
+      method: "POST",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          // open link to new tba
+          const link = responseData.message;
+          window.open(link, "_blank");
+          SuccessManager.getInstance().dispatch("Subscription created successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   *
+   * Cancel subscription
+   *
+   */
+  public cancelSubscription() {
+    return HttpManager.request(this.subscribeRoute, {
+      method: "DELETE",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          SuccessManager.getInstance().dispatch("Subscription cancelled successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   * Get free trial
+   */
+  public getFreeTrial() {
+    console.log("get free trial");
+    return HttpManager.request(this.freeTrialRoute, {
+      method: "GET",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = ApiMutationSuccess.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          // SuccessManager.getInstance().dispatch("Free trial retrieved successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          // ErrorManager.getInstance().dispatch(responseData.error);
+        }
+      })
+    );
+  }
+
+  /**
+   *
+   *
+   * Get is subscription active
+   */
+  public getIsSubscriptionActive() {
+    return HttpManager.request(this.subscribeRoute, {
+      method: "GET",
+    }).pipe(
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status === 200) {
+          // Success Mutation
+          const success = SubscriptionStatus.fromJson(data);
+          return new ApiResponse(status, success, statusText);
+        } else {
+          return val;
+        }
+      }),
+      map((val) => {
+        const { data, status, statusText } = val;
+        if (status !== 200) {
+          // Error Mutation
+          const error = ApiMutationError.fromJson(data);
+          return new ApiResponse(status, error, statusText);
+        } else {
+          return val;
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status === 200) {
+          const responseData = data as ApiMutationSuccess;
+          // SuccessManager.getInstance().dispatch("Subscription status retrieved successfully");
+        }
+      }),
+      tap((val) => {
+        const { data, status } = val;
+        if (status !== 200) {
+          const responseData = data as ApiMutationError;
+          // ErrorManager.getInstance().dispatch(responseData.error);
         }
       })
     );

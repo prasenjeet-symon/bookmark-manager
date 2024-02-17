@@ -1,13 +1,20 @@
+import { singleCall } from "@/datasource/http/http.manager";
+import { SuccessManager } from "@/datasource/http/success.manager";
+import { NetworkApi } from "@/datasource/network.api";
 import { useNavigate } from "react-router-dom";
 import "./DashboardHeader.css";
-import { singleCall } from "@/datasource/http/http.manager";
-import { NetworkApi } from "@/datasource/network.api";
 
 export default function DashboardHeader() {
   const navigate = useNavigate();
 
   const logOut = async () => {
     await singleCall(new NetworkApi().logout());
+    setTimeout(() => {
+      SuccessManager.getInstance().dispatch("Logged out successfully");
+      navigate("/auth/signin", {
+        replace: true,
+      });
+    }, 1000);
   };
 
   // Navigate to different pages
@@ -85,8 +92,12 @@ export default function DashboardHeader() {
               Tools
             </a>
             <div className="more-menu bg-background">
-              <div className="menu-item text-base" onClick={goToImportBookmarks}>Import Bookmarks</div>
-              <div className="menu-item text-base" onClick={goToExportBookmarks}>Export Bookmarks</div>
+              <div className="menu-item text-base" onClick={goToImportBookmarks}>
+                Import Bookmarks
+              </div>
+              <div className="menu-item text-base" onClick={goToExportBookmarks}>
+                Export Bookmarks
+              </div>
               <div className="menu-item text-base">Install Browser Button</div>
             </div>
           </div>
@@ -102,8 +113,9 @@ export default function DashboardHeader() {
           <div className="user-profile">
             <img src="https://github.com/shadcn.png" alt="" />
             <div className="more-menu bg-background">
-              <div className="menu-item text-base">Account</div>
-              <div onClick={logOut} className="menu-item text-base">Logout</div>
+              <div onClick={logOut} className="menu-item text-base">
+                Logout
+              </div>
             </div>
           </div>
         </div>

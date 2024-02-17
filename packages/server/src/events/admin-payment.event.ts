@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { v4 } from 'uuid';
 import { ApiEventData } from '.';
-import { Logger, PrismaClientSingleton, isDefined, isInteger, isValidEmail } from '../utils';
+import { Logger, PrismaClientSingleton, getPrice, isDefined, isValidEmail } from '../utils';
 
 export class AdminPaymentEvent {
     private data: ApiEventData;
@@ -11,6 +11,7 @@ export class AdminPaymentEvent {
     }
 
     /**
+     *
      *
      * Create new subscription plan
      */
@@ -27,33 +28,33 @@ export class AdminPaymentEvent {
         const PLAN_CURRENCY = process.env.PLAN_CURRENCY;
         const PLAN_DESCRIPTION = process.env.PLAN_DESCRIPTION;
         const FREE_TRIAL_DAYS = process.env.FREE_TRIAL_DAYS;
-        const adminIdentifier = this.data.data.adminIdentifier;
-        const adminEmail = this.data.data.adminEmail;
 
-        const stripe = new Stripe(STRIPE_KEY!, {
-            apiVersion: '2023-10-16', // specify the Stripe API version
-        });
+        const adminUserId = this.data.data.adminUserId;
+        const adminEmail = this.data.data.adminEmail;
+        const stripe = new Stripe(STRIPE_KEY!);
 
         try {
-            let planId: string | null = null;
+            let priceId: string | null = null;
 
-            // Old subscription
-            const subscriptionOld = await stripe.prices.list({
+            const upstreamAllPricesActive = await stripe.prices.list({
                 active: true,
             });
 
-            const isThere = subscriptionOld.data.find((item) => {
-                return item.nickname === PLAN_NAME && item.metadata?.adminIdentifier === adminIdentifier;
+            const isThere = upstreamAllPricesActive.data.find((item) => {
+                return item.nickname?.toLocaleLowerCase() === PLAN_NAME?.toLocaleLowerCase();
             });
 
-            if (subscriptionOld.data.length > 0 && isThere) {
-                planId = subscriptionOld.data[0].id;
-                Logger.getInstance().logSuccess('Subscription already created : ' + subscriptionOld.data[0].id);
+            if (upstreamAllPricesActive.data.length > 0 && isThere) {
+                // Price already created
+                priceId = upstreamAllPricesActive.data[0].id;
+                Logger.getInstance().logSuccess('Price already created : ' + upstreamAllPricesActive.data[0].id);
             } else {
+                // We need to create a new price
                 const price = await stripe.prices.create({
-                    unit_amount: +(PLAN_PRICE || 0),
+                    unit_amount: getPrice(PLAN_PRICE),
                     metadata: {
-                        adminIdentifier: adminIdentifier,
+                        adminUserId: adminUserId,
+                        adminEmail: adminEmail,
                     },
                     nickname: PLAN_NAME,
                     currency: PLAN_CURRENCY || 'usd',
@@ -63,15 +64,14 @@ export class AdminPaymentEvent {
                         trial_period_days: +(FREE_TRIAL_DAYS || 30),
                     },
                     product_data: {
-                        // Selling services
                         name: PLAN_NAME || 'Monthly Subscription',
                         statement_descriptor: PLAN_DESCRIPTION,
                         active: true,
                     },
                 });
 
-                planId = price.id;
-                Logger.getInstance().logSuccess('Subscription created : ' + price.id);
+                priceId = price.id;
+                Logger.getInstance().logSuccess('Price created : ' + price.id);
             }
 
             const prisma = PrismaClientSingleton.prisma;
@@ -85,17 +85,20 @@ export class AdminPaymentEvent {
                                 description: PLAN_DESCRIPTION || '',
                                 identifier: v4(),
                                 name: PLAN_NAME || 'Monthly Subscription',
-                                planId: planId,
-                                price: +(PLAN_PRICE || 0),
+                                priceId: priceId,
+                                price: getPrice(PLAN_PRICE),
                                 currency: PLAN_CURRENCY || 'usd',
+                                interval: 'month',
+                                intervalCount: 1,
                             },
                             update: {
                                 description: PLAN_DESCRIPTION || '',
-                                identifier: v4(),
                                 name: PLAN_NAME || 'Monthly Subscription',
-                                planId: planId,
-                                price: +(PLAN_PRICE || 0),
+                                priceId: priceId,
+                                price: getPrice(PLAN_PRICE),
                                 currency: PLAN_CURRENCY || 'usd',
+                                interval: 'month',
+                                intervalCount: 1,
                             },
                         },
                     },
@@ -150,11 +153,6 @@ class AdminPaymentEventValidator {
             Logger.getInstance().logError(
                 'Missing environment variables. STRIPE_KEY, PLAN_PRICE, PLAN_NAME, PLAN_CURRENCY, PLAN_DESCRIPTION are required'
             );
-            return false;
-        }
-
-        if (!isInteger(PLAN_PRICE)) {
-            Logger.getInstance().logError('Invalid PLAN_PRICE');
             return false;
         }
 

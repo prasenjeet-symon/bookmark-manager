@@ -1310,3 +1310,58 @@ export class TaskTracker implements Network<TaskTracker> {
     return TaskTracker.fromRecord(this.toRecord());
   }
 }
+
+/**
+ *
+ *
+ * Subscription
+ */
+export class SubscriptionStatus implements Network<SubscriptionStatus> {
+  isActive: boolean;
+  subscriptionId: string;
+  sessionId: string;
+
+  constructor(isActive: boolean, subscriptionId: string, sessionId: string) {
+    this.isActive = isActive;
+    this.subscriptionId = subscriptionId;
+    this.sessionId = sessionId;
+  }
+
+  public static fromJson(json: string): SubscriptionStatus {
+    return SubscriptionStatus.fromRecord(JSON.parse(json));
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.toRecord());
+  }
+
+  public static fromRecord(record: any): SubscriptionStatus {
+    const parsedIsActive = JsonParser.parseStrict<boolean>(record, "isActive", "boolean");
+    const parsedSubscriptionId = JsonParser.parseStrict<string>(record, "subscriptionId", "string");
+    const parsedSessionId = JsonParser.parseStrict<string>(record, "sessionId", "string");
+
+    return new SubscriptionStatus(parsedIsActive, parsedSubscriptionId, parsedSessionId);
+  }
+
+  public toRecord(): any {
+    return {
+      isActive: this.isActive,
+      subscriptionId: this.subscriptionId,
+      sessionId: this.sessionId,
+    };
+  }
+
+  public deepCopy(): SubscriptionStatus {
+    return SubscriptionStatus.fromRecord(this.toRecord());
+  }
+}
+/**
+ *
+ *
+ *
+ */
+export enum ESubscriptionStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  FREE_TRIAL = "FREE_TRIAL",
+}

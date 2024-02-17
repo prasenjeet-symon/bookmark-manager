@@ -3,6 +3,7 @@ import { CategoryController } from './category.controller';
 import { ExportBookmarkController } from './export-bookmark.controller';
 import { ImportBookmarkController } from './import-bookmark.controller';
 import { LinkController } from './link.controller';
+import { PaymentController } from './payment.controller';
 import { TabController } from './tab.controller';
 import { TagController } from './tag.cotroller';
 import { TaskManagerController } from './task-manager.controller';
@@ -101,8 +102,8 @@ router.put('/links', (req, res) => new LinkController(req, res).updateLink());
  *
  */
 router.delete('/links', (req, res) => new LinkController(req, res).deleteLink());
-/** 
- * 
+/**
+ *
  * Delete catalog link
  */
 router.delete('/catalog/link', (req, res) => new LinkController(req, res).deleteCatalogLink());
@@ -148,7 +149,7 @@ router.post('/import-bookmark', ImportBookmarkController.bookmarkStorage(), (req
 );
 /**
  *
- * 
+ *
  * Export user's bookmark to HTML
  */
 router.post('/export-bookmark', (req, res) => new ExportBookmarkController(req, res).exportBookmarkHTML());
@@ -162,6 +163,27 @@ router.get('/task', (req, res) => new TaskManagerController(req, res).getTaskSta
  * Delete task
  */
 router.delete('/task', (req, res) => new TaskManagerController(req, res).deleteTask());
+/**
+ *
+ *
+ * Subscribe to premium
+ */
+router.post('/subscribe', (req, res) => new PaymentController(req, res).startPremium());
+/**
+ *
+ * Cancel subscription
+ */
+router.delete('/subscribe', (req, res) => new PaymentController(req, res).cancelSubscription());
+/**
+ *
+ * Get free trial
+ */
+router.get('/free-trial', (req, res) => new PaymentController(req, res).getFreeTrial());
+/**
+ *
+ * Get is subscription active
+ */
+router.get('/subscribe', (req, res) => new PaymentController(req, res).getIsSubscriptionActive());
 /**
  *
  *

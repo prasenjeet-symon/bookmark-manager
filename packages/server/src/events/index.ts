@@ -29,6 +29,10 @@ export class ApiEventNames {
     public static readonly USER_LOGIN = 'user_login';
     public static readonly INIT_USER_SUBSCRIPTION = 'init_user_subscription';
     public static readonly ADMIN_PLAN_CREATION = 'admin_plan_creation';
+    public static readonly INIT_USER_FREE_TRIAL = 'init_user_free_trial';
+    public static readonly SEND_SUBSCRIPTION_CANCELLATION_EMAIL = 'send_subscription_cancellation_email';
+    public static readonly SEND_SUBSCRIPTION_ACTIVATION_EMAIL = 'send_subscription_activation_email';
+    public static readonly SEND_FREE_TRIAL_INITIATED_EMAIL = 'send_free_trial_initiated_email';
 }
 
 export class ApiEvent {
@@ -74,12 +78,24 @@ export class ApiEvent {
                     new CategoryEvent(data).deletedCategory();
                     break;
 
-                case ApiEventNames.INIT_USER_SUBSCRIPTION:
-                    new UserPaymentEvent(data).startSubscription();
+                case ApiEventNames.INIT_USER_FREE_TRIAL:
+                    new UserPaymentEvent(data).startFreeTrial();
                     break;
 
                 case ApiEventNames.ADMIN_PLAN_CREATION:
                     new AdminPaymentEvent(data).newSubscriptionPlan();
+                    break;
+
+                case ApiEventNames.SEND_FREE_TRIAL_INITIATED_EMAIL:
+                    new UserPaymentEvent(data).sendFreeTrialEmail();
+                    break;
+
+                case ApiEventNames.SEND_SUBSCRIPTION_ACTIVATION_EMAIL:
+                    new UserPaymentEvent(data).sendSubscriptionInitiatedEmail();
+                    break;
+
+                case ApiEventNames.SEND_SUBSCRIPTION_CANCELLATION_EMAIL:
+                    new UserPaymentEvent(data).sendSubscriptionCancelledEmail();
                     break;
             }
         });

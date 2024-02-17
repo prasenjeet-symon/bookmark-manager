@@ -288,15 +288,15 @@ export function openUrlsInInterval(urlList: string[]): void {
   }
 }
 
-/**  
- * 
- * 
+/**
+ *
+ *
  */
 export function fileToBlob(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     // Get the selected file
     if (!file) {
-      reject(new Error('No file selected'));
+      reject(new Error("No file selected"));
       return;
     }
 
@@ -309,7 +309,7 @@ export function fileToBlob(file: File): Promise<Blob> {
       const fileData = event.target?.result;
 
       if (!fileData) {
-        reject(new Error('Failed to read file data'));
+        reject(new Error("Failed to read file data"));
         return;
       }
 
@@ -322,10 +322,34 @@ export function fileToBlob(file: File): Promise<Blob> {
 
     // Define an error handler for the FileReader
     reader.onerror = () => {
-      reject(new Error('Failed to read file'));
+      reject(new Error("Failed to read file"));
     };
 
     // Read the file as a data URL (base64 encoded string)
     reader.readAsDataURL(file);
   });
+}
+/**
+ *
+ *
+ */
+
+interface CurrencyFormat {
+  currency: string;
+  symbol: string;
+}
+
+const currencyFormats: { [key: string]: CurrencyFormat } = {
+  usd: { currency: "USD", symbol: "$" },
+  inr: { currency: "INR", symbol: "₹" },
+};
+
+export function formatPrice(currency: string, price: number): string {
+  const currencyFormat = currencyFormats[currency.toLowerCase()];
+  if (!currencyFormat) {
+    throw new Error("Unsupported currency");
+  }
+
+  const formattedPrice = price / 100; // assuming price is in cent/paisa, converting to actual amount
+  return `${currencyFormat.symbol}${formattedPrice.toFixed(2)}`; // assuming 2 decimal places for cents/paisa
 }

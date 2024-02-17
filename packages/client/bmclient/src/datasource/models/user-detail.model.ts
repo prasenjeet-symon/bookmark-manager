@@ -75,9 +75,10 @@ export class UserDetailModel {
   private _get() {
     new NetworkApi().getUser().subscribe((val) => {
       const { data, status } = val;
+
       if (status === 200) {
-        this._nextData = data;
-        this._prevData = data;
+        this._nextData = [data];
+        this._prevData = [data];
         this._emit();
         this._saveLocal();
       }

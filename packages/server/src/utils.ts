@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { Resend } from 'resend';
 import { v4 } from 'uuid';
+import { ApiEvent, ApiEventNames } from './events';
 import { EmailOptions, LocationInfo } from './schema';
 
 /**
@@ -106,6 +107,13 @@ export async function signUpAdmin() {
     }
 
     const userId = v4();
+
+    // Enable subscription plan if already not created
+    ApiEvent.getInstance().dispatch(ApiEventNames.ADMIN_PLAN_CREATION, {
+        adminIdentifier: userId,
+        adminEmail: email,
+    });
+
     const oldUser = await doAdminUserExit(email);
     if (oldUser) {
         Logger.getInstance().logError('Admin user already exists. please login');
@@ -269,6 +277,23 @@ export function isTokenActive(token: string): boolean {
 export function isInteger(value: any): boolean {
     return Number.isInteger(value);
 }
+
+/**
+ *
+ * Stripe price
+ */
+export function getStripePrice(price: any): number {
+    return Math.round(getPrice(price) * 100);
+}
+
+/**
+ *
+ * Get price
+ */
+export function getPrice(price: any, defaultPrice: number = 100): number {
+    return Math.round(+(price || defaultPrice));
+}
+
 /**
  *
  * Send email with resend
@@ -387,4 +412,29 @@ export function timestampToDate(timestampInSeconds: number): Date {
 export function dateToTimestampInSeconds(date: Date): number {
     // Get the time in milliseconds using getTime(), and then convert to seconds
     return Math.floor(date.getTime() / 1000);
+}
+
+/**
+ *
+ *
+ *
+ */
+interface CurrencyFormat {
+    currency: string;
+    symbol: string;
+}
+
+const currencyFormats: { [key: string]: CurrencyFormat } = {
+    usd: { currency: 'USD', symbol: '$' },
+    inr: { currency: 'INR', symbol: '₹' },
+};
+
+export function formatPrice(currency: string, price: number): string {
+    const currencyFormat = currencyFormats[currency.toLowerCase()];
+    if (!currencyFormat) {
+        throw new Error('Unsupported currency');
+    }
+
+    const formattedPrice = price / 100; // assuming price is in cent/paisa, converting to actual amount
+    return `${currencyFormat.symbol}${formattedPrice.toFixed(2)}`; // assuming 2 decimal places for cents/paisa
 }
