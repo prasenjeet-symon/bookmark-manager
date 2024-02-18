@@ -9,12 +9,6 @@ export default function DashboardHeader() {
 
   const logOut = async () => {
     await singleCall(new NetworkApi().logout());
-    setTimeout(() => {
-      SuccessManager.getInstance().dispatch("Logged out successfully");
-      navigate("/auth/signin", {
-        replace: true,
-      });
-    }, 1000);
   };
 
   // Navigate to different pages
@@ -26,31 +20,31 @@ export default function DashboardHeader() {
 
   function goToBookmarks() {
     navigate("/dashboard/my-bookmark", {
-      replace: true,
+      replace: false,
     });
   }
 
   function goToSettings() {
     navigate("/dashboard/settings", {
-      replace: true,
+      replace: false,
     });
   }
 
   function goToImportBookmarks() {
     navigate("/dashboard/import-bookmark", {
-      replace: true,
+      replace: false,
     });
   }
 
   function goToExportBookmarks() {
     navigate("/dashboard/export-bookmark", {
-      replace: true,
+      replace: false,
     });
   }
 
   function goToInstallScript() {
-    navigate("/install-script", {
-      replace: true,
+    navigate("/dashboard/add-script", {
+      replace: false,
     });
   }
 
@@ -98,7 +92,9 @@ export default function DashboardHeader() {
               <div className="menu-item text-base" onClick={goToExportBookmarks}>
                 Export Bookmarks
               </div>
-              <div className="menu-item text-base">Install Browser Button</div>
+              <div className="menu-item text-base" onClick={goToInstallScript}>
+                Install Browser Script
+              </div>
             </div>
           </div>
 

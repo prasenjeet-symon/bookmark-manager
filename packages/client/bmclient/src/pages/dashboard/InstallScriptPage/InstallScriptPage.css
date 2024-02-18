@@ -1,0 +1,22 @@
+.install-script-page-style > :nth-child(2) {
+  width: 50%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px;
+}
+
+.install-script-page-style > :nth-child(2) > img {
+  width: 170px;
+  margin-bottom: 15px;
+}
+
+.install-script-page-style > :nth-child(2) > h1 {
+  margin-bottom: 10px;
+}
+
+.install-script-page-style > :nth-child(2) > p {
+  margin-bottom: 15px;
+  text-align: center;
+}

@@ -1,0 +1,22 @@
+.link-added-component-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.link-added-component-style > img {
+  width: 200px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.link-added-component-style > h1 {
+  margin-bottom: 15px;
+}
+
+.link-added-component-style > p {
+  width: 40%;
+  text-align: center;
+  margin: 0px auto 15px auto;
+}

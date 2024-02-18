@@ -270,11 +270,8 @@ export class HttpManager {
    * Make http request
    */
   public static request(url: string, options?: RequestInit): Observable<ApiResponse> {
-    return ApplicationToken.getInstance().observable.pipe(
-      switchMap((token) => {
-        return HttpManager.makeHttpRequest(token, url, false, options);
-      })
-    );
+    const token = ApplicationToken.getInstance().getToken;
+    return HttpManager.makeHttpRequest(token, url, false, options);
   }
 
   /**

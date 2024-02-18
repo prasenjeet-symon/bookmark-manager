@@ -20,6 +20,8 @@ import { default as DashboardHomePage } from "./pages/dashboard/HomePage/HomePag
 import ImportBookmarkPage from "./pages/dashboard/ImportBookmarkPage/ImportBookmarkPage";
 import MyBookmarkPage from "./pages/dashboard/MyBookmarkPage/MyBookmarkPage";
 import SettingsPage from "./pages/dashboard/SettingsPage/SettingsPage";
+import AddBookmarkPage from "./pages/dashboard/AddBookmarkPage/AddBookmarkPage";
+import InstallScriptPage from "./pages/dashboard/InstallScriptPage/InstallScriptPage";
 
 const routes = createBrowserRouter([
   {
@@ -88,6 +90,14 @@ const routes = createBrowserRouter([
         path: "my-bookmark",
         element: <MyBookmarkPage />,
       },
+      {
+        path: 'add-bookmark',
+        element: <AddBookmarkPage />
+      },
+      {
+        path: "add-script",
+        element: <InstallScriptPage/>
+      }
     ],
   },
 ]);
