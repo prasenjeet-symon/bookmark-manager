@@ -16,8 +16,11 @@ export default function DropdownCategoryComponent({ tab, selectedCategory }: { t
 
   useEffect(() => {
     const subscription = new DropdownCategoryComponentController().getCategories(tab.identifier).subscribe((categories) => {
-      console.log(categories.data);
       setCategories(categories.data);
+      // Set initial value to first category
+      setValue(categories.data[0]?.identifier || "");
+      selectedCategory(categories.data[0] || null);
+
       setIsLoading(categories.status === ModelStoreStatus.READY ? false : true);
     });
 

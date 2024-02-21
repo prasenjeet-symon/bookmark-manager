@@ -9,6 +9,7 @@ import { getRandomIntId } from "@/datasource/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
 import { v4 } from "uuid";
 import { z } from "zod";
 import DropdownCategoryComponent from "../HomePage/Components/AddLinkComponent/components/DropdownCategoryComponent/DropdownCategoryComponent";
@@ -28,12 +29,18 @@ export default function AddBookmarkPage() {
   const [tab, setTab] = useState<UserTab | null>(null);
   const [category, setCategory] = useState<TabCategory | null>(null);
   const [isAdded, setIsAdded] = useState<boolean>(false);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const url = decodeURIComponent(queryParams.get('url') || '');
+  const title = decodeURIComponent(queryParams.get('title') || '');
+  const favicon = decodeURIComponent(queryParams.get('favicon') || '');
+
 
   const linkForm = useForm<z.infer<typeof addBookmarkSchema>>({
     resolver: zodResolver(addBookmarkSchema),
     defaultValues: {
-      title: "",
-      url: "",
+      title: title || '',
+      url: url || '',
       notes: "",
       tagString: "",
     },
@@ -70,14 +77,11 @@ export default function AddBookmarkPage() {
       return;
     }
 
-    const link = new Link(getRandomIntId(), v4(), title, url, getRandomIntId(), null, notes, null, category.identifier, userId, new Date(), new Date(), false, tags);
+    const link = new Link(getRandomIntId(), v4(), title, url, getRandomIntId(), favicon, notes, null, category.identifier, userId, new Date(), new Date(), false, tags);
     const controller = new AddBookmarkPageController();
     controller.addLink(link, tab.identifier);
     setIsAdded(true);
   };
-
-    // return <Button> <a href='javascript:(function(){function openPopup(url, title, width, height) {var left = (screen.width - width) / 2;var top = (screen.height - height) / 3;var popup = window.open(url, title, "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top);return popup;}var url = "http://localhost:5173/dashboard/add-bookmark";var title = "Add to Linkify";var width = screen.width * 0.5;var height = screen.height * 0.6;openPopup(url, title, width, height);})();
-    // '>Add to Linkify</a> </Button>
 
   if (isAdded) {
     return (

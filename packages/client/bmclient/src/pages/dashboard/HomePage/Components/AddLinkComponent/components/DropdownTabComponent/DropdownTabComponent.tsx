@@ -17,6 +17,9 @@ export default function DropdownTabComponent({ tabSelected }: { tabSelected: (ta
   useEffect(() => {
     const subscription = new DropdownTabComponentController().getTabs()?.subscribe((tabs) => {
       setTabs(tabs.data);
+      // Initial value is the first tab
+      setValue(tabs.data[0]?.identifier);
+      tabSelected(tabs.data[0] || null);
       setIsLoading(tabs.status === ModelStoreStatus.READY ? false : true);
     });
 

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import scriptImage from "../../../assets/document.png";
 import "./InstallScriptPage.css";
+import script from "./script";
 
 export default function InstallScriptPage() {
   return (
@@ -31,13 +32,7 @@ export default function InstallScriptPage() {
 
           {/* Button */}
           <Button className="mt-5">
-            {" "}
-            <a
-              href='javascript:(function(){function openPopup(url, title, width, height) {var left = (screen.width - width) / 2;var top = (screen.height - height) / 3;var popup = window.open(url, title, "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top);return popup;}var url = "http://localhost:5173/dashboard/add-bookmark";var title = "Add to Linkify";var width = screen.width * 0.5;var height = screen.height * 0.6;openPopup(url, title, width, height);})();
-    // '
-            >
-              Add to Linkify
-            </a>{" "}
+            <a href={script(import.meta.env.VITE_BASE_URL + "/dashboard/add-bookmark")}>Add to Linkify</a>
           </Button>
         </Card>
       </section>

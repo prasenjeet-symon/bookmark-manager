@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import tabLogo from "../../../../../assets/tabs.png";
 import "./TabComponent.css";
 
+import ConfirmationDialogComponent from "@/components/shared/ConfirmationDialogComponent/ConfirmationDialogComponent";
 import EmptyDataComponent from "@/components/shared/EmptyDataComponent/EmptyDataComponent";
 import { ModelStoreStatus, UserTab } from "@/datasource/schema";
-import { faCheckCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AddTabComponent from "../AddTabComponent/AddTabComponent";
 import ChooseTabColorComponent from "../ChoseTabColorComponent/ChoseTabColorComponent";
@@ -12,7 +13,7 @@ import TabSectionComponent from "../TabSectionComponent/TabSectionComponent";
 import UpdateTabComponent from "../UpdateTabComponent/UpdateTabComponent";
 import { TabComponentController } from "./TabComponent.controller";
 
-export default function TabComponent() {
+export default function TabComponent({onSearchClick}:{ onSearchClick: () => void; }) {
   const [tabs, setTabs] = useState<UserTab[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [tabActive, setTabActive] = useState<UserTab>();
@@ -96,12 +97,11 @@ export default function TabComponent() {
                 </div>
               ) : null}
               <div>
-                {" "}
-                {tab.name} {tab.canShowLinkCount ? "(" + tab.linkCount + ")" : ""}{" "}
+                {tab.name} {tab.canShowLinkCount ? "(" + tab.linkCount + ")" : ""}
               </div>
               <div className="tab-actions">
                 {/* Delete */}
-                <FontAwesomeIcon onClick={() => deleteTab(tab)} className="ml-3" size="sm" icon={faTrash} />
+                <ConfirmationDialogComponent title="Delete tab" description="Are you sure you want to delete this tab?" icon={faTrash} confirm={() => deleteTab(tab)} />
                 {/* Edit */}
                 <UpdateTabComponent tab={tab} />
                 {/* Color */}
@@ -110,7 +110,8 @@ export default function TabComponent() {
             </button>
           ))}
         </div>
-        <div>
+        <div className="flex items-center">
+          <FontAwesomeIcon onClick={onSearchClick} size="lg" className="mr-5 cursor-pointer" icon={faSearch} />
           {/* Plus button to add more tab */}
           <div className="add-tab-button bg-slate-950">
             <AddTabComponent />

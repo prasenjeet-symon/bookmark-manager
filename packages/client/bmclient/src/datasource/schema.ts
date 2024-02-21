@@ -1010,6 +1010,8 @@ export class Link implements Network<Link> {
   tags: string[];
 
   selected: boolean = false;
+  tab: UserTab | null= null;
+  category: TabCategory | null = null;
 
   constructor(
     id: number,

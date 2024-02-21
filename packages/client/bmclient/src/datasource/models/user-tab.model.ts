@@ -1,9 +1,9 @@
 import { BehaviorSubject, Subscription, combineLatest, map, of, switchMap } from "rxjs";
 import { ApplicationToken, singleCall } from "../http/http.manager";
 import { LocalDatabase } from "../localstore.api";
-import { TabToCategoryMapping, UserToSettingMapping } from "../mapping";
+import { CategoryToLinkMapping, TabToCategoryMapping, UserToSettingMapping } from "../mapping";
 import { NetworkApi } from "../network.api";
-import { ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, UserTab } from "../schema";
+import { Link, ModelStore, ModelStoreStatus, MutationModelData, MutationModelIdentifier, MutationType, TabCategory, UserTab } from "../schema";
 import { Constants, Logger, MutationModel, deepCopyList, onlyActiveItemsModelStore } from "../utils";
 
 export class UserTabModel {
@@ -15,6 +15,8 @@ export class UserTabModel {
     status: ModelStoreStatus.BOOTING,
     data: [],
   });
+
+  private _searchAllLinks = new BehaviorSubject<string>("");
 
   private _prevData: UserTab[] = [];
   private _nextData: UserTab[] = [];
@@ -262,5 +264,110 @@ export class UserTabModel {
       this._emit();
       return;
     }
+  }
+
+  /**
+   *
+   * 
+   * Search links with tab , category and tags names, notes
+   */
+  public linkWithSearch() {
+    const ref$ = this.getTabs().pipe(
+      switchMap((tabsStore) => {
+        const tabs = tabsStore.data as UserTab[];
+        return combineLatest(
+          tabs.map((tab) => {
+            const tabToCategoryMapping = TabToCategoryMapping.getInstance();
+            const categoryModel = tabToCategoryMapping.get(tab.identifier);
+            return categoryModel.getCategories().pipe(
+              switchMap((categoriesStore) => {
+                const categories = categoriesStore.data;
+                return combineLatest(
+                  categories.map((category) => {
+                    const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
+                    const linkModel = categoryToLinkMapping.get(category.identifier, category.tabIdentifier);
+                    return linkModel.getCategoryLink().pipe(
+                      map((linksStore) => {
+                        const links = linksStore.data as Link[];
+                        return links.map((link) => {
+                          link.category = category;
+                          link.tab = tab;
+                          return link;
+                        });
+                      })
+                    );
+                  })
+                ).pipe(
+                  map((val) => {
+                    return val.flat();
+                  })
+                );
+              })
+            );
+          })
+        ).pipe(
+          map((val) => {
+            return val.flat();
+          })
+        );
+      })
+    );
+
+    const final$ = this._searchAllLinks.pipe(
+      switchMap((queryString) => {
+        if (!queryString || !queryString.trim()) {
+          return of([]);
+        }
+
+        return ref$.pipe(
+          map((links) => {
+            const regex = new RegExp(queryString.trim().toLowerCase(), "ig");
+            return links.filter((link) => {
+              return (
+                regex.test(link.title || "0x0") ||
+                regex.test(link.url) ||
+                regex.test(link.notes || "0x0") ||
+                regex.test(link.tags.join(", ")) ||
+                regex.test(link.category?.name || "0x0") ||
+                regex.test(link.tab?.name || "0x0")
+              );
+            });
+          })
+        );
+      })
+    );
+
+    // Group links into category
+    return final$.pipe(
+      map((links) => {
+        const result: { [key: string]: { links: Link[]; tab: UserTab | null; category: TabCategory | null } } = {};
+
+        links.forEach((link) => {
+          if (!result[link.category?.identifier || ""]) {
+            result[link.category?.identifier || ""] = {
+              links: [link],
+              tab: link.tab,
+              category: link.category,
+            };
+          } else {
+            result[link.category?.identifier || ""] = {
+              ...result[link.category?.identifier || ""],
+              links: [...result[link.category?.identifier || ""].links, link],
+            };
+          }
+        });
+
+        // Convert to array
+        return Object.values(result);
+      })
+    );
+  }
+
+  /** 
+   * 
+   * Search links 
+   */
+  public search(query: string) {
+    this._searchAllLinks.next(query);
   }
 }

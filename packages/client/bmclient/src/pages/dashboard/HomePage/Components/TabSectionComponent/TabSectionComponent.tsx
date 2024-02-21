@@ -1,11 +1,11 @@
+import EmptyDataComponent from "@/components/shared/EmptyDataComponent/EmptyDataComponent";
 import { ModelStoreStatus, TabCategory, UserTab } from "@/datasource/schema";
 import { useEffect, useState } from "react";
+import NoCategoryImage from "../../../../../assets/categories.png";
 import AddCategoryComponent from "../AddCategoryComponent/AddCategoryComponent";
 import CategoryItemComponent from "../CategoryItemComponent/CategoryItemComponent";
 import { TabSectionComponentController } from "./TabSectionComponent.controller";
 import "./TabSectionComponent.css";
-import EmptyDataComponent from "@/components/shared/EmptyDataComponent/EmptyDataComponent";
-import NoCategoryImage from '../../../../../assets/categories.png';
 
 export default function TabSectionComponent({ tab }: { tab: UserTab }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -24,13 +24,24 @@ export default function TabSectionComponent({ tab }: { tab: UserTab }) {
     return <div>Loading...</div>;
   }
 
- 
-
-  return <>
-    <AddCategoryComponent tabIdentifier={tab.identifier} />
-    { categories.length === 0 && !isLoading ? <EmptyDataComponent title="No categories found" description="Looks like you don't have any categories yet. Please add some by clicking the button above" img={NoCategoryImage} />: null }
-    <ThreeColumnLayout tabCategories={categories} tabIdentifier={tab.identifier} />
+  return (
+    <>
+      <div className="flex">
+        <div className="flex-1"></div>
+        <div>
+          <AddCategoryComponent tabIdentifier={tab.identifier} />
+        </div>
+      </div>
+      {categories.length === 0 && !isLoading ? (
+        <EmptyDataComponent
+          title="No categories found"
+          description="Looks like you don't have any categories yet. Please add some by clicking the button above"
+          img={NoCategoryImage}
+        />
+      ) : null}
+      <ThreeColumnLayout tabCategories={categories} tabIdentifier={tab.identifier} />
     </>
+  );
 }
 
 /**
@@ -72,7 +83,6 @@ const ThreeColumnLayout: React.FC<{ tabCategories: TabCategory[]; tabIdentifier:
   return (
     <div className="three-column-layout-style">
       <div>
-        
         {firstColumnItems.map((category) => (
           <CategoryItemComponent key={category.identifier} category={category} />
         ))}

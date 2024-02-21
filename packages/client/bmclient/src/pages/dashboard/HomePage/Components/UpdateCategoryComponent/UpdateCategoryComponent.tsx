@@ -38,7 +38,7 @@ export default function UpdateCategoryComponent({ category }: { category: TabCat
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <FontAwesomeIcon className="hover:cursor-pointer" size="sm" onClick={() => setIsOpen(true)} icon={faEdit} />
+          <FontAwesomeIcon className="hover:cursor-pointer mx-3" size="sm" onClick={() => setIsOpen(true)} icon={faEdit} />
         </DialogTrigger>
         <DialogContent onInteractOutside={() => setIsOpen(false)}>
           <DialogHeader>

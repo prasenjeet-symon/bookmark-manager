@@ -10,6 +10,7 @@ import LinkItemComponent from "../LinkItemComponent/LinkItemComponent";
 import UpdateCategoryComponent from "../UpdateCategoryComponent/UpdateCategoryComponent";
 import { CategoryItemComponentController } from "./CategoryItemComponent.controller";
 import "./CategoryItemComponent.css";
+import ConfirmationDialogComponent from "@/components/shared/ConfirmationDialogComponent/ConfirmationDialogComponent";
 
 export default function CategoryItemComponent({ category }: { category: TabCategory }) {
   const [links, setLinks] = useState<Link[]>([]);
@@ -46,7 +47,7 @@ export default function CategoryItemComponent({ category }: { category: TabCateg
             <UpdateCategoryComponent category={category} />
 
             {/* Delete icon */}
-            <FontAwesomeIcon onClick={deleteCategory} icon={faTrash} className="ml-3 hover:cursor-pointer" size="sm" />
+            <ConfirmationDialogComponent title="Delete category" description="Are you sure you want to delete this category?" confirm={deleteCategory} icon={faTrash} />
 
             {/* Change color icon */}
             <ChooseCategoryColorComponent category={category} />
