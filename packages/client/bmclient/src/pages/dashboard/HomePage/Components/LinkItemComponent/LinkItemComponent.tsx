@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Link } from "@/datasource/schema";
-import { faEllipsisVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faBoxOpen, faEllipsisVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ChooseLinkColorComponent from "../ChooseLinkColorComponent/ChooseLinkColorComponent";
 import UpdateLinkComponent from "../UpdateLinkComponent/UpdateLinkComponent";
@@ -20,8 +20,8 @@ export default function LinkItemComponent({ link, tabIdentifier, canShowNotes, c
         <div>
           <img className="mr-2" src={link.icon || "https://placehold.jp/150x150"} alt="" />
           <HoverCardTrigger>
-            <button type="button" style={{ backgroundColor: link.color ? link.color : "" }} className="text-base link-text text-left">
-              {link.title}
+            <button title={link.title || ""} type="button" style={{ backgroundColor: link.color ? link.color : "" }} className="text-base link-text text-left">
+              {link.title?.slice(0, 25)}...
             </button>
           </HoverCardTrigger>
         </div>
@@ -32,8 +32,10 @@ export default function LinkItemComponent({ link, tabIdentifier, canShowNotes, c
             <UpdateLinkComponent link={link} tabIdentifier={tabIdentifier} />
             <ChooseLinkColorComponent link={link} tabIdentifier={tabIdentifier} />
             <div className="flex justify-between p-2 text-base" onClick={() => deleteLink()}>
-              Delete link <FontAwesomeIcon className="ml-3" size="sm" icon={faTrash} />{" "}
+              Delete link <FontAwesomeIcon className="ml-3" size="sm" icon={faTrash} />
             </div>
+            {/* Open link */}
+            <div onClick={()=> window.open(link.url, "_blank")} className="flex justify-between p-2 text-base">Open link <FontAwesomeIcon className="ml-3" size="sm" icon={faBoxOpen} /></div>
           </div>
         </div>
       </div>

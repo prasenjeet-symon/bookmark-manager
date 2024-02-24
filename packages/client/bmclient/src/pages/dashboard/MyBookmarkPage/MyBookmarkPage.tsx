@@ -13,6 +13,7 @@ import "./MyBookmarkPage.css";
 import BackButtonComponent from "@/components/shared/BackButtonComponent/BackButtonComponent";
 import EmptyDataComponent from "@/components/shared/EmptyDataComponent/EmptyDataComponent";
 import NoLinksImage from '../../../assets/catalog.png';
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 
 export default function MyBookmarkPage() {
   const [links, setLinks] = useState<Link[]>([]);
@@ -37,6 +38,7 @@ export default function MyBookmarkPage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
       <section className="my-bookmark-page-style page-content">
         {/* Back button */}
         <BackButtonComponent/>
@@ -68,7 +70,7 @@ export default function MyBookmarkPage() {
                   </div>
                   <div>
                     <div>{link.title}</div>
-                    <div className="text-slate-400">{link.url}</div>
+                    <div className="text-slate-400">{link.url.slice(0, 40)}...</div>
                     <div className="text-slate-400">
                       {link.tags.map((tag) => (
                         <Badge className="mr-2" variant="default">{tag}</Badge>

@@ -282,6 +282,10 @@ export class UserTabModel {
             return categoryModel.getCategories().pipe(
               switchMap((categoriesStore) => {
                 const categories = categoriesStore.data;
+                if(categories.length === 0){
+                  return of([]);
+                }
+                
                 return combineLatest(
                   categories.map((category) => {
                     const categoryToLinkMapping = CategoryToLinkMapping.getInstance();
@@ -321,6 +325,7 @@ export class UserTabModel {
 
         return ref$.pipe(
           map((links) => {
+            console.log(links);
             const regex = new RegExp(queryString.trim().toLowerCase(), "ig");
             return links.filter((link) => {
               return (
@@ -368,6 +373,7 @@ export class UserTabModel {
    * Search links 
    */
   public search(query: string) {
+    console.log(query);
     this._searchAllLinks.next(query);
   }
 }

@@ -56,8 +56,10 @@ export default function AddLinkComponent({ tabIdentifier, categoryIdentifier }: 
       return;
     }
 
+    const linkFinal = url.includes("https://") ? url : "https://" + url;
+
     const controller = new AddLinkComponentController();
-    const link = new Link(getRandomIntId(), v4(), title, url, getRandomIntId(), null, notes, null, categoryIdentifier, userId, new Date(), new Date(), false, tags);
+    const link = new Link(getRandomIntId(), v4(), title, linkFinal, getRandomIntId(), null, notes, null, categoryIdentifier, userId, new Date(), new Date(), false, tags);
     controller.addLink(link, tabIdentifier);
     setIsOpen(false);
   };

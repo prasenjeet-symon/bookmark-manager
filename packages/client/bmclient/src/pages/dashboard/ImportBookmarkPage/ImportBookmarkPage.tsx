@@ -12,6 +12,7 @@ import ImportErrorComponent from "./Components/ImportErrorComponent/ImportErrorC
 import ImportSuccessComponent from "./Components/ImportSuccessComponent/ImportSuccessComponent";
 import ImportingComponent from "./Components/ImportingComponent/ImportingComponent";
 import "./ImportBookmarkPage.css";
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 
 export default function ImportBookmarkPage() {
   const taskUUID = v4();
@@ -36,6 +37,7 @@ export default function ImportBookmarkPage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
       <section className="import-bookmark-page-style page-content">
         <BackButtonComponent />
 

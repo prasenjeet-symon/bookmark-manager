@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { SettingPageController } from "./SettingsPage.controller";
 import "./SettingsPage.css";
 import { formatPrice } from "@/datasource/utils";
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -79,6 +80,7 @@ export default function SettingsPage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
 
       <section className="page-content setting-page-style">
         <BackButtonComponent />
@@ -204,8 +206,8 @@ export default function SettingsPage() {
             <div className="setting-header text-2xl mb-8"> Payment Setting</div>
             <div className="setting-content">
               {/* Status */}
-              <div className="flex justify-between items-start my-2 py-2">
-                <div className="text-base font-bold mb-1">
+              <div className="flex justify-between items-start my-2 py-2 flex-wrap">
+                <div className="text-base font-bold mb-5">
                   <div className="font-bold mb-2 text-lg">Payment status</div>
                   <div className="font-normal text-base">
                      Subscribe to premium for only <span className="font-bold text-lg">{formatPrice(import.meta.env.VITE_SUBSCRIPTION_PRICE_CURRENCY, import.meta.env.VITE_SUBSCRIPTION_PRICE )}</span> per month. You can cancel anytime.
@@ -247,7 +249,7 @@ export default function SettingsPage() {
             <div className="setting-header text-2xl mb-8"> Danger Zone</div>
             <div className="setting-content">
               {/* Status */}
-              <div className="flex justify-between align-center my-2 py-2">
+              <div className="flex justify-between align-center my-2 py-2 flex-wrap">
                 <div className="text-base font-bold mb-1">
                   <div className="font-bold text-lg">Delete account</div>
                   <div className="text-sm font-normal">Be careful! This action cannot be undone</div>

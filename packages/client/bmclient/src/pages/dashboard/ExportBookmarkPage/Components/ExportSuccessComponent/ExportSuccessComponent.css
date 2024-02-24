@@ -1,27 +1,37 @@
 .export-success-component-style {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-} 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
 
 .export-success-component-style > div:nth-of-type(1) img {
-    width: 200px;
-    height: auto;
+  width: 200px;
+  height: auto;
 }
 
 .export-success-component-style > div:nth-of-type(2) {
-    font-size: 25px;
-    font-weight: 600;
-    margin: 15px 0px 10px 0px;
+  font-size: 25px;
+  font-weight: 600;
+  margin: 15px 0px 10px 0px;
 }
 
 .export-success-component-style > div:nth-of-type(3) {
-    width: 40%;
-    margin: 15px auto;
-    text-align: center;
+  width: 40%;
+  margin: 15px auto;
+  text-align: center;
 }
 
-.export-success-component-style > div:nth-of-type(4){
-    margin: 0px 0px 20px 0px;
+.export-success-component-style > div:nth-of-type(4) {
+  margin: 0px 0px 20px 0px;
+}
+
+@media screen and (max-width: 768px) {
+  .export-success-component-style > div:nth-of-type(3) {
+    width: 90%;
+  }
+
+  .export-success-component-style > div:nth-of-type(2) {
+    text-align: center;
+  }
 }

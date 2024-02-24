@@ -21,3 +21,15 @@
   margin: 15px auto;
   text-align: center;
 }
+
+
+@media screen and (max-width: 768px) {
+  .exporting-component-style > div:nth-of-type(3) {
+    width: 90%;
+  }
+
+  .exporting-component-style > div:nth-of-type(2) {
+    text-align: center;
+  }
+  
+}

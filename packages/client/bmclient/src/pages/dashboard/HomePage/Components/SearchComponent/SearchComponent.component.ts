@@ -10,6 +10,7 @@ export class SearchComponentController {
    */
   public search(queryString: string) {
     const userId = ApplicationToken.getInstance().getUserId;
+    console.log(userId);
     if (!userId) {
       return;
     }
@@ -25,6 +26,7 @@ export class SearchComponentController {
    */
   public getSearchedLinks() {
     const userId = ApplicationToken.getInstance().getUserId;
+    console.log(userId, 'user id exit');
     if (!userId) {
       return of([]);
     }

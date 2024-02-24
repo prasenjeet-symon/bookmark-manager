@@ -1,0 +1,101 @@
+.headerResponsive {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 0px;
+  display: none;
+}
+
+.headerResponsive .logo {
+  margin: 0px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  height: 35px;
+  width: 35px;
+}
+
+.headerResponsive .logo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.headerResponsive .menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px 10px;
+}
+
+.headerResponsive .menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: +5;
+}
+
+.headerResponsive .menu-dialog {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.headerResponsive .nav-menu {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerResponsive .nav-menu > ul {
+  width: 100%;
+  height: 100%;
+}
+
+.headerResponsive .nav-menu > ul li {
+  padding: 10px;
+  list-style: none;
+  margin-bottom: 10px;
+  font-family: sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.headerResponsive .close-button {
+  position: absolute;
+  bottom: 10px;
+  z-index: +10;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  color: white;
+  font-size: 2rem;
+}
+
+.headerResponsive .submenu {
+  display: none;
+  margin-top: 20px;
+}
+
+.headerResponsive .dropdown:hover .submenu {
+  display: block;
+}
+
+@media screen and (max-width: 768px) {
+  .headerResponsive {
+    display: flex;
+  }
+}

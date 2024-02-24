@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import Logo from '../../../assets/LinKet.png';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ export default function Header() {
       <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
         {/* Left: Company Logo */}
         <div onClick={clearStackAndNavigateToHome} className="flex items-center hover:cursor-pointer">
-          <img src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Company Logo" className="h-8 mr-2" />
-          <span className="text-xl font-bold">Linkify</span>
+          <img src={Logo} alt={import.meta.env.VITE_COMPANY_NAME + " Logo"} className="h-8 mr-2 rounded-2xl" />
+          <span className="text-xl font-bold">{ import.meta.env.VITE_COMPANY_NAME}</span>
         </div>
 
         {/* Right: Signin and Sign up Buttons */}

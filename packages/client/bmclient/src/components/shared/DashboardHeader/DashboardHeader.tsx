@@ -1,8 +1,8 @@
 import { singleCall } from "@/datasource/http/http.manager";
-import { SuccessManager } from "@/datasource/http/success.manager";
 import { NetworkApi } from "@/datasource/network.api";
 import { useNavigate } from "react-router-dom";
 import "./DashboardHeader.css";
+import Logo from '../../../assets/LinKet.png';
 
 export default function DashboardHeader() {
   const navigate = useNavigate();
@@ -57,11 +57,11 @@ export default function DashboardHeader() {
   return (
     <>
       {/* Header */}
-      <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <header className="bg-gray-800 text-white p-4 flex justify-between items-center desktop-header">
         {/* Left: Company Logo */}
         <div onClick={goToDashboard} className="flex items-center hover:cursor-pointer">
-          <img src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Company Logo" className="h-8 mr-2" />
-          <span className="text-xl font-bold">Linkify</span>
+          <img src={Logo} alt="Linkit Logo" className="h-8 mr-2 rounded-2xl" />
+          <span className="text-xl font-bold">{import.meta.env.VITE_COMPANY_NAME}</span>
         </div>
 
         {/* Right: Navigation Links and User Profile */}
@@ -107,7 +107,7 @@ export default function DashboardHeader() {
 
           {/* avatar image circle */}
           <div className="user-profile">
-            <img src="https://github.com/shadcn.png" alt="" />
+            <img src="https://picsum.photos/seed/123/200/300" alt="" />
             <div className="more-menu bg-background">
               <div onClick={logOut} className="menu-item text-base">
                 Logout

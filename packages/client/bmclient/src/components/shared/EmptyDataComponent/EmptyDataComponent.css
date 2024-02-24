@@ -7,18 +7,29 @@
   justify-content: center;
   text-align: center;
   margin-top: 50px;
+}
 
-  .big-image {
-    width: 200px; /* Adjust as needed */
-    height: auto; /* Maintain aspect ratio */
+.empty-data-component .big-image {
+  width: 200px;
+  height: auto;
+}
+
+.empty-data-component .title {
+  font-size: 24px;
+  margin-top: 20px;
+}
+
+.empty-data-component .description {
+  margin-top: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .empty-data-component {
+    width: 90%;
   }
 
-  .title {
-    font-size: 24px;
-    margin-top: 20px;
-  }
-
-  .description {
-    margin-top: 10px;
+  .empty-data-component .big-image {
+    width: 100px;
+    height: auto;
   }
 }

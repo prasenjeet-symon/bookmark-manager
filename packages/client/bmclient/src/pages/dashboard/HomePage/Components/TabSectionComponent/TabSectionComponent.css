@@ -8,3 +8,13 @@
 .three-column-layout-style > div {
   flex: 1;
 }
+
+@media screen and (max-width: 768px) {
+  .three-column-layout-style {
+    flex-wrap: wrap;
+  }
+
+  .three-column-layout-style > div {
+    min-width: 100%;
+  }
+}

@@ -737,7 +737,7 @@ export class LinkController {
         }
 
         const tabIdentifier = categoryWithTab.tab.identifier;
-        hiddenTags.push(`${tabIdentifier}__${getCurrentTimestampInSecondsUTC()}`);
+        hiddenTags.push(`${tabIdentifier}__${getCurrentTimestampInSecondsUTC()}__${v4()}`);
 
         // Move link to new category
         await prisma.link.update({

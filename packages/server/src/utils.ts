@@ -249,6 +249,7 @@ export function isValidPassword(password: string): { valid: boolean; message?: s
     // If all checks pass, the password is considered valid
     return { valid: true };
 }
+
 /**
  *
  *

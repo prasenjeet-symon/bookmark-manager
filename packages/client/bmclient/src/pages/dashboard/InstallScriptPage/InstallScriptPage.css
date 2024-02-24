@@ -20,3 +20,9 @@
   margin-bottom: 15px;
   text-align: center;
 }
+
+@media screen and (max-width: 768px) {
+  .install-script-page-style > :nth-child(2) {
+    width: 95%;
+  }
+}

@@ -11,6 +11,7 @@ import "./ExportBookmarkPage.css";
 import ExportErrorComponent from "./Components/ExportErrorComponent/ExportErrorComponent";
 import ExportSuccessComponent from "./Components/ExportSuccessComponent/ExportSuccessComponent";
 import ExportingComponent from "./Components/ExportingComponent/ExportingComponent";
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 
 export default function ExportBookmarkPage() {
   const taskUUID = v4();
@@ -35,6 +36,7 @@ export default function ExportBookmarkPage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
       <section className="export-bookmark-page-style page-content">
         <BackButtonComponent />
         {task !== undefined && task.status === TaskManagerStatus.Error ? <ExportErrorComponent clicked={() => setTask(undefined)} /> : null}

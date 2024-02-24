@@ -244,8 +244,8 @@ model LinkTag {
 
 model HiddenTag {
     id             Int             @id @default(autoincrement())
-    identifier     String          @unique @db.VarChar(300)
-    name           String          @unique @db.VarChar(300)
+    identifier     String          @unique @db.VarChar(700)
+    name           String          @unique @db.VarChar(700)
     order          Int
     linkHiddenTags LinkHiddenTag[]
     createdAt      DateTime        @default(now())
@@ -255,9 +255,9 @@ model HiddenTag {
 
 model LinkHiddenTag {
     id             Int       @id @default(autoincrement())
-    linkIdentifier String    @db.VarChar(100)
+    linkIdentifier String    @db.VarChar(700)
     link           Link      @relation(fields: [linkIdentifier], references: [identifier])
-    tagIdentifier  String    @db.VarChar(300)
+    tagIdentifier  String    @db.VarChar(700)
     tag            HiddenTag @relation(fields: [tagIdentifier], references: [identifier])
     createdAt      DateTime  @default(now())
     updatedAt      DateTime  @updatedAt

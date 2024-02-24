@@ -1,6 +1,6 @@
 .tab-component-style {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 10px;
 }
@@ -8,7 +8,7 @@
 .tab-component-style > div:nth-of-type(1) {
   width: 100%;
   display: flex;
-  align-items: center;
+  grid-gap: 10px;
   flex-wrap: wrap;
   flex: 1;
   padding: 5px 0px;
@@ -27,8 +27,7 @@
 .tab-item-button {
   display: flex;
   align-items: center;
-  padding: 5px 40px;
-  margin-right: 15px;
+  padding: 5px 20px;
   border-radius: 5px;
   position: relative;
 }
@@ -48,4 +47,14 @@
 
 .tab-item-button:hover .tab-actions {
   display: block;
+}
+
+@media screen and (max-width: 768px) {
+  .tab-component-style > div:nth-of-type(1) {
+    display: flex;
+  }
+
+  .tab-item-button {
+    min-width: 150px;
+  }
 }

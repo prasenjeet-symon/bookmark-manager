@@ -10,6 +10,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
+import Logo from '../../../assets/LinKet.png';
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Please enter your full name." }).max(50, { message: "Full name is too long." }),
@@ -57,11 +58,11 @@ export default function SignUpPage() {
       {/* SignUp Page */}
 
       <section>
-        <Card className="w-1/3 m-auto mt-10">
+        <Card className="w-full mx-auto sm:w-3/4 lg:w-1/3 xl:w-1/3 mt-14">
           <CardHeader>
             <div className="flex flex-row align-center justify-center">
               {/* left logo and right text */}
-              <img className="w-10 h-10 mr-5" src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Logo" />
+              <img className="w-10 h-10 mr-5 rounded-2xl" src={Logo} alt={import.meta.env.VITE_APP_NAME} />
               <h1 className="text-2xl font-bold mb-5 text-center">Sign Up Now</h1>
             </div>
           </CardHeader>

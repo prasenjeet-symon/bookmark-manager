@@ -21,6 +21,16 @@
   text-align: center;
 }
 
-.import-error-component-style > div:nth-of-type(4){
-    margin: 0px 0px 20px 0px;
+.import-error-component-style > div:nth-of-type(4) {
+  margin: 0px 0px 20px 0px;
+}
+
+@media screen and (max-width: 768px) {
+  .import-error-component-style > div:nth-of-type(3) {
+    width: 90%;
+  }
+
+  .import-error-component-style > div:nth-of-type(2) {
+    text-align: center;
+  }
 }

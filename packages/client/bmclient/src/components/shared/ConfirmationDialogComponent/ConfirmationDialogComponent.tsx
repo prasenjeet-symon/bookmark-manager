@@ -27,7 +27,7 @@ export default function ConfirmationDialogComponent({ confirm, icon, title, desc
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
 
-            <div className="flex justify-end mt-5">
+            <div className="flex justify-end mt-5 pt-5">
               {/* Cancel button */}
               <Button className="mr-5" onClick={() => setIsOpen(false)} variant="ghost">
                 Cancel

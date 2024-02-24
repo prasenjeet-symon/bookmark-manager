@@ -47,8 +47,10 @@ export default function UpdateLinkComponent({ link, tabIdentifier }: { link: Lin
         return tag !== "";
       });
 
+    const linkFinal = url.includes("https://") ? url : "https://" + url;
+
     link.title = title;
-    link.url = url;
+    link.url = linkFinal;
     link.notes = notes;
     link.tags = tags;
 

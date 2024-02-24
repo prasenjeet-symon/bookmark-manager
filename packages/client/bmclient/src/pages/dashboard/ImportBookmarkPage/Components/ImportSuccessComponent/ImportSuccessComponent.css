@@ -22,6 +22,19 @@
   text-align: center;
 }
 
-.import-success-component-style > div:nth-of-type(4){
-    margin: 0px 0px 20px 0px;
+.import-success-component-style > div:nth-of-type(4) {
+  margin: 0px 0px 20px 0px;
+}
+
+@media screen and (max-width: 768px) {
+  .import-success-component-style > div:nth-of-type(3) {
+    width: 90%;
+  }
+
+  .import-success-component-style > div:nth-of-type(2) {
+    font-size: 25px;
+    font-weight: 600;
+    margin: 15px 0px 10px 0px;
+    text-align: center;
+  }
 }

@@ -53,7 +53,7 @@ export default function HomePage() {
       <section className="free-from-links-section">
         <section>
           <div className="neon">
-            Introducing <span className="gradient-text"> Linkify </span>
+            Introducing <span className="gradient-text"> {import.meta.env.VITE_APP_NAME} </span>
           </div>
           <div>All in one solution for managing your bookmarks.</div>
           <img src={freeFromLinks} alt=" Free from links" />
@@ -225,7 +225,7 @@ export default function HomePage() {
       <section className="footer-section">
         <section>
           <div>
-            <div className="text-2xl font-bold">Linkify Inc.</div>
+            <div className="text-2xl font-bold">{import.meta.env.VITE_APP_NAME} Inc.</div>
             <div>
               <div className="text-sm text-slate-400 mb-5">COMPANY</div>
               <div className="text-base mb-1 hover:cursor-pointer hover:underline">About Us</div>
@@ -238,30 +238,38 @@ export default function HomePage() {
             </div>
             <div>
               <div className="text-sm text-slate-400 mb-5">LEGAL</div>
-              <div className="text-base mb-1 hover:cursor-pointer hover:underline">Terms of Service</div>
-              <div className="text-base mb-1 hover:cursor-pointer hover:underline">Privacy Policy</div>
-              <div className="text-base mb-1 hover:cursor-pointer hover:underline">GDPR</div>
+              <div onClick={()=> window.open(import.meta.env.VITE_TERMS_LINK, "_blank")} className="text-base mb-1 hover:cursor-pointer hover:underline">Terms of Service</div>
+              <div onClick={()=> window.open(import.meta.env.VITE_PRIVACY_LINK, "_blank")} className="text-base mb-1 hover:cursor-pointer hover:underline">Privacy Policy</div>
+              <div onClick={()=> window.open(import.meta.env.VITE_GDPR_LINK, "_blank")} className="text-base mb-1 hover:cursor-pointer hover:underline">GDPR</div>
             </div>
             <div>
               <div className="text-sm text-slate-400 mb-5">PARTY WITH US</div>
               <div className="social-container">
-                <div className="social-item">
+                <div className="social-item" onClick={()=>{
+                    window.open(import.meta.env.VITE_TWITTER_LINK, "_blank");
+                }}>
                   <Twitter />
                 </div>
-                <div className="social-item">
+                <div className="social-item" onClick={()=>{
+                    window.open(import.meta.env.VITE_FACEBOOK_LINK, "_blank");
+                }}>
                   <Facebook />
                 </div>
-                <div className="social-item">
+                <div className="social-item" onClick={()=>{
+                    window.open(import.meta.env.VITE_INSTAGRAM_LINK, "_blank");
+                }}>
                   <Instagram />
                 </div>
-                <div className="social-item">
+                <div className="social-item" onClick={()=>{
+                    window.open(import.meta.env.VITE_LINKEDIN_LINK, "_blank");
+                  }} >
                   <Linkedin />
                 </div>
               </div>
             </div>
           </div>
           <div className="text-slate-500 text-sm mb-2 text-center mt-20"> © Copyright 2024. All rights reserved </div>
-          <div className="text-slate-500 text-sm mb-2 text-center mt-0"> Powered by Linkify </div>
+          <div className="text-slate-500 text-sm mb-2 text-center mt-0"> Powered by {import.meta.env.VITE_APP_NAME} </div>
         </section>
       </section>
     </section>

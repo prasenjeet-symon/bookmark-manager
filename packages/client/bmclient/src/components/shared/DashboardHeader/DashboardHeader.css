@@ -1,8 +1,12 @@
+.desktop-header {
+  display: block;
+}
+
 .user-profile {
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  position: relative;;
+  position: relative;
 }
 
 .user-profile img {
@@ -45,4 +49,10 @@
   cursor: pointer;
   padding: 10px;
   border-radius: 5px;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-header {
+    display: none !important;
+  }
 }

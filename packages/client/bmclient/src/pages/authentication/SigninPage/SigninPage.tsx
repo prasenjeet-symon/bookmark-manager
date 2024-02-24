@@ -10,6 +10,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
+import Logo from '../../../assets/LinKet.png';
 
 const formSchemaSignin = z.object({
   email: z.string().email(),
@@ -63,11 +64,11 @@ export default function SigninPage() {
       {/* Signin Page */}
 
       <section>
-        <Card className="w-1/3 m-auto mt-10">
+        <Card className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/3 mx-auto mt-14">
           <CardHeader>
             <div className="flex flex-row align-center justify-center">
               {/* left logo and right text */}
-              <img className="w-10 h-10 mr-5" src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Logo" />
+              <img className="w-10 h-10 mr-5 rounded-2xl" src={Logo} alt="Logo" />
               <h1 className="text-2xl font-bold mb-5 text-center">Signin Now </h1>
             </div>
           </CardHeader>

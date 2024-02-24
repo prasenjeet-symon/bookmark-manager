@@ -5,11 +5,13 @@ import { Card } from "@/components/ui/card";
 import scriptImage from "../../../assets/document.png";
 import "./InstallScriptPage.css";
 import script from "./script";
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 
 export default function InstallScriptPage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
       <section className="install-script-page-style page-content">
         <BackButtonComponent />
         <Card>
@@ -32,7 +34,7 @@ export default function InstallScriptPage() {
 
           {/* Button */}
           <Button className="mt-5">
-            <a href={script(import.meta.env.VITE_BASE_URL + "/dashboard/add-bookmark")}>Add to Linkify</a>
+            <a href={script(import.meta.env.VITE_BASE_URL + "/dashboard/add-bookmark")}>Add to {import.meta.env.VITE_APP_NAME}</a>
           </Button>
         </Card>
       </section>

@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
+import Logo from '../../../assets/LinKet.png';
 
 const schema = z.object({
   email: z.string().email(),
@@ -43,12 +44,12 @@ export default function ForgotPasswordPage() {
       <Header />
       {/* Forgot Password Page */}
 
-      <section className="flex items-center justify-center mt-40">
-        <Card className="w-96">
+      <section className="flex items-center justify-center mt-14 sm:mt-40 lg:mt-40 xl:mt-40">
+        <Card className="w-full sm:w-full xl:w-1/3 lg:w/3">
           <CardHeader>
             <div className="flex flex-col items-center justify-center mb-2">
               {/* left logo and right text */}
-              <img className="w-16 h-16 mb-2" src="https://wiki.videolan.org/images/Firefox-logo.png" alt="Logo" />
+              <img className="w-16 h-16 mb-2 rounded-2xl" src={Logo} alt={import.meta.env.VITE_APP_NAME} />
               <h1 className="text-2xl font-bold text-center">Forgot Password</h1>
             </div>
           </CardHeader>

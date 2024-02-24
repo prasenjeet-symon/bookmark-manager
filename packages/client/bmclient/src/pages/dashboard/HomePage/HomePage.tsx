@@ -1,4 +1,5 @@
 import DashboardHeader from "@/components/shared/DashboardHeader/DashboardHeader";
+import HeaderMobileDashboard from "@/components/shared/MobileHeaderDashboardComponent/MobileHeaderDashboardComponent";
 import { useState } from "react";
 import SearchComponent from "./Components/SearchComponent/SearchComponent";
 import TabComponent from "./Components/TabComponent/TabComponent";
@@ -10,6 +11,7 @@ export default function DashboardHomePage() {
   return (
     <>
       <DashboardHeader />
+      <HeaderMobileDashboard />
       <section className="page-content">
         {canShowSearch ? <SearchComponent onClose={() => setCanShowSearch(false)} /> : null}
         {canShowSearch ? null : <TabComponent onSearchClick={() => setCanShowSearch(true)} />}

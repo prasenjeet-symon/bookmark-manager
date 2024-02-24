@@ -55,8 +55,8 @@ export default function SetNewPasswordPage() {
       <Header />
       {/* Set New Password Page */}
 
-      <section className="flex items-center justify-center h-auto mt-40">
-        <Card className="w-96">
+      <section className="flex items-center justify-center h-auto sm:mt-40 md:mt-40 lg:mt-40 xl:mt-40 mt-14">
+        <Card className="w-full mx-auto sm:w-3/4 lg:w-1/3 xl:w-1/3">
           <CardHeader>
             <div className="flex flex-col items-center justify-center mb-3">
               <h1 className="text-2xl font-bold text-center">Set New Password</h1>

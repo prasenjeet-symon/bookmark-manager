@@ -20,6 +20,7 @@ export default function SearchComponent({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     const subscription = new SearchComponentController().getSearchedLinks().subscribe((model) => {
+      console.log(model);
       setLinks(model);
     });
 
@@ -27,6 +28,7 @@ export default function SearchComponent({ onClose }: { onClose: () => void }) {
   }, []);
 
   const search = (value: string) => {
+    console.log(value);
     new SearchComponentController().search(value);
   };
 

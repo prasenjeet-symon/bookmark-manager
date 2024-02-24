@@ -4,3 +4,9 @@
   margin-top: 25px;
   margin-bottom: 150px;
 }
+
+@media screen and (max-width: 768px) {
+  .page-content {
+    width: 90%;
+  }
+}
