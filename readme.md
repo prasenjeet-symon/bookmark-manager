@@ -58,12 +58,7 @@
 #### Part 4: Setting up Client
 
 ### Step 1: Clone the Project
-   - Clone the project repository and switch to the `bmclient` branch.
-```bash
-git clone <repository_url>
-cd <project_folder>
-git checkout bmclient
-```
+   - Clone the project to your local machine. ( already done in the above steps skip this step)
 
 ### Step 2: Configure Environment Variables
    - Navigate to `packages\client\bmclient` directory in Command Prompt.
@@ -86,6 +81,6 @@ npm run dev
 ```
 
 ### Step 5: Check Your Client
-   - Your client is now live! Check the terminal for the link to access it. Open a web browser and navigate to the provided link to view your client application.
+   - Your client is now live! Check the terminal for the link to access it. Open a web browser and navigate to the provided link to view your client application. ( http://localhost:5173/ )
 
 By following these steps, you've successfully set up your local development environment and configured the client for your project.
