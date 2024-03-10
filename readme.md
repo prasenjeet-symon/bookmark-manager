@@ -84,3 +84,41 @@ npm run dev
    - Your client is now live! Check the terminal for the link to access it. Open a web browser and navigate to the provided link to view your client application. ( http://localhost:5173/ )
 
 By following these steps, you've successfully set up your local development environment and configured the client for your project.
+
+---
+
+## Setting Up Production-Ready Resend API Keys and Email Configuration
+
+### Step 1: Sign Up and Log In
+
+1. Go to [Resend](https://resend.com/) and sign up using your desired email ID and password. If you don't have an account, create a new one.
+
+### Step 2: Add Your Domain
+
+1. Once logged in, navigate to the "Domains" section in the dashboard.
+2. Click on the "Add Domain" button.
+3. A popup will appear; fill in your desired domain name (e.g., "example.com") and click "Add."
+
+### Step 3: Configure DNS Records
+
+1. After adding the domain, you'll see MX record details, TXT record details, and DKIM records.
+2. Access your domain provider's dashboard and locate the DNS record configuration page.
+3. Add all the DKIM, SPF, and DMARC records provided by Resend.
+4. Once added, return to the Resend dashboard and click "VERIFY DNS RECORDS" to ensure everything is correctly configured.
+
+### Step 4: Generate API Key
+
+1. In the Resend dashboard, go to the "API" menu.
+2. Click on "Create API key."
+3. A popup will appear; choose a name for your API key and click "Add."
+4. Once added, copy the API key generated.
+
+### Step 5: Update Environment Variables
+
+1. Open your server's ENV file.
+2. Add the copied API key to your ENV file.
+3. Ensure that the "RESEND_FROM" variable contains your domain instead of "resend." and "RESEND_API_KEY" variable contains your API key.
+
+### Step 6: Final Configuration
+
+By completing the above steps, you have successfully configured Resend API keys and email for your server. Now, your server is ready to send emails using Resend.
